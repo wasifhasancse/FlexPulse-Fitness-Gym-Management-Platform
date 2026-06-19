@@ -2,33 +2,37 @@
 import ButtonLoader from "@/components/Loader/ButtonLoader";
 import { authClient } from "@/lib/auth-client";
 import {
-  Description,
-  FieldError,
-  Form,
-  Input,
-  Label,
-  TextField,
-  toast,
+    Description,
+    FieldError,
+    Form,
+    Input,
+    Label,
+    TextField,
+    toast,
 } from "@heroui/react";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import Link from "next/link";
 import { redirect, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-import { FiUserPlus } from "react-icons/fi";
-import { RiLightbulbFlashFill } from "react-icons/ri";
+import { FiArrowRight, FiImage, FiLock, FiMail, FiUser } from "react-icons/fi";
+import { GiCentaurHeart } from "react-icons/gi";
 
 export default function SignUp() {
-   const searchParams = useSearchParams();
-    const redirectTo = searchParams.get("redirect") || "/";
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/";
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const featurePoints = [
+    "Personalized Training Plans",
+    "Progress Tracking Dashboard",
+    "Direct Trainer Messaging",
+  ];
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (event) => {
+    event.preventDefault();
     setIsSubmitting(true);
     try {
-      const formData = new FormData(e.target);
+      const formData = new FormData(event.target);
       const name = formData.get("name");
       const image = formData.get("image");
       const email = formData.get("email");
@@ -59,151 +63,99 @@ export default function SignUp() {
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
-    const { data, error } = await authClient.signIn.social({ provider: "google", callbackURL: redirectTo });
+    const { data, error } = await authClient.signIn.social({
+      provider: "google",
+      callbackURL: redirectTo,
+    });
+
     if (data) {
-        toast.success(
-          "Signing in with Google successful!",
-        );
-      }
-      if (error) {
-        toast.danger("Failed to create account. " + error.message);
-      }
+      toast.success("Signing in with Google successful!");
+    }
+    if (error) {
+      toast.danger("Failed to create account. " + error.message);
+    }
+    setIsGoogleLoading(false);
   };
 
   return (
     <section className="mx-auto w-full max-w-10/12 py-8 md:py-12 lg:py-14">
-      <div className="relative overflow-hidden rounded-3xl border border-[#5e41de]/20 bg-white/90 shadow-2xl shadow-[#5e41de]/15 dark:border-[#5e41de]/25 dark:bg-zinc-950/90 dark:shadow-[#5e41de]/20">
-        <div className="absolute inset-0 -z-10 bg-linear-to-br from-white via-[#5e41de]/5 to-[#a78bfa]/10 dark:from-zinc-950 dark:via-[#5e41de]/10 dark:to-[#a78bfa]/5" />
-        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#5e41de]/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-[#a78bfa]/10 blur-3xl" />
+      <div className="overflow-hidden rounded-[2rem] border border-[#30475E]/18 bg-[#111827] shadow-[0_28px_80px_-40px_rgba(0,0,0,0.7)]">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr]">
+          <div className="relative overflow-hidden bg-linear-to-br from-[#233b09] via-[#183507] to-[#102507] p-8 text-white md:p-10 lg:p-12">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(208,255,44,0.18),transparent_35%)]" />
+            <div className="relative flex h-full flex-col">
+              <div className="inline-flex items-center gap-4">
+                <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#D7FF32] text-[#222831] shadow-[0_16px_30px_-18px_rgba(215,255,50,0.9)]">
+                  <GiCentaurHeart size={26} />
+                </span>
+                <span className="text-3xl font-black tracking-tight text-white">
+                  Flex<span className="text-[#D7FF32]">Pulse</span>
+                </span>
+              </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.15fr]">
-          {/* Left Panel */}
-          <div className="relative border-b border-[#5e41de]/15 p-6 md:p-8 lg:border-b-0 lg:border-r lg:border-[#5e41de]/15 lg:p-10">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#5e41de]/25 bg-[#5e41de]/10 px-4 py-1.5 text-xs font-semibold text-[#5e41de] dark:border-[#5e41de]/30 dark:text-[#a78bfa]">
-              <RiLightbulbFlashFill className="animate-pulse" /> IdeaVault
-            </span>
-
-            <h1 className="mt-4 text-3xl font-extrabold leading-tight text-zinc-900 dark:text-zinc-50 md:text-4xl lg:text-5xl">
-              Join the{" "}
-              <span className="text-[#5e41de] dark:text-[#a78bfa]">
-                Innovation Hub
-              </span>
-            </h1>
-
-            <p className="mt-3 max-w-sm text-sm leading-relaxed text-zinc-500 dark:text-zinc-400 md:text-base">
-              Create your account and start sharing, discovering, and validating
-              startup ideas with a global community of innovators.
-            </p>
-
-            <div className="my-6 flex justify-center lg:my-8">
-              <DotLottieReact
-                src="https://lottie.host/cc3811b0-927e-4f53-9caf-05404b593f95/STwiLpOPG4.lottie"
-                loop
-                autoplay
-                style={{ width: "210px", height: "210px" }}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-[#5e41de]/20 bg-[#5e41de]/5 px-4 py-3 shadow-sm shadow-[#5e41de]/10 dark:bg-[#5e41de]/10">
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#5e41de] dark:text-[#a78bfa]">
-                  🚀 Share Ideas
-                </p>
-                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                  Pitch your startup concepts to the world
+              <div className="mt-12 max-w-lg">
+                <h1 className="text-4xl font-black leading-tight text-white md:text-5xl">
+                  Start your journey today
+                </h1>
+                <p className="mt-5 text-lg leading-8 text-zinc-300">
+                  Create your free account and unlock access to world-class
+                  workouts, nutrition guidance, and a thriving athlete
+                  community.
                 </p>
               </div>
-              <div className="rounded-2xl border border-[#5e41de]/20 bg-[#5e41de]/5 px-4 py-3 shadow-sm shadow-[#5e41de]/10 dark:bg-[#5e41de]/10">
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#5e41de] dark:text-[#a78bfa]">
-                  🌍 Global Reach
-                </p>
-                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                  Connect with founders and innovators worldwide
-                </p>
+
+              <div className="mt-10 space-y-4">
+                {featurePoints.map((item) => (
+                  <div
+                    key={item}
+                    className="rounded-2xl border border-[#D7FF32]/18 bg-[#D7FF32]/8 px-5 py-4 text-base font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+                  >
+                    {item}
+                  </div>
+                ))}
               </div>
-              <div className="rounded-2xl border border-[#5e41de]/20 bg-[#5e41de]/5 px-4 py-3 shadow-sm shadow-[#5e41de]/10 dark:bg-[#5e41de]/10 sm:col-span-2">
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#5e41de] dark:text-[#a78bfa]">
-                  🎯 Get Validated
-                </p>
-                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                  Receive votes, comments, and real feedback from the community
-                </p>
-              </div>
+
+              <p className="mt-auto pt-10 text-sm text-zinc-400">
+                © 2026 FlexPulse. All rights reserved.
+              </p>
             </div>
           </div>
 
-          {/* Right Panel */}
-          <div className="p-6 md:p-8 lg:p-10">
-            <div className="mb-6 flex items-start gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#5e41de]/10 shadow-sm shadow-[#5e41de]/20 dark:bg-[#5e41de]/20">
-                <RiLightbulbFlashFill className="h-6 w-6 text-[#5e41de] dark:text-[#a78bfa]" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-extrabold leading-tight text-zinc-900 dark:text-zinc-50 md:text-3xl">
-                  Create Account
-                </h2>
-                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                  Fill in your details to get started
-                </p>
-              </div>
-            </div>
-
-            <div className="signin-form w-full">
-              <Form className="flex w-full flex-col gap-4" onSubmit={onSubmit}>
-                <button
-                  type="button"
-                  onClick={handleGoogleSignIn}
-                  disabled={isGoogleLoading || isSubmitting}
-                  className="google-btn"
+          <div className="bg-[#151E2E] p-8 md:p-10 lg:p-12">
+            <div className="max-w-xl">
+              <h2 className="text-4xl font-black tracking-tight text-white">
+                Create account
+              </h2>
+              <p className="mt-3 text-lg text-zinc-400">
+                Already have an account?{" "}
+                <Link
+                  href="/signin"
+                  className="font-bold text-[#D7FF32] transition hover:text-white"
                 >
-                  {isGoogleLoading ? (
-                    <ButtonLoader text="Connecting..." />
-                  ) : (
-                    <>
-                      <FcGoogle className="google-icon" />
-                      <span className="google-label">Continue with Google</span>
-                    </>
-                  )}
-                </button>
+                  Sign in
+                </Link>
+              </p>
 
-                <div className="flex items-center gap-3">
-                  <div className="h-px w-full bg-[#5e41de]/15" />
-                  <span className="shrink-0 text-xs font-semibold uppercase tracking-widest text-zinc-400">
-                    or
-                  </span>
-                  <div className="h-px w-full bg-[#5e41de]/15" />
-                </div>
-
+              <Form
+                className="mt-10 flex w-full flex-col gap-5"
+                onSubmit={onSubmit}
+              >
                 <TextField
                   isRequired
                   name="name"
                   type="text"
                   className="w-full"
                 >
-                  <Label className="mb-1.5 block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                  <Label className="mb-2 block text-sm font-bold text-white">
                     Full Name
                   </Label>
-                  <Input
-                    placeholder="Enter your full name"
-                    className="w-full rounded-xl border border-[#5e41de]/20 bg-[#5e41de]/5 px-4 py-2.5 text-sm dark:border-[#5e41de]/25 dark:bg-[#5e41de]/10"
-                  />
-                  <FieldError className="mt-1 text-xs text-red-500" />
-                </TextField>
-
-                <TextField
-                  isRequired
-                  name="image"
-                  type="text"
-                  className="w-full"
-                >
-                  <Label className="mb-1.5 block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-                    Profile Image URL
-                  </Label>
-                  <Input
-                    placeholder="https://example.com/avatar.jpg"
-                    className="w-full rounded-xl border border-[#5e41de]/20 bg-[#5e41de]/5 px-4 py-2.5 text-sm dark:border-[#5e41de]/25 dark:bg-[#5e41de]/10"
-                  />
+                  <div className="relative">
+                    <FiUser className="pointer-events-none absolute left-4 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[#7E8AA3]" />
+                    <Input
+                      placeholder="Alex Johnson"
+                      className="w-full rounded-2xl border border-[#30475E]/45 bg-[#0E1420] px-4 py-3 pl-11 text-sm text-white dark:border-[#30475E]/45 dark:bg-[#0E1420]"
+                    />
+                  </div>
                   <FieldError className="mt-1 text-xs text-red-500" />
                 </TextField>
 
@@ -221,13 +173,33 @@ export default function SignUp() {
                     return null;
                   }}
                 >
-                  <Label className="mb-1.5 block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                  <Label className="mb-2 block text-sm font-bold text-white">
                     Email address
                   </Label>
-                  <Input
-                    placeholder="you@example.com"
-                    className="w-full rounded-xl border border-[#5e41de]/20 bg-[#5e41de]/5 px-4 py-2.5 text-sm dark:border-[#5e41de]/25 dark:bg-[#5e41de]/10"
-                  />
+                  <div className="relative">
+                    <FiMail className="pointer-events-none absolute left-4 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[#7E8AA3]" />
+                    <Input
+                      placeholder="you@example.com"
+                      className="w-full rounded-2xl border border-[#30475E]/45 bg-[#0E1420] px-4 py-3 pl-11 text-sm text-white dark:border-[#30475E]/45 dark:bg-[#0E1420]"
+                    />
+                  </div>
+                  <FieldError className="mt-1 text-xs text-red-500" />
+                </TextField>
+
+                <TextField name="image" type="text" className="w-full">
+                  <Label className="mb-2 block text-sm font-bold text-white">
+                    Profile Image{" "}
+                    <span className="font-normal text-zinc-400">
+                      (optional)
+                    </span>
+                  </Label>
+                  <div className="relative">
+                    <FiImage className="pointer-events-none absolute left-4 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[#7E8AA3]" />
+                    <Input
+                      placeholder="Click to upload an image"
+                      className="w-full rounded-2xl border border-dashed border-[#30475E]/45 bg-[#0E1420] px-4 py-3 pl-11 text-sm text-white dark:border-[#30475E]/45 dark:bg-[#0E1420]"
+                    />
+                  </div>
                   <FieldError className="mt-1 text-xs text-red-500" />
                 </TextField>
 
@@ -249,45 +221,76 @@ export default function SignUp() {
                     return null;
                   }}
                 >
-                  <Label className="mb-1.5 block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                  <Label className="mb-2 block text-sm font-bold text-white">
                     Password
                   </Label>
-                  <Input
-                    placeholder="Create a secure password"
-                    className="w-full rounded-xl border border-[#5e41de]/20 bg-[#5e41de]/5 px-4 py-2.5 text-sm dark:border-[#5e41de]/25 dark:bg-[#5e41de]/10"
-                  />
+                  <div className="relative">
+                    <FiLock className="pointer-events-none absolute left-4 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[#7E8AA3]" />
+                    <Input
+                      placeholder="••••••••"
+                      className="w-full rounded-2xl border border-[#30475E]/45 bg-[#0E1420] px-4 py-3 pl-11 text-sm text-white dark:border-[#30475E]/45 dark:bg-[#0E1420]"
+                    />
+                  </div>
                   <Description className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
                     Min. 6 characters with 1 uppercase, 1 lowercase and 1 number
                   </Description>
                   <FieldError className="mt-1 text-xs text-red-500" />
                 </TextField>
 
-                <div className="mt-1">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting || isGoogleLoading}
-                    className="submit-btn"
+                <button
+                  type="submit"
+                  disabled={isSubmitting || isGoogleLoading}
+                  className="mt-2 inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-[#D7FF32] px-5 py-4 text-lg font-black text-[#151E2E] transition hover:bg-[#e5ff6d] disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {isSubmitting ? (
+                    <ButtonLoader text="Creating account..." />
+                  ) : (
+                    <>
+                      <span>Create Account</span>
+                      <FiArrowRight className="h-5 w-5" />
+                    </>
+                  )}
+                </button>
+
+                <p className="pt-1 text-sm leading-7 text-zinc-400">
+                  By creating an account you agree to our{" "}
+                  <Link
+                    href="/terms-of-service"
+                    className="underline transition hover:text-white"
                   >
-                    {isSubmitting ? (
-                      <ButtonLoader text="Creating account..." />
-                    ) : (
-                      <>
-                        <FiUserPlus className="submit-icon" />
-                        <span className="submit-label">Join IdeaVault</span>
-                      </>
-                    )}
-                  </button>
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    href="/privacy-policy"
+                    className="underline transition hover:text-white"
+                  >
+                    Privacy Policy
+                  </Link>
+                  .
+                </p>
+
+                <div className="flex items-center gap-4 pt-1">
+                  <div className="h-px flex-1 bg-[#30475E]/50" />
+                  <span className="text-sm font-bold text-[#7E8AA3]">OR</span>
+                  <div className="h-px flex-1 bg-[#30475E]/50" />
                 </div>
 
-                <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
-                  Already an innovator?{" "}
-                  <Link
-                    href="/signin"
-                    className="font-bold text-[#5e41de] underline decoration-[#5e41de]/30 underline-offset-4 transition hover:text-[#4930b8] dark:text-[#a78bfa]"
-                  >
-                    Sign In
-                  </Link>
-                </p>
+                <button
+                  type="button"
+                  onClick={handleGoogleSignIn}
+                  disabled={isGoogleLoading || isSubmitting}
+                  className="inline-flex w-full items-center justify-center gap-3 rounded-2xl border border-[#30475E]/45 bg-[#0E1420] px-5 py-4 text-base font-bold text-white transition hover:border-[#D7FF32]/35 hover:text-[#D7FF32] disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {isGoogleLoading ? (
+                    <ButtonLoader text="Connecting..." />
+                  ) : (
+                    <>
+                      <FcGoogle className="h-6 w-6" />
+                      <span>Continue with Google</span>
+                    </>
+                  )}
+                </button>
               </Form>
             </div>
           </div>

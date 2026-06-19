@@ -1,7 +1,7 @@
 export const metadata = {
-  title: "Sign In",
+  title: "Sign In | FlexPulse",
   description:
-    "Sign in to your IdeaVault account to manage your ideas and interactions.",
+    "Sign in to your FlexPulse account to access workouts, classes, and your training dashboard.",
 };
 
 export default function SignInLayout({ children }) {

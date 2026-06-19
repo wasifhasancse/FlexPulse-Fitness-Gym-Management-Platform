@@ -1,7 +1,7 @@
 export const metadata = {
-  title: "Sign Up",
+  title: "Sign Up | FlexPulse",
   description:
-    "Create a free IdeaVault account and start sharing your startup ideas with the world.",
+    "Create your free FlexPulse account and start your training journey with workouts, coaching, and community.",
 };
 
 export default function SignUpLayout({ children }) {
