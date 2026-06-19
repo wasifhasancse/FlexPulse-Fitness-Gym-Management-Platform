@@ -49,7 +49,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-[#4382DF]/20 bg-white/95 dark:border-[#4647AE]/25 dark:bg-[#112E81]/90 backdrop-blur-xl">
+    <nav className="sticky top-0 z-50 w-full border-b border-[#30475E]/12 bg-[#DDDDDD]/90 dark:border-white/10 dark:bg-[#222831]/92 backdrop-blur-xl">
       <div className="mx-auto flex h-20 w-full max-w-[min(92%,1280px)] items-center justify-between gap-3">
         <div className="flex items-center gap-2 md:gap-3">
           <Hamburger
@@ -72,7 +72,7 @@ const Navbar = () => {
           <DarkModeSwitch />
 
           {isPending ? (
-            <div className="h-9 w-9 animate-spin rounded-full border-2 border-[#4382DF]/25 border-t-[#4382DF] dark:border-[#AACCD6]/25 dark:border-t-[#AACCD6]" />
+            <div className="h-9 w-9 animate-spin rounded-full border-2 border-[#30475E]/20 border-t-[#F05454] dark:border-[#DDDDDD]/15 dark:border-t-[#F05454]" />
           ) : isLoggedIn ? (
             <>
               <button
@@ -89,14 +89,14 @@ const Navbar = () => {
             <div className="hidden items-center gap-2 md:flex">
               <Link
                 href="/signin"
-                className="inline-flex items-center gap-2 rounded-xl border border-[#4382DF]/40 bg-[#4382DF]/8 dark:border-[#4647AE]/50 dark:bg-[#4647AE]/15 px-4 py-2.5 text-sm font-semibold text-[#112E81] dark:text-[#AACCD6] transition hover:border-[#4382DF]/60 dark:hover:border-[#AACCD6]/60"
+                className="inline-flex items-center gap-2 rounded-xl border border-[#30475E]/15 bg-white/70 px-4 py-2.5 text-sm font-semibold text-[#30475E] transition hover:-translate-y-0.5 hover:border-[#F05454]/35 hover:text-[#F05454] dark:border-white/10 dark:bg-[#30475E]/35 dark:text-[#DDDDDD] dark:hover:border-[#F05454]/35 dark:hover:text-[#F05454]"
               >
                 <FiLogIn className="h-4 w-4" />
                 Login
               </Link>
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-2 rounded-xl bg-[#4382DF] dark:bg-[#AACCD6] px-4 py-2.5 text-sm font-bold text-white dark:text-[#112E81] shadow-[0_10px_28px_-10px_rgba(67,130,223,.85)] dark:shadow-none transition hover:bg-[#4647AE] dark:hover:bg-white"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#F05454] px-4 py-2.5 text-sm font-bold text-white shadow-[0_12px_30px_-14px_rgba(240,84,84,.85)] transition hover:-translate-y-0.5 hover:bg-[#222831] dark:hover:bg-[#30475E]"
               >
                 <FiUserPlus className="h-4 w-4" />
                 Register

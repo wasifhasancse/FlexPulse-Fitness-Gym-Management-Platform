@@ -76,13 +76,18 @@ const StyledWrapper = styled.div`
     place-items: center;
     cursor: pointer;
     line-height: 1;
-    border: 1px solid rgba(67, 130, 223, 0.3);
-    background: rgba(67, 130, 223, 0.08);
+    border: 1px solid rgba(48, 71, 94, 0.16);
+    background: rgba(255, 255, 255, 0.7);
     transition: border-color 0.2s ease;
   }
 
   .toggle:hover {
-    border-color: rgba(67, 130, 223, 0.6);
+    border-color: rgba(240, 84, 84, 0.4);
+  }
+
+  html.dark & .toggle {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(48, 71, 94, 0.35);
   }
 
   .input {
@@ -98,12 +103,12 @@ const StyledWrapper = styled.div`
 
   .icon--moon {
     transition-delay: 200ms;
-    color: #4382df;
+    color: #30475e;
   }
 
   .icon--sun {
     transform: scale(0);
-    color: #fcd34d;
+    color: #f05454;
   }
 
   #switch:checked + .icon--moon {

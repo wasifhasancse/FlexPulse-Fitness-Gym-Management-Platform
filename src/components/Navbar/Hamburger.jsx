@@ -24,7 +24,7 @@ const Hamburger = ({ navLinks, isAuthenticated, onLogout }) => {
     <div className="relative lg:hidden" ref={ref}>
       <button
         type="button"
-        className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#4382DF]/30 bg-[#4382DF]/10 text-[#112E81] dark:border-[#4647AE]/40 dark:bg-[#4647AE]/15 dark:text-[#AACCD6] transition hover:border-[#4382DF]/60 dark:hover:border-[#AACCD6]/60"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#30475E]/15 bg-white/70 text-[#222831] transition hover:-translate-y-0.5 hover:border-[#F05454]/35 hover:text-[#F05454] dark:border-white/10 dark:bg-[#30475E]/35 dark:text-[#DDDDDD] dark:hover:border-[#F05454]/35 dark:hover:text-[#F05454]"
         aria-label="Toggle navigation menu"
         onClick={() => setMenuOpen((prev) => !prev)}
       >
@@ -43,7 +43,7 @@ const Hamburger = ({ navLinks, isAuthenticated, onLogout }) => {
       </button>
 
       <div
-        className={`absolute left-0 top-15 min-w-72 overflow-hidden rounded-2xl border border-[#4382DF]/25 bg-white/90 dark:border-[#4647AE]/30 dark:bg-[#112E81]/95 p-2 text-[#112E81] dark:text-zinc-100 shadow-2xl shadow-[#4382DF]/20 dark:shadow-[#000814]/55 backdrop-blur-md transition-all duration-200 ${
+        className={`absolute left-0 top-15 min-w-72 overflow-hidden rounded-2xl border border-[#30475E]/12 bg-[#DDDDDD]/95 p-2 text-[#222831] shadow-2xl shadow-[#222831]/10 backdrop-blur-md transition-all duration-200 dark:border-white/10 dark:bg-[#222831]/96 dark:text-zinc-100 dark:shadow-black/45 ${
           menuOpen
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none -translate-y-2 opacity-0"
@@ -55,10 +55,10 @@ const Hamburger = ({ navLinks, isAuthenticated, onLogout }) => {
             <Link
               key={index}
               href={item.href}
-              className={`inline-flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
+              className={`inline-flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
                 pathname === item.href
-                  ? "bg-[#4382DF] text-white dark:bg-[#AACCD6] dark:text-[#112E81]"
-                  : "text-[#112E81] dark:text-zinc-200 hover:bg-[#4382DF]/10 dark:hover:bg-white/8"
+                  ? "bg-[#F05454] text-white"
+                  : "text-[#30475E] hover:translate-x-1 hover:bg-white/70 hover:text-[#F05454] dark:text-zinc-200 dark:hover:bg-white/5 dark:hover:text-[#F05454]"
               }`}
               onClick={() => setMenuOpen(false)}
               role="menuitem"
@@ -68,7 +68,7 @@ const Hamburger = ({ navLinks, isAuthenticated, onLogout }) => {
             </Link>
           ))}
 
-          <div className="my-1 h-px bg-[#4382DF]/20 dark:bg-white/10" />
+          <div className="my-1 h-px bg-[#30475E]/10 dark:bg-white/10" />
 
           {isAuthenticated ? (
             <button
@@ -87,7 +87,7 @@ const Hamburger = ({ navLinks, isAuthenticated, onLogout }) => {
             <div className="grid grid-cols-2 gap-2">
               <Link
                 href="/signin"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#4382DF]/40 bg-[#4382DF]/8 dark:border-[#4647AE]/50 dark:bg-[#4647AE]/15 px-3 py-2.5 text-sm font-semibold text-[#112E81] dark:text-[#AACCD6] transition hover:border-[#4382DF]/60 dark:hover:border-[#AACCD6]/60"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#30475E]/15 bg-white/70 px-3 py-2.5 text-sm font-semibold text-[#30475E] transition hover:border-[#F05454]/35 hover:text-[#F05454] dark:border-white/10 dark:bg-[#30475E]/35 dark:text-[#DDDDDD] dark:hover:border-[#F05454]/35 dark:hover:text-[#F05454]"
                 onClick={() => setMenuOpen(false)}
                 role="menuitem"
               >
@@ -96,7 +96,7 @@ const Hamburger = ({ navLinks, isAuthenticated, onLogout }) => {
               </Link>
               <Link
                 href="/signup"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#4382DF] dark:bg-[#AACCD6] px-3 py-2.5 text-sm font-bold text-white dark:text-[#112E81] transition hover:bg-[#4647AE] dark:hover:bg-white"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#F05454] px-3 py-2.5 text-sm font-bold text-white transition hover:bg-[#222831] dark:hover:bg-[#30475E]"
                 onClick={() => setMenuOpen(false)}
                 role="menuitem"
               >

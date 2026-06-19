@@ -11,19 +11,20 @@ const NavLink = ({ navItems, onClick }) => {
       <Link
         href={navItems.href}
         onClick={onClick}
-        className={`group relative inline-flex items-center gap-2 px-3 py-2 text-base font-semibold transition-colors duration-200 ${
+        className={`group inline-flex items-center gap-2 px-2 py-2 text-sm font-semibold transition-all duration-200 ${
           isActive
-            ? "text-[#4382DF] dark:text-[#AACCD6]"
-            : "text-[#112E81] dark:text-zinc-300 hover:text-[#4382DF] dark:hover:text-[#AACCD6]"
+            ? "translate-x-1 text-[#F05454]"
+            : "text-[#30475E] hover:translate-x-1 hover:text-[#F05454] dark:text-zinc-400 dark:hover:text-[#F05454]"
         }`}
       >
-        {navItems.icon ? <navItems.icon className="h-4 w-4" /> : null}
-        <span>{navItems.label}</span>
         <span
-          className={`absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-[#4382DF] dark:bg-[#AACCD6] transition-transform duration-200 ${
-            isActive ? "scale-100" : "scale-0 group-hover:scale-100"
+          className={`h-1 w-1 shrink-0 rounded-full transition-all duration-200 ${
+            isActive
+              ? "w-2 bg-[#F05454]"
+              : "bg-[#F05454]/40 group-hover:w-2 group-hover:bg-[#F05454]"
           }`}
         />
+        <span>{navItems.label}</span>
       </Link>
     </li>
   );

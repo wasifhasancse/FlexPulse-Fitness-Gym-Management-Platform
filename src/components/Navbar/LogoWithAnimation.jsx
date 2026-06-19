@@ -1,6 +1,6 @@
 "use client";
 
-import { FaDumbbell } from "react-icons/fa";
+import { GiCentaurHeart } from "react-icons/gi";
 import styled from "styled-components";
 
 const LogoWithAnimation = () => {
@@ -8,7 +8,7 @@ const LogoWithAnimation = () => {
     <StyledWrapper>
       <span className="brand-wrap" aria-label="FlexPulse">
         <span className="brand-icon" aria-hidden="true">
-          <FaDumbbell size={20} />
+          <GiCentaurHeart size={20} />
         </span>
         <span className="brand-text">
           Flex<span className="brand-accent">Pulse</span>
@@ -35,13 +35,13 @@ const StyledWrapper = styled.div`
     height: 2.5rem;
     border-radius: 0.85rem;
     color: white;
-    background: linear-gradient(135deg, #4382df 0%, #4647ae 100%);
-    box-shadow: 0 8px 24px rgba(67, 130, 223, 0.4);
+    background: linear-gradient(135deg, #222831 0%, #30475e 100%);
+    box-shadow: 0 8px 24px rgba(34, 40, 49, 0.22);
     transition: all 0.3s ease;
   }
 
   .brand-text {
-    color: #112e81;
+    color: #222831;
     font-weight: 800;
     font-size: 1.65rem;
     line-height: 1;
@@ -54,12 +54,12 @@ const StyledWrapper = styled.div`
   }
 
   .brand-accent {
-    color: #4382df;
+    color: #f05454;
     transition: color 0.3s ease;
   }
 
   html.dark & .brand-accent {
-    color: #aaccd6;
+    color: #f05454;
   }
 
   .brand-wrap::after {
@@ -72,7 +72,7 @@ const StyledWrapper = styled.div`
     border-radius: 9999px;
     background: radial-gradient(
       circle at center,
-      rgba(67, 130, 223, 0.5),
+      rgba(240, 84, 84, 0.28),
       transparent 72%
     );
     filter: blur(5px);
@@ -82,7 +82,7 @@ const StyledWrapper = styled.div`
 
   .brand-wrap:hover .brand-icon {
     transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 12px 32px rgba(67, 130, 223, 0.5);
+    box-shadow: 0 12px 32px rgba(240, 84, 84, 0.24);
   }
 
   .brand-wrap:hover::after {
