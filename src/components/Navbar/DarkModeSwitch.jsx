@@ -69,13 +69,20 @@ const DarkModeSwitch = () => {
 
 const StyledWrapper = styled.div`
   .toggle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     display: grid;
     place-items: center;
     cursor: pointer;
     line-height: 1;
+    border: 1px solid rgba(67, 130, 223, 0.3);
+    background: rgba(67, 130, 223, 0.08);
+    transition: border-color 0.2s ease;
+  }
+
+  .toggle:hover {
+    border-color: rgba(67, 130, 223, 0.6);
   }
 
   .input {
@@ -91,12 +98,12 @@ const StyledWrapper = styled.div`
 
   .icon--moon {
     transition-delay: 200ms;
-    color: #5e41de;
+    color: #4382df;
   }
 
   .icon--sun {
     transform: scale(0);
-    color: #f59e0b;
+    color: #fcd34d;
   }
 
   #switch:checked + .icon--moon {
