@@ -43,7 +43,7 @@ const Hamburger = ({ navLinks, isAuthenticated, onLogout }) => {
       </button>
 
       <div
-        className={`absolute right-0 top-13 min-w-72 overflow-hidden rounded-2xl border border-[#4382DF]/25 bg-white/90 dark:border-[#4647AE]/30 dark:bg-[#112E81]/95 p-2 text-[#112E81] dark:text-zinc-100 shadow-2xl shadow-[#4382DF]/20 dark:shadow-[#000814]/55 backdrop-blur-md transition-all duration-200 ${
+        className={`absolute left-0 top-15 min-w-72 overflow-hidden rounded-2xl border border-[#4382DF]/25 bg-white/90 dark:border-[#4647AE]/30 dark:bg-[#112E81]/95 p-2 text-[#112E81] dark:text-zinc-100 shadow-2xl shadow-[#4382DF]/20 dark:shadow-[#000814]/55 backdrop-blur-md transition-all duration-200 ${
           menuOpen
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none -translate-y-2 opacity-0"
