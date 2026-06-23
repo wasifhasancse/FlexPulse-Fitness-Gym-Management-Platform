@@ -14,7 +14,7 @@ const DarkModeSwitch = () => {
     const isDark = stored === "dark" || (!stored && prefersDark);
     if (isDark) {
       document.documentElement.classList.add("dark");
-      checkboxRef.current.checked = true;
+      if (checkboxRef.current) checkboxRef.current.checked = true;
     }
   }, []);
 
@@ -69,25 +69,13 @@ const DarkModeSwitch = () => {
 
 const StyledWrapper = styled.div`
   .toggle {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     display: grid;
     place-items: center;
     cursor: pointer;
     line-height: 1;
-    border: 1px solid rgba(48, 71, 94, 0.16);
-    background: rgba(255, 255, 255, 0.7);
-    transition: border-color 0.2s ease;
-  }
-
-  .toggle:hover {
-    border-color: rgba(240, 84, 84, 0.4);
-  }
-
-  html.dark & .toggle {
-    border-color: rgba(255, 255, 255, 0.1);
-    background: rgba(48, 71, 94, 0.35);
   }
 
   .input {
@@ -103,12 +91,12 @@ const StyledWrapper = styled.div`
 
   .icon--moon {
     transition-delay: 200ms;
-    color: #30475e;
+    color: #5e41de;
   }
 
   .icon--sun {
     transform: scale(0);
-    color: #f05454;
+    color: #f59e0b;
   }
 
   #switch:checked + .icon--moon {

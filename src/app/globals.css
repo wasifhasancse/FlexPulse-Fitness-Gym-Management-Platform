@@ -1,32 +1,75 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 
+@theme {
+  --color-brand-900: var(--brand-900);
+  --color-brand-800: var(--brand-800);
+  --color-brand-500: var(--brand-500);
+  --color-brand-300: var(--brand-300);
+
+  --color-background: var(--bg-color);
+  --color-foreground: var(--text-color);
+
+  --color-primary: var(--primary-color);
+  --color-primary-foreground: var(--primary-fg);
+
+  --color-secondary: var(--secondary-color);
+  --color-secondary-foreground: var(--secondary-fg);
+
+  --color-accent: var(--accent-color);
+  --color-accent-foreground: var(--accent-fg);
+
+  --color-active: var(--active-color);
+  --color-btn-bg: var(--btn-bg);
+  --color-btn-text: var(--btn-text);
+}
+
 :root {
-  --fp-bg: #dddddd;
-  --fp-surface: #ffffff;
-  --fp-text: #222831;
-  --fp-muted: #30475e;
-  --fp-accent: #f05454;
+  /* Light mode theme colors */
+  --bg-color: #ffffff;
+  --text-color: #070F2B;
+
+  --primary-color: #9FA1FF;
+  --primary-fg: #ffffff;
+  --secondary-color: #535C91;
+  --secondary-fg: #ffffff;
+  --accent-color: #9FA1FF;
+  --accent-fg: #070F2B;
+  --active-color: #535C91;
+  --btn-bg: #535C91;
+  --btn-text: #ffffff;
+
+  /* Brand color scales for light mode */
+  --brand-900: #ffffff;
+  --brand-800: #9FA1FF;
+  --brand-500: #535C91;
+  --brand-300: #070F2B;
 }
 
-html.dark {
-  --fp-bg: #222831;
-  --fp-surface: #30475e;
-  --fp-text: #f3f4f6;
-  --fp-muted: #dddddd;
-  --fp-accent: #f05454;
-}
+.dark {
+  /* Dark mode theme colors - using ONLY the 4 requested colors */
+  --bg-color: #070F2B;
+  --text-color: #9FA1FF;
 
-html {
-  background-color: var(--fp-bg);
+  --primary-color: #1B1A55;
+  --primary-fg: #9FA1FF;
+  --secondary-color: #535C91;
+  --secondary-fg: #070F2B;
+  --accent-color: #9FA1FF;
+  --accent-fg: #070F2B;
+  --active-color: #9FA1FF;
+  --btn-bg: #9FA1FF;
+  --btn-text: #070F2B;
+
+  /* Brand color scales for dark mode */
+  --brand-900: #070F2B;
+  --brand-800: #1B1A55;
+  --brand-500: #535C91;
+  --brand-300: #9FA1FF;
 }
 
 body {
-  background-color: var(--fp-bg);
-  color: var(--fp-text);
-}
-
-::selection {
-  background-color: rgba(240, 84, 84, 0.2);
-  color: var(--fp-text);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
