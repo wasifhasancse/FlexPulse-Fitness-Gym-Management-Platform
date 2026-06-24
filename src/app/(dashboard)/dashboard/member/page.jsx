@@ -49,7 +49,19 @@ export default function MemberDashboard() {
     fetchBookings();
   }, [user?.id, setBookings]);
 
-  
+  //total favorite
+  useEffect(() => {
+    if (!user?.id) return;
+    const favorites = async () => {
+      try {
+        const result = await getFavoriteClass(user?.id);
+        setFavorites(result);
+      } catch {
+        setError(err.message || "Failed to load favorite");
+      }
+    };
+    favorites();
+  }, [user?.id, setFavorites]);
 
   // Determine status badge color
   const getStatusColor = (status = "") => {
