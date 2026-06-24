@@ -1,0 +1,42 @@
+import ClassDetails from "@/components/ClassDetails";
+import { getclassesById } from "@/lib/api/allClass";
+import { getUserSession } from "@/lib/core/session";
+
+const ClassDetailsPage = async ({ params }) => {
+  const { id } = await params;
+  const classDetails = await getclassesById(id);
+  const user = await getUserSession();
+
+  let isBooked = false;
+  let isFavorite = false;
+
+  if (user?.id) {
+    //booking check
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/checkBooking?userId=${user.id}&classId=${id}`,
+    );
+    const data = await res.json();
+    isBooked = data.isBooked;
+
+    //favorite check
+    const favRes = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/favorites/check?userId=${user.id}&classId=${id}`,
+    );
+    const favData = await favRes.json();
+    isFavorite = favData.isFavorite;
+  }
+  return (
+    <div>
+      <ClassDetails
+        classData={classDetails}
+        isBooked={isBooked}
+        isFavorite={isFavorite}
+        userId={user?.id}
+        userName={user?.name}
+        userEmail={user?.email}
+      ></ClassDetails>
+    </div>
+  );
+};
+
+export default ClassDetailsPage;
