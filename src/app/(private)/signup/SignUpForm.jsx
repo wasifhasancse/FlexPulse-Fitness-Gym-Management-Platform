@@ -17,6 +17,8 @@ import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "@heroui/react";
 import Image from "next/image";
+import { IoEye } from "react-icons/io5";
+import { IoMdEyeOff } from "react-icons/io";
 
 export const dynamic = "force-dynamic";
 
@@ -113,7 +115,7 @@ const SignUpForm = () => {
           <div className="lg:hidden text-center mb-8">
             <Link href="/" className="inline-flex flex-col items-center">
               <div className="w-12 h-12 bg-[#CFFF04] rounded-md flex items-center justify-center mb-3 shadow-[0_0_15px_rgba(207,255,4,0.3)]">
-                <span className="text-brand-900 font-bold text-2xl">IP</span>
+                <span className="text-brand-900 font-bold text-2xl">FP</span>
               </div>
               <h1 className="font-['Inter'] text-3xl font-black text-foreground tracking-tight">
                 FlexPulse
@@ -268,7 +270,7 @@ const SignUpForm = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center text-brand-500 hover:text-[#CFFF04] text-xs font-bold uppercase tracking-wider font-['Inter']"
                 >
-                  {showPassword ? "Hide" : "Show"}
+                  {showPassword ? <IoMdEyeOff /> : <IoEye />}
                 </button>
               </div>
 
@@ -317,7 +319,7 @@ const SignUpForm = () => {
           {/* Footer note */}
           <div className="mt-8 text-center hidden lg:block">
             <p className="font-['Inter'] text-xs text-brand-500 font-medium">
-              © 2026 IRONPULSE FITNESS.
+              FlexPulse &copy; {new Date().getFullYear()}. All rights reserved.
             </p>
           </div>
         </motion.div>
