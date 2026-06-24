@@ -1,4 +1,4 @@
-import FavoriteCard from "@/components/dashboard/member/FavoriteCard";
+import FavoriteCard from "@/components/Dashboard/member/FavoriteCard";
 import { getFavoriteClass } from "@/lib/api/favoriteClass";
 import { getUserSession } from "@/lib/core/session";
 
@@ -10,7 +10,7 @@ export default async function FavoritesPage() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {favorites.map((fav) => (
-        <FavoriteCard key={fav._id} fav={fav} userId={user.id}></FavoriteCard>
+        <FavoriteCard key={fav._id} fav={fav} userId={user.id} />
       ))}
     </div>
   );
