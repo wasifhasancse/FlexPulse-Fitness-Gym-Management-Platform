@@ -9,6 +9,8 @@ import { authClient } from "@/lib/auth-client";
 import { toast } from "@heroui/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
+import { IoEye } from "react-icons/io5";
+import { IoMdEyeOff } from "react-icons/io";
 
 export const dynamic = "force-dynamic";
 
@@ -64,16 +66,16 @@ const SignInForm = () => {
           <Link href="/" className="inline-block">
             <h1 className="font-['Inter'] text-3xl font-black text-foreground tracking-tight flex items-center gap-2">
               <div className="w-8 h-8 bg-[#CFFF04] rounded-sm flex items-center justify-center">
-                <span className="text-brand-900 font-bold text-lg">IP</span>
+                <span className="text-brand-900 font-bold text-lg">FP</span>
               </div>
-              IRONPULSE
+              FlexPulse
             </h1>
           </Link>
         </div>
 
         <div className="relative z-20 mb-12">
           <h2 className="font-['Inter'] text-5xl font-extrabold text-white mb-6 leading-tight">
-            Welcome back to the <br/> <span className="text-[#CFFF04]">grind.</span>
+            Welcome back to the <br/> <span className="text-[#CFFF04]">FlexPulse.</span>
           </h2>
           <p className="font-['Inter'] text-lg text-brand-300 max-w-md">
             Log in to access your personalized workout plans, track your progress, and book your next premium session.
@@ -98,10 +100,10 @@ const SignInForm = () => {
           <div className="lg:hidden text-center mb-10">
             <Link href="/" className="inline-flex flex-col items-center">
               <div className="w-12 h-12 bg-[#CFFF04] rounded-md flex items-center justify-center mb-3 shadow-[0_0_15px_rgba(207,255,4,0.3)]">
-                <span className="text-brand-900 font-bold text-2xl">IP</span>
+                <span className="text-brand-900 font-bold text-2xl">FP</span>
               </div>
               <h1 className="font-['Inter'] text-3xl font-black text-foreground tracking-tight">
-                IRONPULSE
+                FlexPulse
               </h1>
             </Link>
           </div>
@@ -193,7 +195,7 @@ const SignInForm = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center text-brand-500 hover:text-[#CFFF04] font-['Inter'] text-xs font-bold uppercase tracking-wider"
                 >
-                  {showPassword ? "Hide" : "Show"}
+                  {showPassword ? <IoMdEyeOff /> : <IoEye />}
                 </button>
               </div>
             </div>
@@ -221,7 +223,7 @@ const SignInForm = () => {
           {/* Footer note */}
           <div className="mt-12 text-center">
             <p className="font-['Inter'] text-xs text-brand-500 font-medium">
-              © 2026 IRONPULSE FITNESS. ALL RIGHTS RESERVED.
+             FlexPulse &copy; {new Date().getFullYear()}. All rights reserved.
             </p>
           </div>
         </motion.div>
