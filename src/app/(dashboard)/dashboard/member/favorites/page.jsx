@@ -1,6 +1,6 @@
 import FavoriteCard from "@/components/Dashboard/member/FavoriteCard";
 import { getFavoriteClass } from "@/lib/api/favoriteClass";
-import { getUserSession } from "@/lib/core/session";
+import { getUserSession } from "@/lib/core/getSession";
 
 export default async function FavoritesPage() {
   const user = await getUserSession();
