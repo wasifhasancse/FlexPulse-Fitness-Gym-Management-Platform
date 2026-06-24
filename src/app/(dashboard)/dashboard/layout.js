@@ -1,7 +1,8 @@
 "use client";
+import DashboardNavBar from "@/components/Dashboard/DashboardNavBar";
 import DashboardSideBar from "@/components/Dashboard/DashboardSideBar";
 import { authClient } from "@/lib/auth-client";
-import React, { useState } from "react";
+import { useState } from "react";
 
 const DashboardLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -14,10 +15,10 @@ const DashboardLayout = ({ children }) => {
         onClose={() => setSidebarOpen(false)}
       />
       <div className="flex-1 min-w-0">
-        <DashboardNavbar
+        <DashboardNavBar
           user={user}
           onMenuToggle={() => setSidebarOpen(true)}
-        ></DashboardNavbar>
+        />
         <main className="p-4 md:p-6">{children}</main>
       </div>
     </div>
