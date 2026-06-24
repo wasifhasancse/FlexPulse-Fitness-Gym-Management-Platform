@@ -1,5 +1,5 @@
-import ClassCard from "@/components/Home/ClassCard";
-import SearchingClasses from "@/components/Home/SearchingClasses";
+import ClassCard from "@/components/AllClasses/ClassCard";
+import SearchingClasses from "@/components/AllClasses/SearchingClasses";
 import { getclasses } from "@/lib/api/getClasses";
 
 export default async function AllClassesPage({ searchParams }) {
