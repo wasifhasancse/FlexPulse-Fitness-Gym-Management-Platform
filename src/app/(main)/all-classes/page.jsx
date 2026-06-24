@@ -1,5 +1,5 @@
 import ClassCard from "@/components/Home/ClassCard";
-import SearchClasses from "@/components/SearchClasses";
+import SearchingClasses from "@/components/Home/SearchingClasses";
 import { getclasses } from "@/lib/api/allClass";
 
 export default async function AllClassesPage({ searchParams }) {
@@ -31,7 +31,7 @@ export default async function AllClassesPage({ searchParams }) {
         </div>
 
         {/* Search & Filter Component */}
-        <SearchClasses totalClasses={classesData.length} />
+        <SearchingClasses totalClasses={classesData.length} />
 
         {/* Grid of class cards or Empty State */}
         {classesData.length === 0 ? (
