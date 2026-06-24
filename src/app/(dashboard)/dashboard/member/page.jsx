@@ -12,6 +12,9 @@ import {
 } from "react-icons/fa";
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
+import { getTrainerApplication } from "@/lib/api/getTrainerApplication";
+import { getMyBookings } from "@/lib/api/myBookingClass";
+import { getFavoriteClass } from "@/lib/api/favoriteClass";
 
 export default function MemberDashboard() {
   const [bookings, setBookings = {}] = useState([]);
@@ -21,6 +24,14 @@ export default function MemberDashboard() {
   const user = data?.user;
   const [application, setApplication] = useState([]);
   const { status, feedback } = ({} = application);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user?.id) return;
+      const application = await getTrainerApplication(user.id);
+      setApplication(application);
+    };
+    fetchData();
+  }, [user?.id]);
 
 
   // Determine status badge color
