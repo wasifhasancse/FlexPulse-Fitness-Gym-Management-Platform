@@ -1,24 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import Image from "next/image";
+import { DeleteClassModal } from "@/components/dashboard/trainer/DeleteClassModal";
+import EditModal from "@/components/dashboard/trainer/EditModal";
+import { getMyclasses } from "@/lib/api/getClasses";
+import { authClient } from "@/lib/auth-client";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
-  FaPlus,
-  FaEye,
-  FaEdit,
-  FaTrash,
-  FaUsers,
-  FaSpinner,
   FaCalendarAlt,
   FaClock,
+  FaEye,
+  FaPlus,
+  FaSpinner,
+  FaUsers
 } from "react-icons/fa";
 import { TfiMoney } from "react-icons/tfi";
-import { authClient } from "@/lib/auth-client";
-import { getMyclasses } from "@/lib/api/allClass";
-import EditModal from "@/components/dashboard/trainer/EditModal";
-import { DeleteClassModal } from "@/components/dashboard/trainer/DeleteClassModal";
 
 export default function MyClassesPage() {
   const { data: session } = authClient.useSession();

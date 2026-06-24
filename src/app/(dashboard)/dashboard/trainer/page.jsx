@@ -1,25 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { motion } from "framer-motion";
-import {
-  FaChalkboardTeacher,
-  FaUsers,
-  FaComments,
-  FaPlus,
-  FaList,
-  FaEdit,
-  FaSpinner,
-  FaUser,
-  FaCalendarAlt,
-  FaClock,
-  FaDollarSign,
-} from "react-icons/fa";
-import { authClient } from "@/lib/auth-client";
-import { getMyclasses } from "@/lib/api/allClass";
 import { getMyForumPost } from "@/lib/api/forumPosts";
+import { getMyclasses } from "@/lib/api/getClasses";
+import { authClient } from "@/lib/auth-client";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import {
+  FaEdit,
+  FaList,
+  FaPlus,
+  FaSpinner,
+  FaUser
+} from "react-icons/fa";
 
 // Dummy API functions – replace with real calls
 const fetchTrainerStats = async (trainerId) => {
@@ -133,9 +127,7 @@ export default function TrainerDashboardPage() {
           <p className="font-['Inter'] text-3xl font-bold text-[#CCFF00]">
             {forunPosts.length}
           </p>
-          <p className="font-['Inter'] text-sm text-[#94A3B8]">
-            Forum Posts
-          </p>
+          <p className="font-['Inter'] text-sm text-[#94A3B8]">Forum Posts</p>
         </div>
       </div>
 
