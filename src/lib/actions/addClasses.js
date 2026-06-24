@@ -1,0 +1,11 @@
+"use server";
+
+import { serverMutation } from "../core/serverActions";
+
+export const CreateClasses = async (data) => {
+  return serverMutation("/api/add-class", data);
+};
+
+export const TrainerApplication = async (data) => {
+  return serverMutation("/api/trainerApplication", data);
+};
