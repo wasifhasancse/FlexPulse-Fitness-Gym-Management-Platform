@@ -212,16 +212,16 @@ export default function Navbar() {
             ) : (
               <>
                 <Link
-                  href="/auth/login"
+                  href="/signin"
                   className="font-['Inter'] text-sm font-medium text-foreground hover:text-brand-300 transition-colors"
                 >
-                  Login
+                  Sign In
                 </Link>
                 <Link
-                  href="/auth/register"
+                  href="/signup"
                   className="font-['Inter'] text-sm font-bold bg-btn-bg text-btn-text px-6 py-2 rounded-full border border-brand-500/20 hover:opacity-90 transition-all duration-300"
                 >
-                  Register
+                  Sign Up
                 </Link>
               </>
             )}
@@ -311,16 +311,16 @@ export default function Navbar() {
             ) : (
               <div className="flex flex-col space-y-2">
                 <Link
-                  href="/auth/login"
+                  href="/signin"
                   className="block font-['Inter'] text-sm font-medium py-2 px-3 rounded-lg text-foreground hover:bg-brand-500/20"
                 >
-                  Login
+                  Sign In
                 </Link>
                 <Link
-                  href="/auth/register"
+                  href="/signup"
                   className="block font-['Inter'] text-sm font-bold py-2 px-3 rounded-full bg-btn-bg text-btn-text text-center border border-brand-500/20"
                 >
-                  Register
+                  Sign Up
                 </Link>
               </div>
             )}
