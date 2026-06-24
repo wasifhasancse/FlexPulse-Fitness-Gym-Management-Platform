@@ -1,4 +1,4 @@
-import ClassCard from "@/components/ClassCard";
+import ClassCard from "@/components/Home/ClassCard";
 import SearchClasses from "@/components/SearchClasses";
 import { getclasses } from "@/lib/api/allClass";
 
@@ -6,7 +6,7 @@ export default async function AllClassesPage({ searchParams }) {
   const params = await searchParams;
   const search = (await params.search) || "";
   const category = (await params.category) || "";
-  const classes = await getclasses(search, category);
+  const classesData = await getclasses(search, category);
 
   return (
     <div className="min-h-screen bg-background py-16 px-6 sm:px-6 lg:px-8 transition-colors duration-300">
@@ -31,10 +31,10 @@ export default async function AllClassesPage({ searchParams }) {
         </div>
 
         {/* Search & Filter Component */}
-        <SearchClasses totalClasses={classes.length} />
+        <SearchClasses totalClasses={classesData.length} />
 
         {/* Grid of class cards or Empty State */}
-        {classes.length === 0 ? (
+        {classesData.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center bg-brand-900/10 dark:bg-[#1B1A55]/20 rounded-3xl border border-brand-500/25 max-w-2xl mx-auto px-6 shadow-inner mt-8">
             <div className="w-16 h-16 rounded-full bg-brand-800/10 dark:bg-brand-800/30 flex items-center justify-center mb-4 text-[#535C91] dark:text-[#9290C3]">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-active" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -48,8 +48,8 @@ export default async function AllClassesPage({ searchParams }) {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {classes.map((cls) => (
-              <ClassCard key={cls._id} cls={cls} />
+            {classesData.map((classData) => (
+              <ClassCard key={classData._id} cls={classData} />
             ))}
           </div>
         )}
