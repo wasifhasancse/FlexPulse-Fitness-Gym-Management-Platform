@@ -1,20 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import { getFavoriteClass } from "@/lib/api/getFavoriteClass";
+import { getTrainerApplication } from "@/lib/api/getTrainerApplication";
+import { getMyBookings } from "@/lib/api/myBookingClass";
+import { authClient } from "@/lib/auth-client";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
+  FaCalendarAlt,
   FaCalendarPlus,
   FaClock,
   FaHeart,
   FaUserCircle,
-  FaCalendarAlt,
 } from "react-icons/fa";
-import { authClient } from "@/lib/auth-client";
-import Image from "next/image";
-import { getTrainerApplication } from "@/lib/api/getTrainerApplication";
-import { getMyBookings } from "@/lib/api/myBookingClass";
-import { getFavoriteClass } from "@/lib/api/favoriteClass";
 
 export default function MemberDashboard() {
   const [bookings, setBookings = {}] = useState([]);
@@ -167,9 +167,7 @@ export default function MemberDashboard() {
             <div className="flex items-center gap-2">
               <FaClock className="w-4 h-4 text-[#CCFF00]" />
               <span>
-                <strong className="text-white">
-                  Member Since
-                </strong>{" "}
+                <strong className="text-white">Member Since</strong>{" "}
                 {user?.memberSince || "N/A"}
               </span>
             </div>
@@ -237,10 +235,7 @@ export default function MemberDashboard() {
             <tbody>
               {bookings.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan="4"
-                    className="py-6 text-center text-[#94A3B8]"
-                  >
+                  <td colSpan="4" className="py-6 text-center text-[#94A3B8]">
                     No upcoming classes. Book your first class!
                   </td>
                 </tr>
@@ -257,16 +252,12 @@ export default function MemberDashboard() {
                         <p className="font-medium text-white">
                           {cls.className}
                         </p>
-                        <p className="text-xs text-[#94A3B8]">
-                          {cls.duration}
-                        </p>
+                        <p className="text-xs text-[#94A3B8]">{cls.duration}</p>
                       </td>
                       <td className="py-4 px-4 text-[#94A3B8]">
                         {cls.bookedAt}
                       </td>
-                      <td className="py-4 px-4 text-white">
-                        {cls.trainer}
-                      </td>
+                      <td className="py-4 px-4 text-white">{cls.trainer}</td>
                       <td className="py-4 px-4 text-right">
                         <button className="px-4 py-1.5 border border-[#CCFF00] text-[#CCFF00] rounded-lg text-xs font-medium hover:bg-[#CCFF00] hover:text-[#0B0F19] transition-colors">
                           Modify

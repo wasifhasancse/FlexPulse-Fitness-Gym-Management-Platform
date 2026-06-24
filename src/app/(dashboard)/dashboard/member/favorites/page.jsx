@@ -1,5 +1,5 @@
 import FavoriteCard from "@/components/Dashboard/member/FavoriteCard";
-import { getFavoriteClass } from "@/lib/api/favoriteClass";
+import { getFavoriteClass } from "@/lib/api/getFavoriteClass";
 import { getUserSession } from "@/lib/core/getSession";
 
 export default async function FavoritesPage() {
