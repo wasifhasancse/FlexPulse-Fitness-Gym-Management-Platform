@@ -1,8 +1,8 @@
 "use client";
 
-import { getFavoriteClass } from "@/lib/api/getFavoriteClass";
+import { getFavoriteClass } from "@/lib/api/getFavoriteClasses";
+import { getMyBookingsClasses } from "@/lib/api/getMyBookingClasses";
 import { getTrainerApplication } from "@/lib/api/getTrainerApplication";
-import { getMyBookings } from "@/lib/api/myBookingClass";
 import { authClient } from "@/lib/auth-client";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -39,7 +39,7 @@ export default function MemberDashboard() {
 
     const fetchBookings = async () => {
       try {
-        const result = await getMyBookings(user.id);
+        const result = await getMyBookingsClasses(user.id);
         setBookings(result);
       } catch (err) {
         setError(err.message || "Failed to load bookings");

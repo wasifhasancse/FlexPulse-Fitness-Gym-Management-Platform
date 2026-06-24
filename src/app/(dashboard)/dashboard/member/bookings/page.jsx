@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { motion } from "framer-motion";
-import { FaSpinner, FaCalendarAlt, FaClock } from "react-icons/fa";
-import { getMyBookings } from "@/lib/api/myBookingClass";
+import { getMyBookingsClasses } from "@/lib/api/getMyBookingClasses";
 import { authClient } from "@/lib/auth-client";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { FaCalendarAlt, FaClock, FaSpinner } from "react-icons/fa";
 
 // Helper to format date/time from ISO string
 const formatDate = (isoString) => {
@@ -38,7 +38,7 @@ export default function BookingsPage() {
 
     const fetchBookings = async () => {
       try {
-        const result = await getMyBookings(user.id);
+        const result = await getMyBookingsClasses(user.id);
         // Only keep bookings with paymentStatus === "paid"
         const paidBookings = Array.isArray(result)
           ? result.filter((b) => b.paymentStatus?.toLowerCase() === "paid")
