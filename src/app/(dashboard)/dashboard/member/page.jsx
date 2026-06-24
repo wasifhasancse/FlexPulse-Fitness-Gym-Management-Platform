@@ -33,6 +33,23 @@ export default function MemberDashboard() {
     fetchData();
   }, [user?.id]);
 
+  //total-booking
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchBookings = async () => {
+      try {
+        const result = await getMyBookings(user.id);
+        setBookings(result);
+      } catch (err) {
+        setError(err.message || "Failed to load bookings");
+      }
+    };
+
+    fetchBookings();
+  }, [user?.id, setBookings]);
+
+  
 
   // Determine status badge color
   const getStatusColor = (status = "") => {
