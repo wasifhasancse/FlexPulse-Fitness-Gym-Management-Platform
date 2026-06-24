@@ -1,6 +1,6 @@
 import ClassCard from "@/components/Home/ClassCard";
 import SearchingClasses from "@/components/Home/SearchingClasses";
-import { getclasses } from "@/lib/api/allClass";
+import { getclasses } from "@/lib/api/getClasses";
 
 export default async function AllClassesPage({ searchParams }) {
   const params = await searchParams;
