@@ -1,19 +1,13 @@
 "use client";
 
-import { getMyForumPost } from "@/lib/api/forumPosts";
 import { getMyclasses } from "@/lib/api/getClasses";
+import { getMyForumPost } from "@/lib/api/getForumPosts";
 import { authClient } from "@/lib/auth-client";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-  FaEdit,
-  FaList,
-  FaPlus,
-  FaSpinner,
-  FaUser
-} from "react-icons/fa";
+import { FaEdit, FaList, FaPlus, FaSpinner, FaUser } from "react-icons/fa";
 
 // Dummy API functions – replace with real calls
 const fetchTrainerStats = async (trainerId) => {

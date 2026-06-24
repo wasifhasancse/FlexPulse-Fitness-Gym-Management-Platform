@@ -1,8 +1,8 @@
+import MyPostCard from "@/components/dashboard/trainer/MyPostCard";
+import { getMyForumPost } from "@/lib/api/getForumPosts";
+import { getUserSession } from "@/lib/core/session";
 import Link from "next/link";
 import { FaPlus } from "react-icons/fa";
-import MyPostCard from "@/components/dashboard/trainer/MyPostCard";
-import { getMyForumPost } from "@/lib/api/forumPosts";
-import { getUserSession } from "@/lib/core/session";
 
 export default async function MyPostsPage() {
   const user = await getUserSession();
