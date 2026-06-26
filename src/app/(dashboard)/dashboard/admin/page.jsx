@@ -18,9 +18,9 @@ import {
   Tooltip,
 } from "recharts";
 import { authClient } from "@/lib/auth-client";
-import { getAllUsers } from "@/lib/api/user";
 import Image from "next/image";
 import { getAllClasses } from "@/lib/api/getClasses";
+import { getAllUsers } from "@/lib/api/getAllUsers";
 
 const COLORS = ["#CCFF00", "#FF3366", "#3B82F6", "#8B5CF6"];
 

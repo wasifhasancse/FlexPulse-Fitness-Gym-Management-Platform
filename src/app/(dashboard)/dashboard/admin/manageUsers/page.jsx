@@ -12,8 +12,8 @@ import {
 import { authClient } from "@/lib/auth-client";
 import {toast} from "@heroui/react";
 import Image from "next/image";
-import { getAllUsers } from "@/lib/api/user";
 import { updateUserRole, blockUser, unblockUser } from "@/lib/actions/users";
+import { getAllUsers } from "@/lib/api/getAllUsers";
 
 
 export default function ManageUsersPage() {
