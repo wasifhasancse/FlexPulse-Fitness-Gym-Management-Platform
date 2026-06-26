@@ -1,7 +1,7 @@
 "use client";
 
 import { DeleteClassModal } from "@/components/dashboard/trainer/DeleteClassModal";
-import EditModal from "@/components/dashboard/trainer/EditModal";
+import UpdateModal from "@/components/Dashboard/trainer/UpdateModal";
 import { getMyclasses } from "@/lib/api/getClasses";
 import { authClient } from "@/lib/auth-client";
 import { motion } from "framer-motion";
@@ -9,12 +9,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
-  FaCalendarAlt,
-  FaClock,
-  FaEye,
-  FaPlus,
-  FaSpinner,
-  FaUsers
+    FaCalendarAlt,
+    FaClock,
+    FaEye,
+    FaPlus,
+    FaSpinner,
+    FaUsers,
 } from "react-icons/fa";
 import { TfiMoney } from "react-icons/tfi";
 
@@ -250,10 +250,10 @@ export default function MyClassesPage() {
                         >
                           <FaEye className="w-4 h-4" />
                         </Link>
-                        <EditModal
+                        <UpdateModal
                           classes={cls}
                           onUpdated={() => setRefresh((r) => r + 1)}
-                        ></EditModal>
+                        ></UpdateModal>
 
                         <DeleteClassModal
                           onDelete={() => setRefresh((r) => r + 1)}

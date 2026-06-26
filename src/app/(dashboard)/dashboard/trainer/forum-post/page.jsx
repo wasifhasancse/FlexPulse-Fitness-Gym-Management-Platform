@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import { FaImage, FaTimes, FaArrowLeft, FaPencilAlt } from "react-icons/fa";
-import { imageUpload } from "@/lib/imgUpload";
-import Image from "next/image";
-import { authClient } from "@/lib/auth-client";
-import { toast} from "@heroui/react";
-import { useRouter } from "next/navigation";
 import { addForumPost } from "@/lib/actions/AddForumPost";
+import { authClient } from "@/lib/auth-client";
+import { imageUpload } from "@/lib/imageUpload";
+import { toast } from "@heroui/react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { FaArrowLeft, FaImage, FaPencilAlt, FaTimes } from "react-icons/fa";
 
 export default function CreateForumPostPage() {
   const [title, setTitle] = useState("");

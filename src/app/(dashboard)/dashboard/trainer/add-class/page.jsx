@@ -2,22 +2,22 @@
 
 import { CreateClasses } from "@/lib/actions/addClass";
 import { authClient } from "@/lib/auth-client";
-import { imageUpload } from "@/lib/imgUpload";
+import { imageUpload } from "@/lib/imageUpload";
 import { toast } from "@heroui/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
 import {
-  FaCalendarAlt,
-  FaClock,
-  FaDollarSign,
-  FaDumbbell,
-  FaFileAlt,
-  FaImage,
-  FaLevelUpAlt,
-  FaTag,
-  FaTimes,
-  FaUsers,
+    FaCalendarAlt,
+    FaClock,
+    FaDollarSign,
+    FaDumbbell,
+    FaFileAlt,
+    FaImage,
+    FaLevelUpAlt,
+    FaTag,
+    FaTimes,
+    FaUsers,
 } from "react-icons/fa";
 
 export default function AddClassPage() {
