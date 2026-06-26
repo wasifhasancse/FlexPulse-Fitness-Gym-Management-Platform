@@ -14,3 +14,14 @@ export const updateUserRole = async (userId, role = "admin") => {
   revalidatePath("/dashboard/admin/manageUsers");
   return data;
 };
+
+export const blockUser = async (userId) => {
+  const data = await auth.api.banUser({
+    body: {
+      userId,
+    },
+    headers: await headers(),
+  });
+  revalidatePath("/dashboard/admin/manageUsers");
+  return data;
+};
