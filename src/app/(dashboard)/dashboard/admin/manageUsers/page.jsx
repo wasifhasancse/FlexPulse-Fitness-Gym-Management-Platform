@@ -12,7 +12,7 @@ import {
 import { authClient } from "@/lib/auth-client";
 import {toast} from "@heroui/react";
 import Image from "next/image";
-import { updateUserRole, blockUser, unblockUser } from "@/lib/actions/users";
+import { updateUserRole, blockUser, unblockUser } from "@/lib/actions/AdminUserManage";
 import { getAllUsers } from "@/lib/api/getAllUsers";
 
 
