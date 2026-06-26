@@ -3,6 +3,6 @@
 import { serverMutation } from "../core/serverActions";
 
 
-export const AddSubscription = async (subscriptionInfo) => {
+export const addSubscription = async (subscriptionInfo) => {
   return serverMutation("/api/subscription", subscriptionInfo);
 };

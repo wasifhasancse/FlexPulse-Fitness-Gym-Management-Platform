@@ -7,9 +7,9 @@ import { FaImage, FaTimes, FaArrowLeft, FaPencilAlt } from "react-icons/fa";
 import { imageUpload } from "@/lib/imgUpload";
 import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
-import { addForumPosts } from "@/lib/actions/AddForumPost";
 import { toast} from "@heroui/react";
 import { useRouter } from "next/navigation";
+import { addForumPost } from "@/lib/actions/AddForumPost";
 
 export default function CreateForumPostPage() {
   const [title, setTitle] = useState("");
@@ -47,7 +47,7 @@ export default function CreateForumPostPage() {
       userId: user?.id,
     };
     try {
-      const result = await addForumPosts(formData);
+      const result = await addForumPost(formData);
       if (result.insertedId) {
         toast.success("Class added successfully!");
         resetForm();
@@ -151,13 +151,7 @@ export default function CreateForumPostPage() {
                     PNG, JPG, GIF up to 5MB
                   </p>
                 </div>
-                {/* <input
-                  id="imageInput"
-                  type="file"
-                  accept="image/*"
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                  onChange={handleImageChange}
-                /> */}
+
                 <input
                   type="file"
                   accept="image/*"

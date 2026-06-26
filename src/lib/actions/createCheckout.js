@@ -17,7 +17,7 @@ export async function createCheckoutSession(formData) {
   const duration = formData.get("duration");
   const image = formData.get("image");
 
-  const PRICE_ID = "price_1TjgfHCRS2C5nrZAmvjqawSr";
+  const PRICE_ID = process.env.STRIPE_PRICE_ID;
 
   const session = await stripe.checkout.sessions.create({
     customer_email: user.email,
