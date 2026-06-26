@@ -25,3 +25,14 @@ export const blockUser = async (userId) => {
   revalidatePath("/dashboard/admin/manageUsers");
   return data;
 };
+
+export const unblockUser = async (userId) => {
+  const data = await auth.api.unbanUser({
+    body: {
+      userId,
+    },
+    headers: await headers(),
+  });
+  revalidatePath("/dashboard/admin/manageUsers");
+  return data;
+};
