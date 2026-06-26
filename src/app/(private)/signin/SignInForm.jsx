@@ -195,7 +195,7 @@ const SignInForm = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center text-brand-500 hover:text-[#CFFF04] font-['Inter'] text-xs font-bold uppercase tracking-wider"
                 >
-                  {showPassword ? <IoMdEyeOff /> : <IoEye />}
+                  {showPassword ? <IoMdEyeOff className="h-5 w-5" /> : <IoEye className="h-5 w-5" /> }
                 </button>
               </div>
             </div>
