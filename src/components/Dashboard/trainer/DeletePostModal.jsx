@@ -1,20 +1,20 @@
 "use client";
 
-import { deleteClassById } from "@/lib/actions/deleteClass";
-import { AlertDialog, Button, toast } from "@heroui/react";
-
+import { AlertDialog, Button } from "@heroui/react";
+import { useRouter } from "next/navigation";
+import { toast} from "@heroui/react";
 import { FaTrash } from "react-icons/fa";
+import { deletePostById } from "@/lib/actions/deleteClass";
 
-export function DeleteClassModal({ classes, onDelete }) {
-  const classId = classes._id;
-  const handleDelete = async (classId) => {
+export function DeletePostModal({ post }) {
+  const postId = post._id;
+  const router = useRouter();
+  const handleDelete = async (postId) => {
     try {
-      const result = await deleteClassById(classId);
-
+      const result = await deletePostById(postId);
       if (result.deletedCount > 0) {
         toast.success("Delete Successfully!");
-
-        onDelete?.();
+        router.refresh("/dashboard/trainer/my-posts");
       }
     } catch (error) {
       toast.error("Delete Failed!");
@@ -23,8 +23,8 @@ export function DeleteClassModal({ classes, onDelete }) {
   return (
     <AlertDialog>
       <Button
-        className="bg-transparent p-1.5 text-[#6B655A] dark:text-[#B8B0A6] hover:text-[#C47A6A] transition-colors"
-        title="Delete"
+        className="absolute top-3 right-3 z-10 p-1.5 bg-black/60 text-white rounded-full hover:bg-[#C47A6A] transition-colors"
+        title="Delete Post"
       >
         <FaTrash className="w-4 h-4" />
       </Button>
@@ -36,14 +36,13 @@ export function DeleteClassModal({ classes, onDelete }) {
             <AlertDialog.Header>
               <AlertDialog.Icon status="danger" />
               <AlertDialog.Heading>
-                Delete class permanently?
+                Delete post permanently?
               </AlertDialog.Heading>
             </AlertDialog.Header>
             <AlertDialog.Body>
               <p>
-                This will permanently delete{" "}
-                <strong>{classes.className}</strong> and all of its data. This
-                action cannot be undone.
+                This will permanently delete <strong>{post.title}</strong> and
+                all of its data. This action cannot be undone.
               </p>
             </AlertDialog.Body>
             <AlertDialog.Footer>
@@ -51,7 +50,7 @@ export function DeleteClassModal({ classes, onDelete }) {
                 Cancel
               </Button>
               <Button
-                onClick={() => handleDelete(classes._id)}
+                onClick={() => handleDelete(postId)}
                 slot="close"
                 variant="danger"
               >
