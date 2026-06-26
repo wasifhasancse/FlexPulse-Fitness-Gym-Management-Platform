@@ -7,7 +7,7 @@ import { FaImage, FaTimes, FaArrowLeft, FaPencilAlt } from "react-icons/fa";
 import { imageUpload } from "@/lib/imgUpload";
 import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
-import { addForumPosts } from "@/lib/actions/forumPosts";
+import { addForumPosts } from "@/lib/actions/AddForumPost";
 import { toast} from "@heroui/react";
 import { useRouter } from "next/navigation";
 
