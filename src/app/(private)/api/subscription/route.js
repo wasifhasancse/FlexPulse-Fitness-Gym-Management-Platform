@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe";
-import { getUserSession } from "@/lib/core/session";
+import { getUserSession } from "@/lib/core/getSession";
 
 export async function POST(request) {
   try {
