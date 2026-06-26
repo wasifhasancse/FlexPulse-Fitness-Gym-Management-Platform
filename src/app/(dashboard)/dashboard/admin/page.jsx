@@ -20,6 +20,7 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { getAllUsers } from "@/lib/api/user";
 import Image from "next/image";
+import { getAllClasses } from "@/lib/api/getClasses";
 
 const COLORS = ["#CCFF00", "#FF3366", "#3B82F6", "#8B5CF6"];
 
@@ -36,7 +37,7 @@ export default function AdminDashboardPage() {
     const fetchData = async () => {
       try {
         const data = await getAllUsers();
-        const classes = await getclasses();
+        const classes = await getAllClasses();
         setClasses(classes);
         setUsers(data);
       } catch (err) {
