@@ -1,6 +1,5 @@
 "use client";
 
-import { getForumsPostById } from "@/lib/api/forumPosts";
 import { useSession } from "@/lib/auth-client";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -22,6 +21,7 @@ import {
     FaUserCircle,
 } from "react-icons/fa";
 import { RiDeleteBin5Line } from "react-icons/ri";
+import { getForumsPostById } from "@/lib/api/getForumPosts";
 
 // Sample related articles
 const relatedArticles = [
