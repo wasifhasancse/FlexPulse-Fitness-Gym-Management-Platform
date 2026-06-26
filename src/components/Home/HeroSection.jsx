@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
 import Image from "next/image";
 
-export default function Banner() {
+export default function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-background transition-colors duration-300">
       {/* Background Glow using active theme color */}
