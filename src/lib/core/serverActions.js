@@ -17,3 +17,16 @@ export const serverMutation = async (path, data, method = "POST") => {
   const response = await res.json();
   return response;
 };
+
+
+export const serverMutationById = async (path, id, method = "GET") => {
+  const res = await fetch(`${baseUrl}${path}/${id}`, {
+    method: method,
+    headers: {
+      "Content-Type": "application/json",
+    },
+
+  });
+  const response = await res.json();
+  return response;
+};
