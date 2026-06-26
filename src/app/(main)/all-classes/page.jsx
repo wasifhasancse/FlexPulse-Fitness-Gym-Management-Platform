@@ -1,12 +1,13 @@
 import ClassCard from "@/components/AllClasses/ClassCard";
 import SearchingClasses from "@/components/AllClasses/SearchingClasses";
-import { getclasses } from "@/lib/api/getClasses";
+import { getAllClasses } from "@/lib/api/getClasses";
+
 
 export default async function AllClassesPage({ searchParams }) {
   const params = await searchParams;
   const search = (await params.search) || "";
   const category = (await params.category) || "";
-  const classesData = await getclasses(search, category);
+  const classesData = await getAllClasses(search, category);
 
   return (
     <div className="min-h-screen bg-background py-16 px-6 sm:px-6 lg:px-8 transition-colors duration-300">
