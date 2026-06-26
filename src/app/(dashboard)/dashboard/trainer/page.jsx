@@ -1,6 +1,6 @@
 "use client";
 
-import { getMyclasses } from "@/lib/api/getClasses";
+import { getMyClasses } from "@/lib/api/getClasses";
 import { getMyForumPost } from "@/lib/api/getForumPosts";
 import { authClient } from "@/lib/auth-client";
 import { motion } from "framer-motion";
@@ -38,7 +38,7 @@ export default function TrainerDashboardPage() {
     if (!trainerId) return;
     const loadData = async () => {
       try {
-        const myclasses = await getMyclasses(trainerId);
+        const myclasses = await getMyClasses(trainerId);
         const myForumPosts = await getMyForumPost(trainerId);
         setForumPosts(myForumPosts);
         setClasses(myclasses);

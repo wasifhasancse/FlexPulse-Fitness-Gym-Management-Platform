@@ -2,7 +2,7 @@
 
 import { DeleteClassModal } from "@/components/Dashboard/trainer/DeleteClassModal";
 import UpdateModal from "@/components/Dashboard/trainer/UpdateModal";
-import { getMyclasses } from "@/lib/api/getClasses";
+import { getMyClasses } from "@/lib/api/getClasses";
 import { authClient } from "@/lib/auth-client";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -33,7 +33,7 @@ export default function MyClassesPage() {
 
     const loadClasses = async () => {
       try {
-        const data = await getMyclasses(trainerId);
+        const data = await getMyClasses(trainerId);
         setClasses(data);
       } catch (err) {
         setError(err.message || "Failed to load classes");

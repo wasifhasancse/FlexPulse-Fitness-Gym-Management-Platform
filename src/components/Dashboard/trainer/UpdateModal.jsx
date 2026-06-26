@@ -1,6 +1,7 @@
 "use client";
 
-import { UpdateClass } from "@/lib/actions/updateClass";
+
+import { updateClass } from "@/lib/actions/updateClass";
 import { authClient } from "@/lib/auth-client";
 import { imageUpload } from "@/lib/imageUpload";
 import { Button, Modal, Surface, toast } from "@heroui/react";
@@ -73,7 +74,7 @@ const UpdateModal = ({ classes, onUpdated }) => {
     };
 
     try {
-      const data = await UpdateClass(classes._id, updatedData);
+      const data = await updateClass(classes._id, updatedData);
 
       if (data.modifiedCount > 0) {
         toast.success("Class updated successfully!");

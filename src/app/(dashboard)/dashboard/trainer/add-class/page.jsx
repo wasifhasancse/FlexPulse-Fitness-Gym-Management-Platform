@@ -1,6 +1,6 @@
 "use client";
 
-import { CreateClasses } from "@/lib/actions/addClass";
+import { createClasses } from "@/lib/actions/addClass";
 import { authClient } from "@/lib/auth-client";
 import { imageUpload } from "@/lib/imageUpload";
 import { toast } from "@heroui/react";
@@ -77,11 +77,11 @@ export default function AddClassPage() {
       authorId: user.id,
       authorName: user.name,
       authorImage: user.image,
-      autorEmail: user.email,
+      authorEmail: user.email,
       status: "panding",
     };
     try {
-      const addClass = await CreateClasses(formData);
+      const addClass = await createClasses(formData);
       if (addClass.insertedId) {
         toast.success("Class added successfully!");
         resetForm();
