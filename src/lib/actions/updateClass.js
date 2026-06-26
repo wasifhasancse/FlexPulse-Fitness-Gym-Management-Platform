@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { serverMutation } from "../core/server";
+import { serverMutation } from "../core/serverActions";
 
 export const updateClass = async (id, data) => {
   const result = serverMutation(`/api/all-classes/${id}`, data, "PATCH");

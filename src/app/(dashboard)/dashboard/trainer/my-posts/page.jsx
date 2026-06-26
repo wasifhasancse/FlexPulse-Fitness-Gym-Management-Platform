@@ -1,6 +1,6 @@
 import MyForumPostCard from "@/components/Dashboard/trainer/MyForumPostCard";
 import { getMyForumPost } from "@/lib/api/getForumPosts";
-import { getUserSession } from "@/lib/core/session";
+import { getUserSession } from "@/lib/core/getSession";
 import Link from "next/link";
 import { FaPlus } from "react-icons/fa";
 

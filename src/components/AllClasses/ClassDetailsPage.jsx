@@ -20,7 +20,7 @@ import {
     FaUsers,
 } from "react-icons/fa";
 
-export default function ClassDetailsPage({
+export default function ClassDetailsPageLayout({
   classData: propClassData,
   isBooked,
   isFavorite: initialFavorite,

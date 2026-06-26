@@ -1,6 +1,6 @@
 import ForumPostCard from "@/components/ForumPage/ForumPostCard";
 import SearchingForum from "@/components/ForumPage/SearchingForum";
-import { getForumPosts } from "@/lib/api/forumPosts";
+import { getForumPosts } from "@/lib/api/getForumPosts";
 import Link from "next/link";
 import { FaPlus } from "react-icons/fa";
 

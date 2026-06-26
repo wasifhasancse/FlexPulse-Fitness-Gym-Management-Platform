@@ -1,6 +1,6 @@
 "use client";
 
-import { DeleteClassModal } from "@/components/dashboard/trainer/DeleteClassModal";
+import { DeleteClassModal } from "@/components/Dashboard/trainer/DeleteClassModal";
 import UpdateModal from "@/components/Dashboard/trainer/UpdateModal";
 import { getMyclasses } from "@/lib/api/getClasses";
 import { authClient } from "@/lib/auth-client";
@@ -253,12 +253,12 @@ export default function MyClassesPage() {
                         <UpdateModal
                           classes={cls}
                           onUpdated={() => setRefresh((r) => r + 1)}
-                        ></UpdateModal>
+                        />
 
                         <DeleteClassModal
                           onDelete={() => setRefresh((r) => r + 1)}
                           classes={cls}
-                        ></DeleteClassModal>
+                        />
                         <Link
                           href={`/dashboard/trainer/my-classes/${cls._id}/students`}
                           className="p-1.5 text-[#6B655A] dark:text-[#B8B0A6] hover:text-[#D4845A] transition-colors"
