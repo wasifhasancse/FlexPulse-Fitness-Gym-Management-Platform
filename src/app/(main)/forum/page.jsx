@@ -1,8 +1,8 @@
 import PostCard from "@/components/communityForum/PostCard";
-import SearchForum from "@/components/communityForum/SearchForum";
 import { getForumPosts } from "@/lib/api/forumPosts";
 import Link from "next/link";
 import { FaPlus } from "react-icons/fa";
+import SearchingForum from "../../../components/ForumPage/SearchingForum";
 
 export default async function ForumPage({ searchParams }) {
   const params = await searchParams;
@@ -46,7 +46,7 @@ export default async function ForumPage({ searchParams }) {
         {/* Action Header: Search & Create Post */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 max-w-3xl mx-auto">
           <div className="flex-1">
-            <SearchForum totalPosts={posts.length} />
+            <SearchingForum totalPosts={posts.length} />
           </div>
           <div className="flex justify-center shrink-0">
             <Link
