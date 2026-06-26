@@ -1,4 +1,4 @@
-import MyPostCard from "@/components/dashboard/trainer/MyPostCard";
+import MyForumPostCard from "@/components/Dashboard/trainer/MyForumPostCard";
 import { getMyForumPost } from "@/lib/api/getForumPosts";
 import { getUserSession } from "@/lib/core/session";
 import Link from "next/link";
@@ -47,7 +47,7 @@ export default async function MyPostsPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {myForumPosts.map((post) => (
-            <MyPostCard key={post._id} post={post} />
+            <MyForumPostCard key={post._id} post={post} />
           ))}
         </div>
       )}
