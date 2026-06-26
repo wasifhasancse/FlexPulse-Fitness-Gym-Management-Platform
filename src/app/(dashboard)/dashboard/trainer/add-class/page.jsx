@@ -1,6 +1,6 @@
 "use client";
 
-import { CreateClasses } from "@/lib/actions/addClasses";
+import { CreateClasses } from "@/lib/actions/addClass";
 import { authClient } from "@/lib/auth-client";
 import { imageUpload } from "@/lib/imgUpload";
 import { toast } from "@heroui/react";
