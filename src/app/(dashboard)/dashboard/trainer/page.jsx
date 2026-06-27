@@ -33,8 +33,17 @@ export default function TrainerDashboardPage() {
     if (!trainerId) return;
     const loadData = async () => {
       try {
-        const myclasses = await getMyClasses(trainerId);
-        const myForumPosts = await getMyForumPost(trainerId);
+        const [myclasses, myForumPosts, statsRes] = await Promise.all([
+          getMyClasses(trainerId),
+          getMyForumPost(trainerId),
+          fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trainer/stats?trainerId=${trainerId}`),
+        ]);
+        const statsData = await statsRes.json();
+        setStats({
+          totalClasses: statsData.totalClasses || 0,
+          totalStudents: statsData.totalStudents || 0,
+          forumPosts: myForumPosts?.length || 0,
+        });
         setForumPosts(myForumPosts || []);
         setClasses(myclasses || []);
       } catch (err) {

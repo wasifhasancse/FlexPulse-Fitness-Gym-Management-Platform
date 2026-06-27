@@ -31,14 +31,41 @@ export default function ClassDetailsPageLayout({
   const data = propClassData;
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [favLoading, setFavLoading] = useState(false);
-  const rating = 4.9;
-  const reviews = 124;
-  const capacity = 12;
-  const equipment = "Dumbbells, Mat, Timer";
+  // Deterministic ratings and reviews based on class ID
+  const seed = data._id ? data._id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) : 0;
+  const rating = (4.5 + (seed % 6) * 0.1).toFixed(1);
+  const reviews = 30 + (seed % 150);
+  const capacity = 10 + (seed % 10);
+  
+  const getEquipment = (category = "") => {
+    const cat = category.toLowerCase();
+    if (cat.includes("yoga") || cat.includes("stretch")) return "Mat, Blocks, Strap";
+    if (cat.includes("cardio") || cat.includes("hiit")) return "Jump Rope, Timer, Mat";
+    if (cat.includes("weight") || cat.includes("strength")) return "Dumbbells, Kettlebells, Barbell";
+    if (cat.includes("combat") || cat.includes("box")) return "Boxing Gloves, Handwraps, Pads";
+    return "Gym Equipment, Mat, Towel";
+  };
+  const equipment = getEquipment(data.category);
+
+  const getIntensity = (level = "") => {
+    const lvl = level.toLowerCase();
+    if (lvl.includes("advanced") || lvl.includes("high")) return "High Intensity";
+    if (lvl.includes("intermediate") || lvl.includes("medium")) return "Medium Intensity";
+    return "Light Intensity";
+  };
+  const intensity = getIntensity(data.difficultyLevel || data.level);
+
+  const getStudio = (category = "") => {
+    const cat = category.toLowerCase();
+    if (cat.includes("yoga") || cat.includes("stretch")) return "Mindfulness Studio";
+    if (cat.includes("cardio") || cat.includes("hiit")) return "Aero Studio";
+    if (cat.includes("combat")) return "Ring Arena";
+    return "Main Gym Floor";
+  };
+  const studio = getStudio(data.category);
+
   const language = "English";
-  const intensity = "High";
-  const location = "IronPulse Headquarters";
-  const studio = "Studio A";
+  const location = "FlexPulse Main Facility";
 
   const handleFavoriteToggle = async () => {
     if (!userId) {

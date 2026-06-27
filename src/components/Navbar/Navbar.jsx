@@ -113,8 +113,8 @@ export default function Navbar() {
               <div className="relative" ref={dropdownRef}>
                 {/* Profile Pill Trigger */}
                 <button
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center gap-2.5 pl-1.5 pr-3.5 py-1.5 rounded-full bg-[#EBE9FE] dark:bg-[#1B1A55]/80 text-[#5e41de] dark:text-[#9290C3] font-medium text-sm transition-all hover:bg-[#DED9FD] dark:hover:bg-[#1B1A55] cursor-pointer border border-[#EBE9FE] dark:border-brand-500/20"
+                   onClick={() => setIsProfileOpen(!isProfileOpen)}
+                   className="flex items-center gap-2.5 pl-1.5 pr-3.5 py-1.5 rounded-full bg-[#535C91]/15 dark:bg-[#1B1A55]/80 text-active dark:text-[#9290C3] font-medium text-sm transition-all hover:bg-[#535C91]/25 dark:hover:bg-[#1B1A55] cursor-pointer border border-[#535C91]/20 dark:border-brand-500/20"
                 >
                   {user.image ? (
                     <Image
@@ -122,36 +122,36 @@ export default function Navbar() {
                       alt={user.name}
                       width={30}
                       height={30}
-                      className="rounded-full object-cover border border-[#5e41de]/30"
+                      className="rounded-full object-cover border border-active/30"
                     />
                   ) : (
-                    <FaUserCircle className="w-7.5 h-7.5 text-[#5e41de] dark:text-[#9290C3]" />
+                    <FaUserCircle className="w-7.5 h-7.5 text-active dark:text-[#9290C3]" />
                   )}
                   <span className="font-['Inter'] font-semibold">
                     {user.name ? user.name.split(" ")[0] : "User"}
                   </span>
                   {isProfileOpen ? (
-                    <FaChevronUp className="w-3.5 h-3.5 text-[#5e41de] dark:text-[#9290C3]" />
+                    <FaChevronUp className="w-3.5 h-3.5 text-active dark:text-[#9290C3]" />
                   ) : (
-                    <FaChevronDown className="w-3.5 h-3.5 text-[#5e41de] dark:text-[#9290C3]" />
+                    <FaChevronDown className="w-3.5 h-3.5 text-active dark:text-[#9290C3]" />
                   )}
                 </button>
 
                 {/* Profile Dropdown Menu */}
                 {isProfileOpen && (
-                  <div className="absolute right-0 mt-2.5 w-80 bg-white dark:bg-[#070F2B] border border-[#EBE9FE] dark:border-brand-500/30 rounded-[20px] shadow-xl z-50 overflow-hidden py-1 transition-all">
+                  <div className="absolute right-0 mt-2.5 w-80 bg-white dark:bg-[#070F2B] border border-brand-500/20 dark:border-brand-500/30 rounded-[20px] shadow-xl z-50 overflow-hidden py-1 transition-all">
                     {/* User Info Container */}
-                    <div className="bg-[#F3F0FF] dark:bg-[#1B1A55]/40 m-3 p-4 rounded-2xl flex items-center gap-3">
+                    <div className="bg-[#535C91]/5 dark:bg-[#1B1A55]/40 m-3 p-4 rounded-2xl flex items-center gap-3">
                       {user.image ? (
                         <Image
                           src={user.image}
                           alt={user.name}
                           width={52}
                           height={52}
-                          className="rounded-full object-cover border border-[#5e41de]/20"
+                          className="rounded-full object-cover border border-active/20"
                         />
                       ) : (
-                        <FaUserCircle className="w-13 h-13 text-[#5e41de] dark:text-[#9290C3]" />
+                        <FaUserCircle className="w-13 h-13 text-active dark:text-[#9290C3]" />
                       )}
                       <div className="min-w-0 flex-1">
                         <p className="font-['Inter'] font-bold text-gray-900 dark:text-white text-base truncate">
@@ -167,7 +167,7 @@ export default function Navbar() {
                     <div className="px-2 pb-2 space-y-1">
                       <Link
                         href={`/dashboard/${user?.role}`}
-                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm rounded-xl font-medium text-gray-700 dark:text-gray-200 hover:bg-[#F3F0FF] dark:hover:bg-[#1B1A55]/50 hover:text-[#5e41de] dark:hover:text-[#9290C3] transition-colors"
+                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm rounded-xl font-medium text-gray-700 dark:text-gray-200 hover:bg-[#535C91]/10 hover:text-active dark:hover:bg-[#1B1A55]/50 dark:hover:text-[#9290C3] transition-colors"
                       >
                         <FiGrid className="w-4 h-4" />
                         <span>Dashboard</span>
@@ -175,7 +175,7 @@ export default function Navbar() {
 
                       <Link
                         href={`/dashboard/${user?.role}`}
-                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm rounded-xl font-medium text-gray-700 dark:text-gray-200 hover:bg-[#F3F0FF] dark:hover:bg-[#1B1A55]/50 hover:text-[#5e41de] dark:hover:text-[#9290C3] transition-colors"
+                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm rounded-xl font-medium text-gray-700 dark:text-gray-200 hover:bg-[#535C91]/10 hover:text-active dark:hover:bg-[#1B1A55]/50 dark:hover:text-[#9290C3] transition-colors"
                       >
                         <FiEdit3 className="w-4 h-4" />
                         <span>Profile Management</span>
@@ -183,13 +183,13 @@ export default function Navbar() {
 
                       <Link
                         href="#"
-                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm rounded-xl font-medium text-gray-700 dark:text-gray-200 hover:bg-[#F3F0FF] dark:hover:bg-[#1B1A55]/50 hover:text-[#5e41de] dark:hover:text-[#9290C3] transition-colors"
+                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm rounded-xl font-medium text-gray-700 dark:text-gray-200 hover:bg-[#535C91]/10 hover:text-active dark:hover:bg-[#1B1A55]/50 dark:hover:text-[#9290C3] transition-colors"
                       >
                         <FiSettings className="w-4 h-4" />
                         <span>Settings</span>
                       </Link>
 
-                      <div className="border-t border-[#EBE9FE] dark:border-brand-800/40 my-2"></div>
+                      <div className="border-t border-brand-500/10 dark:border-brand-800/40 my-2"></div>
 
                       <button
                         onClick={onLogout}

@@ -93,27 +93,27 @@ export default function AddClassPage() {
   };
 
   return (
-    <div className="w-full bg-white dark:bg-[#2D2A24] h-full  p-6 md:p-8">
+    <div className="w-full bg-white dark:bg-brand-800/20 h-full p-6 md:p-8 rounded-2xl border border-brand-500/10 dark:border-brand-500/20 shadow-card">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="font-['Playfair_Display'] text-3xl font-bold text-[#2D2A24] dark:text-[#EAE5DE]">
+        <div className="mb-8 font-sans">
+          <h1 className="font-['Outfit'] text-3xl font-bold text-foreground">
             Trainer Dashboard
           </h1>
-          <p className="font-['Inter'] text-[#6B655A] dark:text-[#B8B0A6]">
+          <p className="text-[#535C91] dark:text-[#9290C3] font-medium mt-1">
             Welcome back, Trainer!
           </p>
-          <h2 className="font-['Inter'] text-xl font-semibold text-[#2D2A24] dark:text-[#EAE5DE] mt-4">
+          <h2 className="text-xl font-bold text-active mt-4">
             Add New Class
           </h2>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 font-sans">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Left column */}
             <div className="space-y-5">
@@ -121,9 +121,9 @@ export default function AddClassPage() {
               <div>
                 <label
                   htmlFor="className"
-                  className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] mb-1 flex items-center gap-2"
+                  className="text-sm font-semibold text-foreground mb-1.5 flex items-center gap-2"
                 >
-                  <FaDumbbell className="text-[#D4845A] w-4 h-4" />
+                  <FaDumbbell className="text-active w-4 h-4" />
                   CLASS NAME
                 </label>
                 <input
@@ -132,22 +132,22 @@ export default function AddClassPage() {
                   value={className}
                   onChange={(e) => setClassName(e.target.value)}
                   placeholder="Fitness Class"
-                  className="w-full px-4 py-2.5 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#E8E0D8] dark:border-[#4A4540] rounded-lg text-[#2D2A24] dark:text-[#EAE5DE] placeholder-[#8A847C] dark:placeholder-[#6B655A] focus:outline-none focus:border-[#D4845A] focus:ring-2 focus:ring-[#D4845A]/20 transition-all font-['Inter'] text-sm"
+                  className="w-full px-4 py-2.5 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 border border-brand-500/20 dark:border-brand-500/30 rounded-lg text-foreground placeholder-[#535C91]/50 dark:placeholder-[#9290C3]/50 focus:outline-none focus:border-active focus:ring-2 focus:ring-active/20 transition-all text-sm"
                 />
               </div>
 
               {/* Class Image */}
               <div>
-                <label className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] mb-1 flex items-center gap-2">
-                  <FaImage className="text-[#D4845A] w-4 h-4" />
+                <label className="text-sm font-semibold text-foreground mb-1.5 flex items-center gap-2">
+                  <FaImage className="text-active w-4 h-4" />
                   CLASS IMAGE
                 </label>
                 {uploading ? (
-                  <div className="w-full h-48 flex items-center justify-center border rounded-lg">
-                    <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-[#D4845A]" />
+                  <div className="w-full h-48 flex items-center justify-center border border-brand-500/20 rounded-lg bg-[#535C91]/5 dark:bg-[#1b1a55]/40">
+                    <div className="animate-spin rounded-full h-10 w-10 border-4 border-brand-500/25 border-t-active" />
                   </div>
                 ) : classImage ? (
-                  <div className="relative w-full h-48 rounded-lg overflow-hidden border">
+                  <div className="relative w-full h-48 rounded-lg overflow-hidden border border-brand-500/15 dark:border-brand-500/30 bg-[#535C91]/5 dark:bg-[#1b1a55]/40">
                     <Image
                       width={500}
                       height={500}
@@ -160,16 +160,16 @@ export default function AddClassPage() {
                     <button
                       type="button"
                       onClick={handleImageRemove}
-                      className="absolute top-2 right-2 p-1.5 bg-black/70 text-white rounded-full"
+                      className="absolute top-2 right-2 p-1.5 bg-black/70 text-white rounded-full cursor-pointer hover:bg-black/95 transition-colors"
                     >
                       <FaTimes className="w-4 h-4" />
                     </button>
                   </div>
                 ) : (
                   <div className="relative">
-                    <div className="w-full h-48 bg-[#F5EDE6] dark:bg-[#3A3530] border-2 border-dashed border-[#E8E0D8] dark:border-[#4A4540] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[#D4845A] transition-colors">
-                      <FaImage className="w-8 h-8 text-[#6B655A] dark:text-[#B8B0A6] mb-2" />
-                      <p className="font-['Inter'] text-sm text-[#6B655A] dark:text-[#B8B0A6]">
+                    <div className="w-full h-48 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 border-2 border-dashed border-brand-500/20 dark:border-brand-500/30 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-active transition-colors">
+                      <FaImage className="w-8 h-8 text-[#535C91] dark:text-[#9290C3] mb-2" />
+                      <p className="text-sm text-[#535C91] dark:text-[#9290C3]">
                         Click to upload or drag & drop
                       </p>
                     </div>
@@ -201,16 +201,16 @@ export default function AddClassPage() {
               <div>
                 <label
                   htmlFor="category"
-                  className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] mb-1 flex items-center gap-2"
+                  className="text-sm font-semibold text-foreground mb-1.5 flex items-center gap-2"
                 >
-                  <FaTag className="text-[#D4845A] w-4 h-4" />
+                  <FaTag className="text-active w-4 h-4" />
                   CATEGORY
                 </label>
                 <select
                   id="category"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#E8E0D8] dark:border-[#4A4540] rounded-lg text-[#2D2A24] dark:text-[#EAE5DE] focus:outline-none focus:border-[#D4845A] focus:ring-2 focus:ring-[#D4845A]/20 transition-all font-['Inter'] text-sm appearance-none"
+                  className="w-full px-4 py-2.5 bg-white dark:bg-brand-800/40 border border-brand-500/20 rounded-lg text-foreground focus:outline-none focus:border-active focus:ring-2 focus:ring-active/20 transition-all text-sm appearance-none"
                 >
                   <option value="Yoga">Yoga</option>
                   <option value="HIIT">HIIT</option>
@@ -228,9 +228,9 @@ export default function AddClassPage() {
               <div>
                 <label
                   htmlFor="duration"
-                  className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] mb-1 flex items-center gap-2"
+                  className="text-sm font-semibold text-foreground mb-1.5 flex items-center gap-2"
                 >
-                  <FaClock className="text-[#D4845A] w-4 h-4" />
+                  <FaClock className="text-active w-4 h-4" />
                   DURATION
                 </label>
                 <div className="flex items-center gap-2">
@@ -240,9 +240,9 @@ export default function AddClassPage() {
                     min="1"
                     value={duration}
                     onChange={(e) => setDuration(parseInt(e.target.value) || 0)}
-                    className="w-24 px-4 py-2.5 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#E8E0D8] dark:border-[#4A4540] rounded-lg text-[#2D2A24] dark:text-[#EAE5DE] focus:outline-none focus:border-[#D4845A] focus:ring-2 focus:ring-[#D4845A]/20 transition-all font-['Inter'] text-sm"
+                    className="w-24 px-4 py-2.5 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 border border-brand-500/20 dark:border-brand-500/30 rounded-lg text-foreground focus:outline-none focus:border-active focus:ring-2 focus:ring-active/20 transition-all text-sm"
                   />
-                  <span className="font-['Inter'] text-sm text-[#6B655A] dark:text-[#B8B0A6]">
+                  <span className="text-sm text-[#535C91] dark:text-[#9290C3] font-semibold">
                     mins
                   </span>
                 </div>
@@ -250,8 +250,8 @@ export default function AddClassPage() {
 
               {/* Class Schedule Days */}
               <div>
-                <label className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] mb-1 flex items-center gap-2">
-                  <FaCalendarAlt className="text-[#D4845A] w-4 h-4" />
+                <label className="text-sm font-semibold text-foreground mb-1.5 flex items-center gap-2">
+                  <FaCalendarAlt className="text-active w-4 h-4" />
                   CLASS SCHEDULE DAYS
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -260,10 +260,10 @@ export default function AddClassPage() {
                       key={day}
                       type="button"
                       onClick={() => toggleDay(day)}
-                      className={`px-3 py-1.5 rounded-md font-['Inter'] text-sm font-medium transition-all ${
+                      className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                         selectedDays.includes(day)
-                          ? "bg-[#D4845A] text-white shadow-sm"
-                          : "bg-[#F5EDE6] dark:bg-[#3A3530] text-[#2D2A24] dark:text-[#EAE5DE] hover:bg-[#E8E0D8] dark:hover:bg-[#4A4540]"
+                          ? "bg-active text-btn-text shadow-sm"
+                          : "bg-[#535C91]/10 dark:bg-[#1b1a55]/60 text-foreground hover:bg-[#535C91]/20 dark:hover:bg-[#1b1a55]/80"
                       }`}
                     >
                       {day}
@@ -276,9 +276,9 @@ export default function AddClassPage() {
               <div>
                 <label
                   htmlFor="time"
-                  className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] mb-1 flex items-center gap-2"
+                  className="text-sm font-semibold text-foreground mb-1.5 flex items-center gap-2"
                 >
-                  <FaClock className="text-[#D4845A] w-4 h-4" />
+                  <FaClock className="text-active w-4 h-4" />
                   TIME
                 </label>
                 <input
@@ -286,7 +286,7 @@ export default function AddClassPage() {
                   type="time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#E8E0D8] dark:border-[#4A4540] rounded-lg text-[#2D2A24] dark:text-[#EAE5DE] focus:outline-none focus:border-[#D4845A] focus:ring-2 focus:ring-[#D4845A]/20 transition-all font-['Inter'] text-sm"
+                  className="w-full px-4 py-2.5 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 border border-brand-500/20 dark:border-brand-500/30 rounded-lg text-foreground focus:outline-none focus:border-active focus:ring-2 focus:ring-active/20 transition-all text-sm"
                 />
               </div>
             </div>
@@ -296,9 +296,9 @@ export default function AddClassPage() {
             <div>
               <label
                 htmlFor="description"
-                className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] mb-1 flex items-center gap-2"
+                className="text-sm font-semibold text-foreground mb-1.5 flex items-center gap-2"
               >
-                <FaFileAlt className="text-[#D4845A] w-4 h-4" />
+                <FaFileAlt className="text-active w-4 h-4" />
                 DESCRIPTION
               </label>
               <textarea
@@ -307,7 +307,7 @@ export default function AddClassPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe the class ..."
-                className="w-full px-4 py-2.5 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#E8E0D8] dark:border-[#4A4540] rounded-lg text-[#2D2A24] dark:text-[#EAE5DE] placeholder-[#8A847C] dark:placeholder-[#6B655A] focus:outline-none focus:border-[#D4845A] focus:ring-2 focus:ring-[#D4845A]/20 transition-all font-['Inter'] text-sm resize-none"
+                className="w-full px-4 py-2.5 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 border border-brand-500/20 dark:border-brand-500/30 rounded-lg text-foreground placeholder-[#535C91]/50 dark:placeholder-[#9290C3]/50 focus:outline-none focus:border-active focus:ring-2 focus:ring-active/20 transition-all text-sm resize-none"
               />
             </div>
 
@@ -315,16 +315,16 @@ export default function AddClassPage() {
               <div>
                 <label
                   htmlFor="difficultyLevel"
-                  className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] mb-1 flex items-center gap-2"
+                  className="text-sm font-semibold text-foreground mb-1.5 flex items-center gap-2"
                 >
-                  <FaLevelUpAlt className="text-[#D4845A] w-4 h-4" />
+                  <FaLevelUpAlt className="text-active w-4 h-4" />
                   DIFFICULTY LEVEL
                 </label>
                 <select
                   id="difficultyLevel"
                   value={difficultyLevel}
                   onChange={(e) => setDifficultyLevel(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#E8E0D8] dark:border-[#4A4540] rounded-lg text-[#2D2A24] dark:text-[#EAE5DE] focus:outline-none focus:border-[#D4845A] focus:ring-2 focus:ring-[#D4845A]/20 transition-all font-['Inter'] text-sm appearance-none"
+                  className="w-full px-4 py-2.5 bg-white dark:bg-brand-800/40 border border-brand-500/20 rounded-lg text-foreground focus:outline-none focus:border-active focus:ring-2 focus:ring-active/20 transition-all text-sm appearance-none"
                 >
                   <option value="Beginner">Beginner</option>
                   <option value="Intermediate">Intermediate</option>
@@ -335,9 +335,9 @@ export default function AddClassPage() {
               <div>
                 <label
                   htmlFor="price"
-                  className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] mb-1 flex items-center gap-2"
+                  className="text-sm font-semibold text-foreground mb-1.5 flex items-center gap-2"
                 >
-                  <FaDollarSign className="text-[#D4845A] w-4 h-4" />
+                  <FaDollarSign className="text-active w-4 h-4" />
                   PRICE ($)
                 </label>
                 <input
@@ -347,16 +347,16 @@ export default function AddClassPage() {
                   step="0.01"
                   value={price}
                   onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
-                  className="w-full px-4 py-2.5 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#E8E0D8] dark:border-[#4A4540] rounded-lg text-[#2D2A24] dark:text-[#EAE5DE] focus:outline-none focus:border-[#D4845A] focus:ring-2 focus:ring-[#D4845A]/20 transition-all font-['Inter'] text-sm"
+                  className="w-full px-4 py-2.5 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 border border-brand-500/20 dark:border-brand-500/30 rounded-lg text-foreground focus:outline-none focus:border-active focus:ring-2 focus:ring-active/20 transition-all text-sm"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="slot"
-                  className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] mb-1 flex items-center gap-2"
+                  className="text-sm font-semibold text-foreground mb-1.5 flex items-center gap-2"
                 >
-                  <FaUsers className="text-[#D4845A] w-4 h-4" />
+                  <FaUsers className="text-active w-4 h-4" />
                   SLOT (capacity)
                 </label>
                 <input
@@ -365,7 +365,7 @@ export default function AddClassPage() {
                   min="1"
                   value={slot}
                   onChange={(e) => setSlot(parseInt(e.target.value) || 0)}
-                  className="w-full px-4 py-2.5 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#E8E0D8] dark:border-[#4A4540] rounded-lg text-[#2D2A24] dark:text-[#EAE5DE] focus:outline-none focus:border-[#D4845A] focus:ring-2 focus:ring-[#D4845A]/20 transition-all font-['Inter'] text-sm"
+                  className="w-full px-4 py-2.5 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 border border-brand-500/20 dark:border-brand-500/30 rounded-lg text-foreground focus:outline-none focus:border-active focus:ring-2 focus:ring-active/20 transition-all text-sm"
                 />
               </div>
             </div>
@@ -374,7 +374,7 @@ export default function AddClassPage() {
           <div className="flex justify-end pt-4">
             <button
               type="submit"
-              className="px-8 py-3 bg-[#D4845A] text-white font-['Inter'] font-semibold rounded-lg hover:bg-[#B86A42] transition-colors shadow-md hover:shadow-lg flex items-center gap-2"
+              className="px-8 py-3 bg-btn-bg text-btn-text font-semibold rounded-xl hover:opacity-90 transition-all shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer border border-brand-500/20"
             >
               Add Class
             </button>

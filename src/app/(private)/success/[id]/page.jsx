@@ -74,73 +74,73 @@ export default async function Success({ searchParams, params }) {
     }
 
     return (
-      <div className="min-h-screen bg-[#FCF9F6] dark:bg-[#1E1C18] flex items-center justify-center px-4 py-12 transition-colors duration-300">
-        <div className="w-full max-w-2xl bg-white dark:bg-[#2D2A24] rounded-2xl shadow-xl border border-[#E8E0D8] dark:border-[#3A3530] p-8 md:p-12">
+      <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12 transition-colors duration-300">
+        <div className="w-full max-w-2xl bg-white dark:bg-brand-800/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/30 p-8 md:p-12">
           {/* Success Icon */}
           <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 rounded-full bg-[#A68B6E]/20 dark:bg-[#A68B6E]/30 flex items-center justify-center">
-              <FaCheckCircle className="w-10 h-10 text-[#A68B6E]" />
+            <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center">
+              <FaCheckCircle className="w-10 h-10 text-emerald-500" />
             </div>
           </div>
 
           {/* Heading */}
-          <h1 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-center text-[#2D2A24] dark:text-[#EAE5DE]">
+          <h1 className="font-['Outfit'] text-3xl md:text-4xl font-bold text-center text-foreground">
             Payment Successful!
           </h1>
-          <p className="font-['Inter'] text-center text-[#6B655A] dark:text-[#B8B0A6] mt-2">
+          <p className="font-['Inter'] text-center text-[#535C91] dark:text-[#9290C3] mt-2">
             Thank you for your booking. A confirmation email has been sent to{" "}
-            <span className="font-medium text-[#2D2A24] dark:text-[#EAE5DE]">
+            <span className="font-semibold text-foreground">
               {customerEmail}
             </span>
             .
           </p>
 
           {/* Booking Summary */}
-          <div className="mt-8 bg-[#F5EDE6] dark:bg-[#3A3530] rounded-xl p-6 space-y-3 border border-[#E8E0D8] dark:border-[#4A4540]">
-            <h2 className="font-['Inter'] text-sm font-semibold uppercase tracking-wider text-[#6B655A] dark:text-[#B8B0A6]">
+          <div className="mt-8 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 rounded-xl p-6 space-y-3 border border-brand-500/20 dark:border-brand-500/30">
+            <h2 className="font-['Inter'] text-sm font-bold uppercase tracking-wider text-[#535C91] dark:text-[#9290C3]">
               Booking Summary
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex items-center gap-3">
-                <FaCalendarCheck className="w-5 h-5 text-[#D4845A]" />
+                <FaCalendarCheck className="w-5 h-5 text-active" />
                 <div>
-                  <p className="font-['Inter'] text-xs text-[#6B655A] dark:text-[#B8B0A6]">
+                  <p className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3]">
                     Class
                   </p>
-                  <p className="font-['Inter'] font-medium text-[#2D2A24] dark:text-[#EAE5DE]">
+                  <p className="font-['Inter'] font-semibold text-foreground">
                     {className}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <FaUser className="w-5 h-5 text-[#D4845A]" />
+                <FaUser className="w-5 h-5 text-active" />
                 <div>
-                  <p className="font-['Inter'] text-xs text-[#6B655A] dark:text-[#B8B0A6]">
+                  <p className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3]">
                     Trainer
                   </p>
-                  <p className="font-['Inter'] font-medium text-[#2D2A24] dark:text-[#EAE5DE]">
+                  <p className="font-['Inter'] font-semibold text-foreground">
                     {trainer}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <FaClock className="w-5 h-5 text-[#D4845A]" />
+                <FaClock className="w-5 h-5 text-active" />
                 <div>
-                  <p className="font-['Inter'] text-xs text-[#6B655A] dark:text-[#B8B0A6]">
+                  <p className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3]">
                     Duration
                   </p>
-                  <p className="font-['Inter'] font-medium text-[#2D2A24] dark:text-[#EAE5DE]">
+                  <p className="font-['Inter'] font-semibold text-foreground">
                     {duration} minutes
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <FaDollarSign className="w-5 h-5 text-[#D4845A]" />
+                <FaDollarSign className="w-5 h-5 text-active" />
                 <div>
-                  <p className="font-['Inter'] text-xs text-[#6B655A] dark:text-[#B8B0A6]">
+                  <p className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3]">
                     Price
                   </p>
-                  <p className="font-['Inter'] font-medium text-[#2D2A24] dark:text-[#EAE5DE]">
+                  <p className="font-['Inter'] font-semibold text-foreground">
                     ${price}
                   </p>
                 </div>
@@ -152,26 +152,26 @@ export default async function Success({ searchParams, params }) {
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <Link
               href="/dashboard/member/bookings"
-              className="flex-1 text-center py-3 bg-[#D4845A] text-white font-['Inter'] font-semibold rounded-lg hover:bg-[#B86A42] transition-colors shadow-md hover:shadow-lg"
+              className="flex-1 text-center py-3 bg-btn-bg text-btn-text font-['Inter'] font-semibold rounded-xl hover:opacity-90 transition-colors shadow-sm cursor-pointer border border-brand-500/20"
             >
               View My Bookings
             </Link>
             <Link
               href="/all-classes"
-              className="flex-1 text-center py-3 border-2 border-[#D4845A] text-[#D4845A] font-['Inter'] font-semibold rounded-lg hover:bg-[#D4845A] hover:text-white transition-all"
+              className="flex-1 text-center py-3 border-2 border-brand-500/20 text-[#535C91] dark:text-[#9290C3] font-['Inter'] font-semibold rounded-xl hover:border-active hover:text-active transition-all cursor-pointer"
             >
               Browse More Classes
             </Link>
           </div>
 
           {/* Extra info */}
-          <p className="mt-6 text-center font-['Inter'] text-xs text-[#6B655A] dark:text-[#B8B0A6]">
+          <p className="mt-6 text-center font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3]">
             If you have any questions, please email{" "}
             <a
-              href="mailto:orders@example.com"
-              className="text-[#D4845A] hover:underline"
+              href="mailto:support@flexpulse.com"
+              className="text-active hover:underline"
             >
-              orders@example.com
+              support@flexpulse.com
             </a>
             .
           </p>

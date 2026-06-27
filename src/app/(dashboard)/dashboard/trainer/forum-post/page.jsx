@@ -60,18 +60,18 @@ export default function CreateForumPostPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FCF9F6] dark:bg-[#1E1C18] py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300 flex items-center justify-center">
+    <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300 flex items-center justify-center">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-2xl bg-white dark:bg-[#2D2A24] rounded-2xl shadow-lg border border-[#E8E0D8] dark:border-[#3A3530] p-6 md:p-8"
+        className="w-full max-w-2xl bg-white dark:bg-brand-800/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/30 p-6 md:p-8"
       >
         {/* Back button */}
         <div className="mb-6">
           <Link
             href="/forum"
-            className="inline-flex items-center gap-2 text-[#6B655A] dark:text-[#B8B0A6] hover:text-[#D4845A] transition-colors font-['Inter'] text-sm"
+            className="inline-flex items-center gap-2 text-[#535C91] dark:text-[#9290C3] hover:text-active transition-colors font-['Inter'] text-sm"
           >
             <FaArrowLeft className="w-4 h-4" />
             Back to Forum
@@ -80,10 +80,10 @@ export default function CreateForumPostPage() {
 
         {/* Header */}
         <div className="mb-6">
-          <h1 className="font-['Playfair_Display'] text-3xl font-bold text-[#2D2A24] dark:text-[#EAE5DE]">
+          <h1 className="font-['Outfit'] text-3xl font-bold text-foreground">
             Create New Post
           </h1>
-          <p className="font-['Inter'] text-[#6B655A] dark:text-[#B8B0A6] mt-1">
+          <p className="font-['Inter'] text-[#535C91] dark:text-[#9290C3] mt-1">
             Share your fitness insights, tips, or success story with the
             community.
           </p>
@@ -95,9 +95,9 @@ export default function CreateForumPostPage() {
           <div>
             <label
               htmlFor="title"
-              className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] block mb-1"
+              className="font-['Inter'] text-sm font-semibold text-foreground block mb-1"
             >
-              Post Title <span className="text-[#C47A6A]">*</span>
+              Post Title <span className="text-rose-500">*</span>
             </label>
             <input
               id="title"
@@ -105,25 +105,25 @@ export default function CreateForumPostPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter a compelling title..."
-              className="w-full px-4 py-2.5 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#E8E0D8] dark:border-[#4A4540] rounded-lg text-[#2D2A24] dark:text-[#EAE5DE] placeholder-[#8A847C] dark:placeholder-[#6B655A] focus:outline-none focus:border-[#D4845A] focus:ring-2 focus:ring-[#D4845A]/20 transition-all font-['Inter'] text-sm"
+              className="w-full px-4 py-2.5 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 border border-brand-500/20 dark:border-brand-500/30 rounded-lg text-foreground placeholder-[#535C91]/50 dark:placeholder-[#9290C3]/50 focus:outline-none focus:border-active focus:ring-2 focus:ring-active/20 transition-all font-['Inter'] text-sm"
               required
             />
           </div>
 
           {/* Image Upload */}
           <div>
-            <label className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] block mb-1">
+            <label className="font-['Inter'] text-sm font-semibold text-foreground block mb-1">
               Post Image{" "}
-              <span className="text-[#6B655A] dark:text-[#B8B0A6] text-xs font-normal">
+              <span className="text-[#535C91] dark:text-[#9290C3] text-xs font-normal">
                 (optional)
               </span>
             </label>
             {uploading ? (
-              <div className="w-full h-48 flex items-center justify-center border rounded-lg">
-                <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-[#D4845A]" />
+              <div className="w-full h-48 flex items-center justify-center border border-brand-500/20 rounded-lg bg-[#535C91]/5 dark:bg-[#1b1a55]/40">
+                <div className="animate-spin rounded-full h-10 w-10 border-4 border-brand-500/25 border-t-active" />
               </div>
             ) : image ? (
-              <div className="relative w-full h-56 rounded-lg overflow-hidden border border-[#E8E0D8] dark:border-[#3A3530]">
+              <div className="relative w-full h-56 rounded-lg overflow-hidden border border-brand-500/15 dark:border-brand-500/30 bg-[#535C91]/5 dark:bg-[#1b1a55]/40">
                 <Image
                   width={400}
                   height={200}
@@ -135,19 +135,19 @@ export default function CreateForumPostPage() {
                 <button
                   type="button"
                   onClick={handleRemoveImage}
-                  className="absolute top-2 right-2 p-1.5 bg-black/70 text-white rounded-full hover:bg-black/90 transition-colors"
+                  className="absolute top-2 right-2 p-1.5 bg-black/70 text-white rounded-full hover:bg-black/90 transition-colors cursor-pointer"
                 >
                   <FaTimes className="w-4 h-4" />
                 </button>
               </div>
             ) : (
               <div className="relative">
-                <div className="w-full h-56 bg-[#F5EDE6] dark:bg-[#3A3530] border-2 border-dashed border-[#E8E0D8] dark:border-[#4A4540] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[#D4845A] transition-colors">
-                  <FaImage className="w-8 h-8 text-[#6B655A] dark:text-[#B8B0A6] mb-2" />
-                  <p className="font-['Inter'] text-sm text-[#6B655A] dark:text-[#B8B0A6]">
+                <div className="w-full h-56 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 border-2 border-dashed border-brand-500/20 dark:border-brand-500/30 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-active transition-colors">
+                  <FaImage className="w-8 h-8 text-[#535C91] dark:text-[#9290C3] mb-2" />
+                  <p className="font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3]">
                     Click to upload an image
                   </p>
-                  <p className="font-['Inter'] text-xs text-[#6B655A] dark:text-[#B8B0A6] mt-1">
+                  <p className="font-['Inter'] text-xs text-[#535C91]/70 dark:text-[#9290C3]/70 mt-1">
                     PNG, JPG, GIF up to 5MB
                   </p>
                 </div>
@@ -178,9 +178,9 @@ export default function CreateForumPostPage() {
           <div>
             <label
               htmlFor="description"
-              className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] block mb-1"
+              className="font-['Inter'] text-sm font-semibold text-foreground block mb-1"
             >
-              Description <span className="text-[#C47A6A]">*</span>
+              Description <span className="text-rose-500">*</span>
             </label>
             <textarea
               id="description"
@@ -188,7 +188,7 @@ export default function CreateForumPostPage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Write your post content here..."
-              className="w-full px-4 py-2.5 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#E8E0D8] dark:border-[#4A4540] rounded-lg text-[#2D2A24] dark:text-[#EAE5DE] placeholder-[#8A847C] dark:placeholder-[#6B655A] focus:outline-none focus:border-[#D4845A] focus:ring-2 focus:ring-[#D4845A]/20 transition-all font-['Inter'] text-sm resize-none"
+              className="w-full px-4 py-2.5 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 border border-brand-500/20 dark:border-brand-500/30 rounded-lg text-foreground placeholder-[#535C91]/50 dark:placeholder-[#9290C3]/50 focus:outline-none focus:border-active focus:ring-2 focus:ring-active/20 transition-all font-['Inter'] text-sm resize-none"
               required
             />
           </div>
@@ -198,10 +198,10 @@ export default function CreateForumPostPage() {
             <button
               type="submit"
               disabled={!isFormValid}
-              className={`flex-1 py-2.5 font-['Inter'] font-semibold rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 ${
+              className={`flex-1 py-2.5 font-['Inter'] font-semibold rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
                 isFormValid
-                  ? "bg-[#D4845A] text-white hover:bg-[#B86A42]"
-                  : "bg-[#E8E0D8] dark:bg-[#3A3530] text-[#8A847C] dark:text-[#6B655A] cursor-not-allowed"
+                  ? "bg-btn-bg text-btn-text hover:opacity-90"
+                  : "bg-[#535C91]/10 dark:bg-[#1b1a55]/60 text-[#535C91]/50 dark:text-[#9290C3]/50 cursor-not-allowed"
               }`}
             >
               <FaPencilAlt className="w-4 h-4" />
@@ -209,7 +209,7 @@ export default function CreateForumPostPage() {
             </button>
             <Link
               href="/forum"
-              className="flex-1 py-2.5 border-2 border-[#E8E0D8] dark:border-[#3A3530] text-[#2D2A24] dark:text-[#EAE5DE] font-['Inter'] font-semibold rounded-lg hover:border-[#D4845A] hover:text-[#D4845A] transition-colors text-center"
+              className="flex-1 py-2.5 border-2 border-brand-500/20 text-[#535C91] dark:text-[#9290C3] font-['Inter'] font-semibold rounded-lg hover:border-active hover:text-active transition-colors text-center"
             >
               Cancel
             </Link>

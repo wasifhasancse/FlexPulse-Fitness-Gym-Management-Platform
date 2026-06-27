@@ -14,17 +14,17 @@ export default async function MyPostsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="font-['Playfair_Display'] text-2xl sm:text-3xl font-bold text-[#2D2A24] dark:text-[#EAE5DE]">
+          <h1 className="font-['Outfit'] text-2xl sm:text-3xl font-bold text-foreground">
             My Posts
           </h1>
-          <p className="text-[#6B655A] dark:text-[#B8B0A6] font-['Inter'] text-sm">
+          <p className="text-[#535C91] dark:text-[#9290C3] font-['Inter'] text-sm">
             {myForumPosts.length} {myForumPosts.length === 1 ? "post" : "posts"}{" "}
             published
           </p>
         </div>
         <Link
-          href="/dashboard/trainer/forum-posts"
-          className="inline-flex items-center gap-2 bg-[#D4845A] text-white px-4 py-2 rounded-lg font-['Inter'] text-sm font-medium hover:bg-[#B86A42] transition-colors shadow-sm whitespace-nowrap"
+          href="/dashboard/trainer/forum-post"
+          className="inline-flex items-center gap-2 bg-btn-bg text-btn-text px-4 py-2 rounded-xl font-['Inter'] text-sm font-semibold hover:opacity-90 transition-colors shadow-sm whitespace-nowrap border border-brand-500/20"
         >
           <FaPlus className="w-4 h-4" />
           New Post
@@ -33,13 +33,13 @@ export default async function MyPostsPage() {
 
       {/* Posts Grid */}
       {myForumPosts.length === 0 ? (
-        <div className="bg-white dark:bg-[#2D2A24] rounded-2xl p-12 text-center border border-[#E8E0D8] dark:border-[#3A3530]">
-          <p className="text-[#6B655A] dark:text-[#B8B0A6] font-['Inter']">
+        <div className="bg-white dark:bg-brand-800/20 rounded-2xl p-12 text-center border border-brand-500/15 dark:border-brand-500/20">
+          <p className="text-[#535C91] dark:text-[#9290C3] font-['Inter'] mb-4">
             You haven&apos;t created any posts yet.
           </p>
           <Link
-            href="/forum/create"
-            className="inline-block mt-4 px-5 py-2.5 bg-[#D4845A] text-white rounded-lg font-['Inter'] text-sm hover:bg-[#B86A42] transition-colors"
+            href="/dashboard/trainer/forum-post"
+            className="inline-block px-5 py-2.5 bg-btn-bg text-btn-text rounded-xl font-['Inter'] font-semibold hover:opacity-90 transition-colors shadow-sm"
           >
             Write Your First Post
           </Link>

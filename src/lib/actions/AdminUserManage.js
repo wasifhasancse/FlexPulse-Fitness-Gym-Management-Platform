@@ -49,12 +49,15 @@ export const updateUserRole = async (userId, role = "admin") => {
 
 
 export const blockUser = async (userId) => {
+  console.log('userId :>> ', userId);
   const data = await auth.api.banUser({
     body: {
       userId,
     },
     headers: await headers(),
   });
+  console.log(data);
+  console.log(userId);
   revalidatePath("/dashboard/admin/manageUsers");
   return data;
 };

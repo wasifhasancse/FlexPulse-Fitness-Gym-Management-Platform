@@ -2,7 +2,7 @@
 
 import { DeleteClassModal } from "@/components/Dashboard/trainer/DeleteClassModal";
 import UpdateModal from "@/components/Dashboard/trainer/UpdateModal";
-import { getMyClasses } from "@/lib/api/getClasses";
+import { getMyClasses, getClassStudents } from "@/lib/api/getClasses";
 import { authClient } from "@/lib/auth-client";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -15,8 +15,10 @@ import {
     FaPlus,
     FaSpinner,
     FaUsers,
+    FaTimes
 } from "react-icons/fa";
 import { TfiMoney } from "react-icons/tfi";
+import { toast } from "@heroui/react";
 
 export default function MyClassesPage() {
   const { data: session } = authClient.useSession();
@@ -26,6 +28,11 @@ export default function MyClassesPage() {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  const [selectedClass, setSelectedClass] = useState(null);
+  const [students, setStudents] = useState([]);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const [isStudentsModalOpen, setIsStudentsModalOpen] = useState(false);
 
   const [refresh, setRefresh] = useState(0);
   useEffect(() => {
@@ -87,10 +94,28 @@ export default function MyClassesPage() {
     }
   };
 
+  const handleViewStudents = async (cls) => {
+    setSelectedClass(cls);
+    setIsStudentsModalOpen(true);
+    setStudentsLoading(true);
+    try {
+      const { data: tokenData } = await authClient.token();
+      if (tokenData?.token) {
+        const data = await getClassStudents(cls._id, tokenData.token);
+        setStudents(data || []);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load students list");
+    } finally {
+      setStudentsLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <FaSpinner className="w-8 h-8 text-[#D4845A] animate-spin" />
+        <FaSpinner className="w-8 h-8 text-active animate-spin" />
       </div>
     );
   }
@@ -98,7 +123,7 @@ export default function MyClassesPage() {
   if (error) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="font-['Inter'] text-[#C47A6A]">
+        <p className="font-['Inter'] text-rose-500">
           Error loading classes: {error}
         </p>
       </div>
@@ -115,17 +140,17 @@ export default function MyClassesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-[#2D2A24] dark:text-[#EAE5DE]">
+          <h1 className="font-['Outfit'] text-3xl md:text-4xl font-bold text-foreground">
             My Managed Classes
           </h1>
-          <p className="font-['Inter'] text-[#6B655A] dark:text-[#B8B0A6] mt-1">
+          <p className="font-['Inter'] text-[#535C91] dark:text-[#9290C3] mt-1">
             {activeClasses} Active Sessions · {totalEnrollments} Total
             Enrollments · Updated just now
           </p>
         </div>
         <Link
           href="/dashboard/trainer/add-class"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#D4845A] text-white font-['Inter'] font-medium rounded-lg hover:bg-[#B86A42] transition-colors shadow-sm hover:shadow-md whitespace-nowrap"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-btn-bg text-btn-text font-['Inter'] font-semibold rounded-xl hover:opacity-90 transition-colors shadow-sm hover:shadow-md whitespace-nowrap border border-brand-500/20"
         >
           <FaPlus className="w-4 h-4" />
           Create New Class
@@ -134,30 +159,30 @@ export default function MyClassesPage() {
 
       {/* Table */}
       {classes.length === 0 ? (
-        <div className="bg-white dark:bg-[#2D2A24] rounded-xl p-12 text-center shadow-sm border border-[#E8E0D8] dark:border-[#3A3530]">
-          <p className="font-['Inter'] text-[#6B655A] dark:text-[#B8B0A6]">
+        <div className="bg-white dark:bg-brand-800/20 rounded-2xl p-12 text-center shadow-card border border-brand-500/15 dark:border-brand-500/20">
+          <p className="font-['Inter'] text-[#535C91] dark:text-[#9290C3] mb-4">
             You haven&apos;t created any classes yet.
           </p>
           <Link
             href="/dashboard/trainer/add-class"
-            className="inline-block mt-4 px-5 py-2.5 bg-[#D4845A] text-white font-['Inter'] font-medium rounded-lg hover:bg-[#B86A42] transition-colors"
+            className="inline-block px-5 py-2.5 bg-btn-bg text-btn-text font-['Inter'] font-semibold rounded-xl hover:opacity-90 transition-colors shadow-sm"
           >
             Create Your First Class
           </Link>
         </div>
       ) : (
-        <div className="bg-white dark:bg-[#2D2A24] rounded-xl shadow-sm border border-[#E8E0D8] dark:border-[#3A3530] overflow-hidden">
+        <div className="bg-white dark:bg-brand-800/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/20 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left font-['Inter'] text-sm">
-              <thead className="bg-[#F5EDE6] dark:bg-[#3A3530] text-[#6B655A] dark:text-[#B8B0A6]">
+              <thead className="bg-brand-500/10 text-[#535C91] dark:text-[#9290C3]">
                 <tr>
-                  <th className="py-3 px-4 font-semibold">Image</th>
-                  <th className="py-3 px-4 font-semibold">Class Name</th>
-                  <th className="py-3 px-4 font-semibold">Date & Time</th>
-                  <th className="py-3 px-4 font-semibold">Price</th>
-                  <th className="py-3 px-4 font-semibold">Bookings</th>
-                  <th className="py-3 px-4 font-semibold">Status</th>
-                  <th className="py-3 px-4 font-semibold text-right">
+                  <th className="py-3.5 px-6 font-semibold">Image</th>
+                  <th className="py-3.5 px-6 font-semibold">Class Name</th>
+                  <th className="py-3.5 px-6 font-semibold">Date & Time</th>
+                  <th className="py-3.5 px-6 font-semibold">Price</th>
+                  <th className="py-3.5 px-6 font-semibold">Bookings</th>
+                  <th className="py-3.5 px-6 font-semibold">Status</th>
+                  <th className="py-3.5 px-6 font-semibold text-right">
                     Actions
                   </th>
                 </tr>
@@ -166,12 +191,12 @@ export default function MyClassesPage() {
                 {classes.map((cls) => (
                   <tr
                     key={cls._id}
-                    className="border-b border-[#E8E0D8] dark:border-[#3A3530] hover:bg-[#F5EDE6] dark:hover:bg-[#3A3530] transition-colors"
+                    className="border-b border-brand-500/10 dark:border-brand-800/40 hover:bg-brand-500/5 transition-colors"
                   >
                     {/* Image */}
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-6">
                       {cls.classImage ? (
-                        <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-[#F5EDE6] dark:bg-[#3A3530]">
+                        <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-brand-500/5 border border-brand-500/10">
                           <Image
                             src={cls.classImage}
                             alt={cls.className}
@@ -181,56 +206,56 @@ export default function MyClassesPage() {
                           />
                         </div>
                       ) : (
-                        <div className="w-12 h-12 rounded-lg bg-[#F5EDE6] dark:bg-[#3A3530] flex items-center justify-center text-[#6B655A] dark:text-[#B8B0A6] text-xs">
+                        <div className="w-12 h-12 rounded-lg bg-brand-500/5 border border-brand-500/10 flex items-center justify-center text-[#535C91] dark:text-[#9290C3] text-xs">
                           No img
                         </div>
                       )}
                     </td>
 
                     {/* Class Name */}
-                    <td className="py-4 px-4">
-                      <p className="font-medium text-[#2D2A24] dark:text-[#EAE5DE]">
+                    <td className="py-4 px-6">
+                      <p className="font-bold text-foreground">
                         {cls.className}
                       </p>
-                      <p className="text-xs text-[#6B655A] dark:text-[#B8B0A6]">
+                      <p className="text-xs text-[#535C91] dark:text-[#9290C3] mt-0.5">
                         {cls.category} · {cls.difficultyLevel}
                       </p>
                     </td>
 
                     {/* Date & Time */}
-                    <td className="py-4 px-4 text-[#2D2A24] dark:text-[#EAE5DE]">
+                    <td className="py-4 px-6 text-foreground">
                       <div className="flex flex-col gap-0.5">
-                        <span className="flex items-center gap-1">
-                          <FaCalendarAlt className="w-3 h-3 text-[#D4845A]" />
+                        <span className="flex items-center gap-1.5 font-medium">
+                          <FaCalendarAlt className="w-3 h-3 text-active" />
                           {cls.classSchedule}
                         </span>
-                        <span className="flex items-center gap-1 text-xs text-[#6B655A] dark:text-[#B8B0A6]">
-                          <FaClock className="w-3 h-3 text-[#D4845A]" />
+                        <span className="flex items-center gap-1.5 text-xs text-[#535C91] dark:text-[#9290C3]">
+                          <FaClock className="w-3 h-3 text-active" />
                           {cls.time} · {cls.duration} min
                         </span>
                       </div>
                     </td>
 
                     {/* Price */}
-                    <td className="py-4 px-4 text-[#2D2A24] dark:text-[#EAE5DE]">
+                    <td className="py-4 px-6 text-foreground font-bold">
                       <span className="flex items-center gap-1">
-                        <TfiMoney className="w-3 h-3 text-[#D4845A]" />$
+                        <TfiMoney className="w-3.5 h-3.5 text-active" />$
                         {cls.price}
                       </span>
                     </td>
 
                     {/* Bookings */}
-                    <td className="py-4 px-4">
-                      <span className="font-medium text-[#2D2A24] dark:text-[#EAE5DE]">
+                    <td className="py-4 px-6 text-foreground font-bold">
+                      <span>
                         {cls.bookedCount || 0}
                       </span>
-                      <span className="text-[#6B655A] dark:text-[#B8B0A6]">
+                      <span className="text-[#535C91] dark:text-[#9290C3] font-normal">
                         /{cls.slot}
                       </span>
                     </td>
 
                     {/* Status */}
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-6">
                       <span
                         className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(
                           cls.status,
@@ -241,11 +266,11 @@ export default function MyClassesPage() {
                     </td>
 
                     {/* Actions */}
-                    <td className="py-4 px-4 text-right">
+                    <td className="py-4 px-6 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Link
                           href={`/all-classes/${cls._id}`}
-                          className="p-1.5 text-[#6B655A] dark:text-[#B8B0A6] hover:text-[#D4845A] transition-colors"
+                          className="p-1.5 text-[#535C91] dark:text-[#9290C3] hover:text-active transition-colors"
                           title="View Details"
                         >
                           <FaEye className="w-4 h-4" />
@@ -259,13 +284,13 @@ export default function MyClassesPage() {
                           onDelete={() => setRefresh((r) => r + 1)}
                           classes={cls}
                         />
-                        <Link
-                          href={`/dashboard/trainer/my-classes/${cls._id}/students`}
-                          className="p-1.5 text-[#6B655A] dark:text-[#B8B0A6] hover:text-[#D4845A] transition-colors"
+                        <button
+                          onClick={() => handleViewStudents(cls)}
+                          className="p-1.5 text-[#535C91] dark:text-[#9290C3] hover:text-active transition-colors cursor-pointer"
                           title="View Students"
                         >
                           <FaUsers className="w-4 h-4" />
-                        </Link>
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -273,6 +298,80 @@ export default function MyClassesPage() {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* Attendees Modal */}
+      {isStudentsModalOpen && selectedClass && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.2 }}
+            className="bg-background rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-brand-500/20 max-h-[85vh] overflow-y-auto"
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="font-['Outfit'] text-2xl font-bold text-foreground">
+                Enrolled Students
+              </h2>
+              <button
+                onClick={() => {
+                  setIsStudentsModalOpen(false);
+                  setStudents([]);
+                }}
+                className="text-[#535C91] dark:text-[#9290C3] hover:text-active transition-colors cursor-pointer"
+              >
+                <FaTimes size={20} />
+              </button>
+            </div>
+
+            <p className="font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3] mb-4">
+              Class: <span className="font-bold text-foreground">{selectedClass.className}</span>
+            </p>
+
+            {studentsLoading ? (
+              <div className="flex flex-col items-center justify-center py-10">
+                <FaSpinner className="w-8 h-8 text-active animate-spin mb-2" />
+                <p className="text-xs text-[#535C91] dark:text-[#9290C3]">Fetching student list...</p>
+              </div>
+            ) : students.length === 0 ? (
+              <div className="bg-brand-500/5 p-8 rounded-xl text-center border border-brand-500/10">
+                <p className="text-[#535C91] dark:text-[#9290C3] font-['Inter'] text-sm">
+                  No students have booked this class yet.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="bg-brand-500/10 p-2.5 rounded-xl text-xs font-bold text-[#535C91] dark:text-[#9290C3] grid grid-cols-2">
+                  <span>NAME</span>
+                  <span>EMAIL</span>
+                </div>
+                <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                  {students.map((student, index) => (
+                    <div
+                      key={index}
+                      className="p-3 bg-white dark:bg-brand-800/20 border border-brand-500/10 rounded-xl grid grid-cols-2 text-sm text-foreground hover:bg-brand-500/5 transition-colors"
+                    >
+                      <span className="font-semibold truncate">{student.name}</span>
+                      <span className="truncate text-[#535C91] dark:text-[#9290C3]">{student.email}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => {
+                  setIsStudentsModalOpen(false);
+                  setStudents([]);
+                }}
+                className="px-5 py-2.5 bg-btn-bg text-btn-text hover:opacity-90 font-['Inter'] font-semibold rounded-xl transition-all cursor-pointer shadow-sm text-sm"
+              >
+                Close list
+              </button>
+            </div>
+          </motion.div>
         </div>
       )}
     </motion.div>

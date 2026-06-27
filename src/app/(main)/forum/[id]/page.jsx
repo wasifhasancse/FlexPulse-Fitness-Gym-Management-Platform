@@ -24,20 +24,6 @@ import {
 } from "react-icons/fa";
 import { RiDeleteBin5Line } from "react-icons/ri";
 
-// Sample related articles
-const relatedArticles = [
-  {
-    id: "rel1",
-    title: "The Power of Cinnamon Folding for Peak Performance",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400",
-  },
-  {
-    id: "rel2",
-    title: "5 Recovery Myths Debunked by Science",
-    image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=400",
-  },
-];
-
 export default function ForumPostDetailsPage() {
   const params = useParams();
   const postId = params?.id;
@@ -57,6 +43,7 @@ export default function ForumPostDetailsPage() {
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [relatedArticles, setRelatedArticles] = useState([]);
 
   const [editingComment, setEditingComment] = useState(null);
   const [editingText, setEditingText] = useState("");
@@ -84,6 +71,21 @@ export default function ForumPostDetailsPage() {
     };
     fetchPost();
   }, [postId, user]);
+
+  useEffect(() => {
+    if (!postId) return;
+    const fetchRelated = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/forumPost?limit=5`);
+        const data = await res.json();
+        const items = data?.items || [];
+        setRelatedArticles(items.filter(item => item._id !== postId).slice(0, 3));
+      } catch (err) {
+        console.error("Failed to load related articles", err);
+      }
+    };
+    fetchRelated();
+  }, [postId]);
 
   useEffect(() => {
     if (post?.title) {
@@ -130,6 +132,9 @@ export default function ForumPostDetailsPage() {
       }
       setIsLiked(data.liked);
       setLikeCount(data.likeCount);
+      if (data.dislikeCount !== undefined) {
+        setDislikeCount(data.dislikeCount);
+      }
     } catch (err) {
       console.error("Failed to like post:", err);
     }
@@ -155,6 +160,9 @@ export default function ForumPostDetailsPage() {
       setDislikeCount(data.dislikeCount);
       if (data.disliked) {
         setIsLiked(false);
+      }
+      if (data.likeCount !== undefined) {
+        setLikeCount(data.likeCount);
       }
     } catch (err) {
       console.error("Failed to dislike post:", err);
@@ -321,7 +329,7 @@ export default function ForumPostDetailsPage() {
   // Reply Submit
   const handleReplySubmit = async (e, commentId) => {
     e.preventDefault();
-    if (!user) return alert("To reply to this comment, please login first!");
+    if (!user) return toast.error("To reply to this comment, please login first!");
     if (!replyText.trim()) return;
     setSubmitting(true);
     try {
@@ -369,16 +377,16 @@ export default function ForumPostDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FCF9F6] dark:bg-[#1E1C18] flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-[#D4845A] border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-active border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-[#FCF9F6] dark:bg-[#1E1C18] flex items-center justify-center">
-        <p className="font-['Inter'] text-[#C47A6A]">
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="font-['Inter'] text-rose-500">
           {error || "Post not found"}
         </p>
       </div>
@@ -386,13 +394,13 @@ export default function ForumPostDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FCF9F6] dark:bg-[#1E1C18] py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+    <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
         {/* Back button */}
         <div className="mb-6">
           <Link
             href="/forum"
-            className="inline-flex items-center gap-2 text-[#6B655A] dark:text-[#B8B0A6] hover:text-[#D4845A] transition-colors font-['Inter'] text-sm"
+            className="inline-flex items-center gap-2 text-[#535C91] dark:text-[#9290C3] hover:text-active transition-colors font-['Inter'] text-sm"
           >
             <FaArrowLeft className="w-4 h-4" />
             Back to Forum
@@ -407,11 +415,11 @@ export default function ForumPostDetailsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="bg-white dark:bg-[#2D2A24] rounded-2xl shadow-lg border border-[#E8E0D8] dark:border-[#3A3530] overflow-hidden"
+              className="bg-white dark:bg-[#1b1a55]/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/30 overflow-hidden"
             >
               {/* Post Image */}
               {post.image && (
-                <div className="relative w-full h-64 md:h-80 bg-[#F5EDE6] dark:bg-[#3A3530]">
+                <div className="relative w-full h-64 md:h-80 bg-brand-800/10">
                   <Image
                     src={post.image}
                     alt={post.title}
@@ -426,7 +434,7 @@ export default function ForumPostDetailsPage() {
               {/* Content */}
               <div className="p-6 md:p-8">
                 {/* Title */}
-                <h1 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-[#2D2A24] dark:text-[#EAE5DE] leading-tight">
+                <h1 className="font-['Outfit'] text-3xl md:text-4xl font-bold text-foreground leading-tight">
                   {post.title}
                 </h1>
 
@@ -438,18 +446,18 @@ export default function ForumPostDetailsPage() {
                       alt={post.userName}
                       width={100}
                       height={100}
-                      className="w-10 h-10 rounded-full object-cover border-2 border-[#D4845A]"
+                      className="w-10 h-10 rounded-full object-cover border-2 border-brand-300"
                     />
                   ) : (
-                    <FaUserCircle className="w-10 h-10 text-[#D4845A]" />
+                    <FaUserCircle className="w-10 h-10 text-active" />
                   )}
                   <div>
-                    <p className="font-['Inter'] font-semibold text-[#2D2A24] dark:text-[#EAE5DE]">
+                    <p className="font-['Inter'] font-semibold text-foreground">
                       {post.userName || "Anonymous"}
                     </p>
-                    <div className="flex items-center gap-2 text-sm text-[#6B655A] dark:text-[#B8B0A6]">
+                    <div className="flex items-center gap-2 text-sm text-[#535C91] dark:text-[#9290C3]">
                       {post.userRole && (
-                        <span className="font-['Inter'] font-medium text-[#D4845A] bg-[#D4845A]/10 dark:bg-[#D4845A]/20 px-2 py-0.5 rounded-full text-xs">
+                        <span className="font-['Inter'] font-medium text-active bg-[#535C91]/10 dark:bg-[#1B1A55]/60 px-2 py-0.5 rounded-full text-xs">
                           {post.userRole.charAt(0).toUpperCase() +
                             post.userRole.slice(1)}
                         </span>
@@ -464,69 +472,66 @@ export default function ForumPostDetailsPage() {
 
                 {/* Description */}
                 <div className="mt-6">
-                  <p className="font-['Inter'] text-[#2D2A24] dark:text-[#EAE5DE] leading-relaxed text-base">
+                  <p className="font-['Inter'] text-foreground leading-relaxed text-base">
                     {post.description}
                   </p>
                 </div>
 
                 {/* Quote Block */}
-                <div className="mt-8 p-6 bg-[#F5EDE6] dark:bg-[#3A3530] rounded-xl border-l-4 border-[#D4845A]">
-                  <FaQuoteLeft className="text-[#D4845A] w-5 h-5 mb-2 opacity-60" />
-                  <p className="font-['Inter'] italic text-[#2D2A24] dark:text-[#EAE5DE] leading-relaxed">
-                    &quot;True recovery isn&apos;t just about what you eat;
-                    it&apos;s about the timing and the biological integrity of
-                    the nutrient you provide your body after a high-intensity
-                    stimulus.&quot;
+                <div className="mt-8 p-6 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 rounded-xl border-l-4 border-active">
+                  <FaQuoteLeft className="text-active w-5 h-5 mb-2 opacity-60" />
+                  <p className="font-['Inter'] italic text-[#535C91] dark:text-[#9290C3] leading-relaxed">
+                    &quot;Success in fitness is not about random effort; it's about the consistency and building healthy daily habits with dedicated guidance.&quot;
                   </p>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-wrap items-center gap-4 mt-6 pt-4 border-t border-[#E8E0D8] dark:border-[#3A3530]">
+                <div className="flex flex-wrap items-center gap-4 mt-6 pt-4 border-t border-brand-500/10 dark:border-brand-800/40">
                   <button
                     onClick={handelLike}
-                    className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-['Inter'] text-sm font-medium transition-all ${
+                    className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-['Inter'] text-sm font-medium transition-all cursor-pointer ${
                       isLiked
-                        ? "bg-[#D4845A] text-white"
-                        : "bg-[#F5EDE6] dark:bg-[#3A3530] text-[#2D2A24] dark:text-[#EAE5DE] hover:bg-[#E8E0D8] dark:hover:bg-[#4A4540]"
+                        ? "bg-active text-btn-text"
+                        : "bg-[#535C91]/10 dark:bg-[#1b1a55]/60 text-foreground hover:bg-[#535C91]/20 dark:hover:bg-[#1b1a55]/80"
                     }`}
                   >
                     <FaHeart
-                      className={`w-4 h-4 ${isLiked ? "text-white" : "text-[#D4845A]"}`}
+                      className={`w-4 h-4 ${isLiked ? "text-btn-text" : "text-active"}`}
                     />
                     {isLiked ? "Liked" : "Like"} ({likeCount})
                   </button>
                   <button
                     onClick={handleDislike}
-                    className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-['Inter'] text-sm font-medium transition-all ${
+                    className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-['Inter'] text-sm font-medium transition-all cursor-pointer ${
                       isDisliked
-                        ? "bg-red-500 text-white"
-                        : "bg-[#F5EDE6] dark:bg-[#3A3530] text-[#2D2A24] dark:text-[#EAE5DE] hover:bg-[#E8E0D8] dark:hover:bg-[#4A4540]"
+                        ? "bg-rose-500 text-white"
+                        : "bg-[#535C91]/10 dark:bg-[#1b1a55]/60 text-foreground hover:bg-[#535C91]/20 dark:hover:bg-[#1b1a55]/80"
                     }`}
                   >
                     <FaThumbsDown
-                      className={`w-4 h-4 ${isDisliked ? "text-white" : "text-red-500"}`}
+                      className={`w-4 h-4 ${isDisliked ? "text-white" : "text-rose-500"}`}
                     />
                     {isDisliked ? "Disliked" : "Dislike"} ({dislikeCount})
                   </button>
-                  <button className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F5EDE6] dark:bg-[#3A3530] text-[#2D2A24] dark:text-[#EAE5DE] hover:bg-[#E8E0D8] dark:hover:bg-[#4A4540] transition-colors font-['Inter'] text-sm font-medium">
-                    <FaComment className="w-4 h-4 text-[#D4845A]" />
-                    Comment
+                  <button className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#535C91]/10 dark:bg-[#1b1a55]/60 text-foreground hover:bg-[#535C91]/20 dark:hover:bg-[#1b1a55]/80 transition-colors font-['Inter'] text-sm font-medium cursor-pointer">
+                    <FaComment className="w-4 h-4 text-active" />
+                    Comment ({comments.length})
                   </button>
                   <button
                     onClick={() => setIsSaved(!isSaved)}
-                    className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-['Inter'] text-sm font-medium transition-all ${
+                    className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-['Inter'] text-sm font-medium transition-all cursor-pointer ${
                       isSaved
-                        ? "bg-[#D4845A] text-white"
-                        : "bg-[#F5EDE6] dark:bg-[#3A3530] text-[#2D2A24] dark:text-[#EAE5DE] hover:bg-[#E8E0D8] dark:hover:bg-[#4A4540]"
+                        ? "bg-active text-btn-text"
+                        : "bg-[#535C91]/10 dark:bg-[#1b1a55]/60 text-foreground hover:bg-[#535C91]/20 dark:hover:bg-[#1b1a55]/80"
                     }`}
                   >
                     <FaBookmark
-                      className={`w-4 h-4 ${isSaved ? "text-white" : "text-[#D4845A]"}`}
+                      className={`w-4 h-4 ${isSaved ? "text-btn-text" : "text-active"}`}
                     />
                     {isSaved ? "Saved" : "Save"}
                   </button>
-                  <button className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F5EDE6] dark:bg-[#3A3530] text-[#2D2A24] dark:text-[#EAE5DE] hover:bg-[#E8E0D8] dark:hover:bg-[#4A4540] transition-colors font-['Inter'] text-sm font-medium ml-auto">
-                    <FaShareAlt className="w-4 h-4 text-[#D4845A]" />
+                  <button className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#535C91]/10 dark:bg-[#1b1a55]/60 text-foreground hover:bg-[#535C91]/20 dark:hover:bg-[#1b1a55]/80 transition-colors font-['Inter'] text-sm font-medium ml-auto cursor-pointer">
+                    <FaShareAlt className="w-4 h-4 text-active" />
                     Share
                   </button>
                 </div>
@@ -538,23 +543,23 @@ export default function ForumPostDetailsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-white dark:bg-[#2D2A24] rounded-2xl shadow-lg border border-[#E8E0D8] dark:border-[#3A3530] p-6 md:p-8"
+              className="bg-white dark:bg-[#1b1a55]/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/30 p-6 md:p-8"
             >
-              <h3 className="font-['Inter'] text-sm font-semibold uppercase tracking-wider text-[#6B655A] dark:text-[#B8B0A6] mb-6">
+              <h3 className="font-['Inter'] text-sm font-semibold uppercase tracking-wider text-[#535C91] dark:text-[#9290C3] mb-6">
                 Community Discussion ({comments.length})
               </h3>
 
               {/* Comments List */}
               <div className="space-y-6">
                 {comments.length === 0 ? (
-                  <p className="font-['Inter'] text-sm text-[#6B655A] dark:text-[#B8B0A6]">
-                    No comments yet. Be the first!
+                  <p className="font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3]">
+                    No comments yet. Be the first to share your thoughts!
                   </p>
                 ) : (
                   comments.map((comment) => (
                     <div
                       key={comment._id}
-                      className="border-b border-[#E8E0D8] dark:border-[#3A3530] pb-4 last:border-0"
+                      className="border-b border-brand-500/10 dark:border-brand-800/40 pb-4 last:border-0"
                     >
                       <div className="flex items-start gap-3">
                         {comment.userImage ? (
@@ -563,22 +568,22 @@ export default function ForumPostDetailsPage() {
                             alt={comment.userName}
                             width={40}
                             height={40}
-                            className="w-10 h-10 rounded-full object-cover border-2 border-[#D4845A] shrink-0"
+                            className="w-10 h-10 rounded-full object-cover border-2 border-brand-300 shrink-0"
                           />
                         ) : (
-                          <FaUserCircle className="w-10 h-10 text-[#D4845A] shrink-0" />
+                          <FaUserCircle className="w-10 h-10 text-active shrink-0" />
                         )}
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <p className="font-['Inter'] font-semibold text-[#2D2A24] dark:text-[#EAE5DE] text-sm">
+                              <p className="font-['Inter'] font-semibold text-foreground text-sm">
                                 {comment.userName}
                               </p>
-                              <span className="text-xs text-[#6B655A] dark:text-[#B8B0A6]">
+                              <span className="text-xs text-[#535C91] dark:text-[#9290C3]">
                                 {timeAgo(comment.createdAt)}
                               </span>
                               {comment.edited && (
-                                <span className="text-xs text-[#6B655A] dark:text-[#B8B0A6] italic">
+                                <span className="text-xs text-[#535C91] dark:text-[#9290C3] italic">
                                   (edited)
                                 </span>
                               )}
@@ -591,7 +596,7 @@ export default function ForumPostDetailsPage() {
                                     setEditingComment(comment._id);
                                     setEditingText(comment.content);
                                   }}
-                                  className="text-xs text-[#6B655A] dark:text-[#B8B0A6] hover:text-[#D4845A] transition-colors px-2 py-1 rounded hover:bg-[#F5EDE6] dark:hover:bg-[#3A3530]"
+                                  className="text-xs text-[#535C91] dark:text-[#9290C3] hover:text-active transition-colors px-2 py-1 rounded hover:bg-[#535C91]/10 dark:hover:bg-[#1b1a55]/60 cursor-pointer"
                                 >
                                   <FaEdit />
                                 </button>
@@ -599,7 +604,7 @@ export default function ForumPostDetailsPage() {
                                   onClick={() =>
                                     handleCommentDelete(comment._id)
                                   }
-                                  className="text-xs text-[#6B655A] dark:text-[#B8B0A6] hover:text-red-500 transition-colors px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
+                                  className="text-xs text-[#535C91] dark:text-[#9290C3] hover:text-rose-500 transition-colors px-2 py-1 rounded hover:bg-rose-500/10 cursor-pointer"
                                 >
                                   <RiDeleteBin5Line />
                                 </button>
@@ -613,13 +618,13 @@ export default function ForumPostDetailsPage() {
                                 value={editingText}
                                 onChange={(e) => setEditingText(e.target.value)}
                                 rows="2"
-                                className="w-full px-3 py-2 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#D4845A] rounded-lg text-sm text-[#2D2A24] dark:text-[#EAE5DE] focus:outline-none resize-none"
+                                className="w-full px-3 py-2 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 border border-active rounded-lg text-sm text-foreground focus:outline-none resize-none"
                               />
                               <div className="flex gap-2 mt-2">
                                 <button
                                   onClick={() => handleCommentEdit(comment._id)}
                                   disabled={submitting || !editingText.trim()}
-                                  className="px-4 py-1.5 bg-[#D4845A] text-white text-xs font-medium rounded-lg hover:bg-[#B86A42] disabled:opacity-50"
+                                  className="px-4 py-1.5 bg-btn-bg text-btn-text text-xs font-medium rounded-lg hover:opacity-90 disabled:opacity-50 cursor-pointer"
                                 >
                                   {submitting ? "Saving..." : "Save"}
                                 </button>
@@ -628,38 +633,38 @@ export default function ForumPostDetailsPage() {
                                     setEditingComment(null);
                                     setEditingText("");
                                   }}
-                                  className="px-4 py-1.5 bg-[#F5EDE6] dark:bg-[#3A3530] text-[#6B655A] text-xs font-medium rounded-lg"
+                                  className="px-4 py-1.5 bg-[#535C91]/10 dark:bg-[#1b1a55]/60 text-foreground text-xs font-medium rounded-lg cursor-pointer"
                                 >
                                   Cancel
                                 </button>
                               </div>
                             </div>
                           ) : (
-                            <p className="font-['Inter'] text-sm text-[#2D2A24] dark:text-[#EAE5DE] mt-1">
+                            <p className="font-['Inter'] text-sm text-foreground mt-1">
                               {comment.content}
                             </p>
                           )}
 
                           <div className="flex items-center gap-4 mt-2">
                             <button
-                              onClick={() =>
-                                handleCommentLike(comment._id, comment.likes)
-                              }
-                              className={`flex items-center gap-1 text-xs transition-colors ${
-                                comment.likes?.includes(user?.id)
-                                  ? "text-[#D4845A]"
-                                  : "text-[#6B655A] dark:text-[#B8B0A6] hover:text-[#D4845A]"
-                              }`}
-                            >
+                                onClick={() =>
+                                  handleCommentLike(comment._id, comment.likes)
+                                }
+                                className={`flex items-center gap-1 text-xs transition-colors cursor-pointer ${
+                                  comment.likes?.includes(user?.id)
+                                    ? "text-active"
+                                    : "text-[#535C91] dark:text-[#9290C3] hover:text-active"
+                                }`}
+                              >
                               <FaThumbsUp className="w-3 h-3" />
                               <span>{comment.likes?.length || 0}</span>
                             </button>
                             <button
                               onClick={() => handleCommentDislike(comment._id)}
-                              className={`flex items-center gap-1 text-xs transition-colors ${
+                              className={`flex items-center gap-1 text-xs transition-colors cursor-pointer ${
                                 comment.dislikes?.includes(user?.id)
-                                  ? "text-red-500"
-                                  : "text-[#6B655A] dark:text-[#B8B0A6] hover:text-red-500"
+                                  ? "text-rose-500"
+                                  : "text-[#535C91] dark:text-[#9290C3] hover:text-rose-500"
                               }`}
                             >
                               <FaThumbsDown className="w-3 h-3" />
@@ -673,7 +678,7 @@ export default function ForumPostDetailsPage() {
                                     : comment._id,
                                 )
                               }
-                              className="flex items-center gap-1 text-xs text-[#6B655A] dark:text-[#B8B0A6] hover:text-[#D4845A] transition-colors"
+                              className="flex items-center gap-1 text-xs text-[#535C91] dark:text-[#9290C3] hover:text-active transition-colors cursor-pointer"
                             >
                               <FaReply className="w-3 h-3" /> Reply
                             </button>
@@ -691,13 +696,13 @@ export default function ForumPostDetailsPage() {
                                 onChange={(e) => setReplyText(e.target.value)}
                                 placeholder="Write a reply..."
                                 rows="2"
-                                className="w-full px-3 py-2 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#E8E0D8] dark:border-[#4A4540] rounded-lg text-sm text-[#2D2A24] dark:text-[#EAE5DE] placeholder-[#8A847C] focus:outline-none focus:border-[#D4845A] resize-none"
+                                className="w-full px-3 py-2 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 border border-brand-500/20 dark:border-brand-500/30 rounded-lg text-sm text-foreground placeholder-[#535C91]/50 dark:placeholder-[#9290C3]/50 focus:outline-none focus:border-active resize-none"
                               />
                               <div className="flex gap-2 mt-2">
                                 <button
                                   type="submit"
                                   disabled={submitting || !replyText.trim()}
-                                  className="px-4 py-1.5 bg-[#D4845A] text-white text-xs font-medium rounded-lg hover:bg-[#B86A42] disabled:opacity-50"
+                                  className="px-4 py-1.5 bg-btn-bg text-btn-text text-xs font-medium rounded-lg hover:opacity-90 disabled:opacity-50 cursor-pointer"
                                 >
                                   {submitting ? "Posting..." : "Post Reply"}
                                 </button>
@@ -707,7 +712,7 @@ export default function ForumPostDetailsPage() {
                                     setReplyingTo(null);
                                     setReplyText("");
                                   }}
-                                  className="px-4 py-1.5 bg-[#F5EDE6] dark:bg-[#3A3530] text-[#6B655A] text-xs font-medium rounded-lg"
+                                  className="px-4 py-1.5 bg-[#535C91]/10 dark:bg-[#1b1a55]/60 text-foreground text-xs font-medium rounded-lg cursor-pointer"
                                 >
                                   Cancel
                                 </button>
@@ -716,7 +721,7 @@ export default function ForumPostDetailsPage() {
                           )}
 
                           {comment.replies?.length > 0 && (
-                            <div className="mt-3 ml-4 space-y-3 border-l-2 border-[#E8E0D8] dark:border-[#3A3530] pl-4">
+                            <div className="mt-3 ml-4 space-y-3 border-l-2 border-brand-500/20 dark:border-brand-800/40 pl-4">
                               {comment.replies.map((reply) => (
                                 <div
                                   key={reply._id}
@@ -728,21 +733,21 @@ export default function ForumPostDetailsPage() {
                                       alt={reply.userName}
                                       width={28}
                                       height={28}
-                                      className="w-7 h-7 rounded-full object-cover border border-[#D4845A] shrink-0"
+                                      className="w-7 h-7 rounded-full object-cover border border-brand-300 shrink-0"
                                     />
                                   ) : (
-                                    <FaUserCircle className="w-7 h-7 text-[#D4845A] shrink-0" />
+                                    <FaUserCircle className="w-7 h-7 text-active shrink-0" />
                                   )}
                                   <div>
                                     <div className="flex items-center gap-2">
-                                      <p className="font-['Inter'] font-semibold text-[#2D2A24] dark:text-[#EAE5DE] text-xs">
+                                      <p className="font-['Inter'] font-semibold text-foreground text-xs">
                                         {reply.userName}
                                       </p>
-                                      <span className="text-xs text-[#6B655A] dark:text-[#B8B0A6]">
+                                      <span className="text-xs text-[#535C91] dark:text-[#9290C3]">
                                         {timeAgo(reply.createdAt)}
                                       </span>
                                     </div>
-                                    <p className="font-['Inter'] text-xs text-[#2D2A24] dark:text-[#EAE5DE] mt-0.5">
+                                    <p className="font-['Inter'] text-xs text-foreground mt-0.5">
                                       {reply.content}
                                     </p>
                                   </div>
@@ -757,8 +762,8 @@ export default function ForumPostDetailsPage() {
                 )}
               </div>
 
-              <div className="mt-8 pt-6 border-t border-[#E8E0D8] dark:border-[#3A3530]">
-                <h4 className="font-['Inter'] font-semibold text-[#2D2A24] dark:text-[#EAE5DE] mb-4">
+              <div className="mt-8 pt-6 border-t border-brand-500/10 dark:border-brand-800/40">
+                <h4 className="font-['Inter'] font-semibold text-foreground mb-4">
                   Join the Conversation
                 </h4>
                 {user ? (
@@ -768,17 +773,17 @@ export default function ForumPostDetailsPage() {
                       onChange={(e) => setNewComment(e.target.value)}
                       placeholder="Write your comment..."
                       rows="3"
-                      className="w-full px-4 py-2.5 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#E8E0D8] dark:border-[#4A4540] rounded-lg text-[#2D2A24] dark:text-[#EAE5DE] placeholder-[#8A847C] focus:outline-none focus:border-[#D4845A] focus:ring-2 focus:ring-[#D4845A]/20 font-['Inter'] text-sm resize-none"
+                      className="w-full px-4 py-2.5 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 border border-brand-500/20 dark:border-brand-500/30 rounded-lg text-foreground placeholder-[#535C91]/50 dark:placeholder-[#9290C3]/50 focus:outline-none focus:border-active focus:ring-2 focus:ring-active/20 font-['Inter'] text-sm resize-none"
                       required
                     />
                     <div className="flex justify-end mt-3">
                       <button
                         type="submit"
                         disabled={submitting || !newComment.trim()}
-                        className={`px-6 py-2 font-['Inter'] font-medium rounded-lg transition-all ${
+                        className={`px-6 py-2 font-['Inter'] font-medium rounded-lg transition-all cursor-pointer ${
                           newComment.trim() && !submitting
-                            ? "bg-[#D4845A] text-white hover:bg-[#B86A42] shadow-md"
-                            : "bg-[#E8E0D8] dark:bg-[#3A3530] text-[#8A847C] cursor-not-allowed"
+                            ? "bg-btn-bg text-btn-text hover:opacity-90 shadow-md"
+                            : "bg-[#535C91]/10 dark:bg-[#1b1a55]/60 text-[#535C91]/50 dark:text-[#9290C3]/50 cursor-not-allowed"
                         }`}
                       >
                         {submitting ? "Posting..." : "Post Comment"}
@@ -786,13 +791,13 @@ export default function ForumPostDetailsPage() {
                     </div>
                   </form>
                 ) : (
-                  <div className="text-center py-6 bg-[#F5EDE6] dark:bg-[#3A3530] rounded-xl">
-                    <p className="font-['Inter'] text-sm text-[#6B655A] dark:text-[#B8B0A6] mb-3">
+                  <div className="text-center py-6 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 rounded-xl">
+                    <p className="font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3] mb-3">
                       Please login to join the conversation
                     </p>
                     <Link
                       href="/signin"
-                      className="px-6 py-2 bg-[#D4845A] text-white font-['Inter'] font-medium rounded-lg hover:bg-[#B86A42] transition-colors"
+                      className="px-6 py-2 bg-btn-bg text-btn-text font-['Inter'] font-medium rounded-lg hover:opacity-90 transition-colors"
                     >
                       Login
                     </Link>
@@ -809,9 +814,9 @@ export default function ForumPostDetailsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="bg-white dark:bg-[#2D2A24] rounded-2xl shadow-lg border border-[#E8E0D8] dark:border-[#3A3530] p-6"
+              className="bg-white dark:bg-[#1b1a55]/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/30 p-6"
             >
-              <h3 className="font-['Inter'] text-sm font-semibold uppercase tracking-wider text-[#6B655A] dark:text-[#B8B0A6] mb-4">
+              <h3 className="font-['Inter'] text-sm font-semibold uppercase tracking-wider text-[#535C91] dark:text-[#9290C3] mb-4">
                 About this Author
               </h3>
               <div className="flex flex-col items-start">
@@ -821,24 +826,24 @@ export default function ForumPostDetailsPage() {
                     alt={post.userName}
                     width={800}
                     height={400}
-                    className="w-16 h-16 rounded-full object-cover border-2 border-[#D4845A]"
+                    className="w-16 h-16 rounded-full object-cover border-2 border-brand-300"
                   />
                 ) : (
-                  <FaUserCircle className="w-16 h-16 text-[#D4845A]" />
+                  <FaUserCircle className="w-16 h-16 text-active" />
                 )}
-                <p className="font-['Inter'] font-semibold text-[#2D2A24] dark:text-[#EAE5DE] text-lg mt-3">
+                <p className="font-['Outfit'] font-semibold text-foreground text-lg mt-3">
                   {post.userName || "Anonymous"}
                 </p>
-                <p className="font-['Inter'] text-sm text-[#D4845A]">
+                <p className="font-['Inter'] text-sm text-active">
                   {post.userRole
                     ? post.userRole.charAt(0).toUpperCase() +
                       post.userRole.slice(1)
                     : "Member"}
                 </p>
-                <p className="font-['Inter'] text-sm text-[#6B655A] dark:text-[#B8B0A6] mt-2">
-                  With over 15 years in elite athletic nutrition, this author
-                  specializes in metabolic health and dietary precision for
-                  high-performance athletes.
+                <p className="font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3] mt-2 leading-relaxed">
+                  {post.userRole === "admin"
+                    ? "FlexPulse Platform Administrator dedicated to sharing community guidelines, updates, and general wellness insights for all members."
+                    : "Certified FlexPulse fitness instructor focused on supporting client goals, teaching classes, and sharing modern bodyweight training insights."}
                 </p>
               </div>
             </motion.div>
@@ -848,31 +853,38 @@ export default function ForumPostDetailsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.15 }}
-              className="bg-white dark:bg-[#2D2A24] rounded-2xl shadow-lg border border-[#E8E0D8] dark:border-[#3A3530] p-6"
+              className="bg-white dark:bg-[#1b1a55]/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/30 p-6"
             >
-              <h3 className="font-['Inter'] text-sm font-semibold uppercase tracking-wider text-[#6B655A] dark:text-[#B8B0A6] mb-4">
+              <h3 className="font-['Inter'] text-sm font-semibold uppercase tracking-wider text-[#535C91] dark:text-[#9290C3] mb-4">
                 Related Articles
               </h3>
               <div className="space-y-3">
-                {relatedArticles.map((article) => (
-                  <Link
-                    key={article.id}
-                    href={`/forum/${article.id}`}
-                    className="group flex items-center gap-3 p-3 bg-[#F5EDE6] dark:bg-[#3A3530] rounded-xl hover:bg-[#E8E0D8] dark:hover:bg-[#4A4540] transition-colors"
-                  >
-                    <div className="relative w-16 h-16 rounded-lg overflow-hidden shrink-0">
-                      <Image
-                        src={article.image}
-                        alt={article.title}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <p className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] group-hover:text-[#D4845A] transition-colors line-clamp-2">
-                      {article.title}
-                    </p>
-                  </Link>
-                ))}
+                {relatedArticles.length === 0 ? (
+                  <p className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3]">
+                    No other posts found.
+                  </p>
+                ) : (
+                  relatedArticles.map((article) => (
+                    <Link
+                      key={article._id}
+                      href={`/forum/${article._id}`}
+                      className="group flex items-center gap-3 p-3 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 rounded-xl hover:bg-[#535C91]/10 dark:hover:bg-[#1b1a55]/60 transition-colors"
+                    >
+                      <div className="relative w-16 h-16 rounded-lg overflow-hidden shrink-0">
+                        <Image
+                          src={article.image || "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=400"}
+                          alt={article.title}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </div>
+                      <p className="font-['Inter'] text-sm font-medium text-foreground group-hover:text-active transition-colors line-clamp-2">
+                        {article.title}
+                      </p>
+                    </Link>
+                  ))
+                )}
               </div>
             </motion.div>
           </div>

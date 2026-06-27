@@ -29,6 +29,7 @@ export default function AdminDashboardPage() {
 
   const [users, setUsers] = useState([]);
   const [classes, setClasses] = useState([]);
+  const [stats, setStats] = useState({ totalUsers: 0, totalClasses: 0, totalBookings: 0 });
   const [loading, setLoading] = useState(true);
 
   // Set page title
@@ -40,13 +41,27 @@ export default function AdminDashboardPage() {
     if (!user) return;
     const fetchData = async () => {
       try {
-        const data = await getAllUsers();
-        const classesData = await getAllClasses("", "", 1, 0, true);
+        const { data: tokenData } = await authClient.token();
+        if (!tokenData?.token) return;
+
+        const [usersData, classesData, statsRes] = await Promise.all([
+          getAllUsers(),
+          getAllClasses("", "", 1, 0, true),
+          fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/stats`, {
+            headers: {
+              Authorization: `Bearer ${tokenData.token}`,
+            },
+          }),
+        ]);
+
+        const statsJson = await statsRes.json();
+        setStats(statsJson);
+
         const classItems = Array.isArray(classesData)
           ? classesData
           : classesData?.items || [];
         setClasses(classItems);
-        setUsers(data || []);
+        setUsers(usersData || []);
       } catch (err) {
         console.error("Failed to fetch admin stats:", err);
       } finally {
@@ -59,8 +74,9 @@ export default function AdminDashboardPage() {
   const adminCount = users.filter((u) => u.role === "admin").length;
   const trainerCount = users.filter((u) => u.role === "trainer").length;
   const memberCount = users.filter((u) => u.role === "member").length;
-  const totalUsers = users.length;
-  const totalClasses = classes.length;
+  const totalUsers = stats.totalUsers || users.length;
+  const totalClasses = stats.totalClasses || classes.length;
+  const totalBookedClasses = stats.totalBookings || 0;
 
   const roleData = [
     { name: "Admin", value: adminCount },
@@ -68,10 +84,21 @@ export default function AdminDashboardPage() {
     { name: "Member", value: memberCount },
   ];
 
-  const categoryData = [
-    { name: "Cardio", value: 45 },
-    { name: "Weights", value: 30 },
-    { name: "Combat", value: 25 },
+  const categoriesCount = classes.reduce((acc, cls) => {
+    const cat = cls.category || "General";
+    acc[cat] = (acc[cat] || 0) + 1;
+    return acc;
+  }, {});
+
+  const dynamicCategoryData = Object.keys(categoriesCount).map((name) => ({
+    name,
+    value: categoriesCount[name],
+  }));
+
+  const categoryData = dynamicCategoryData.length > 0 ? dynamicCategoryData : [
+    { name: "Yoga", value: 3 },
+    { name: "Cardio", value: 2 },
+    { name: "Weights", value: 1 },
   ];
 
   if (loading) {
@@ -106,7 +133,7 @@ export default function AdminDashboardPage() {
           { label: "Total Classes", value: totalClasses, icon: FaUserCircle },
           {
             label: "Total Booked Classes",
-            value: trainerCount, // Keep the original metric representation
+            value: totalBookedClasses,
             icon: FaCheckCircle,
           },
         ].map((stat) => (

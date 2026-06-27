@@ -79,7 +79,7 @@ const StyledWrapper = styled.div`
 
   .icon--moon {
     transition-delay: 200ms;
-    color: #5e41de;
+    color: var(--active-color);
   }
 
   .icon--sun {
