@@ -19,7 +19,7 @@ const demoteTrainer = async (trainerId, token) => {
 };
 
 
-const manageTrainiers = () => {
+const ManageTrainiers = () => {
    const [trainers, setTrainers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -297,4 +297,4 @@ const manageTrainiers = () => {
 );
 };
 
-export default manageTrainiers;
+export default ManageTrainiers;
