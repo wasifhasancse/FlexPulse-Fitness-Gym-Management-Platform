@@ -10,10 +10,11 @@ import {
   FaHashtag,
 } from "react-icons/fa";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "@heroui/react";
 
 const fetchTransactions = async (token) => {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/transactions`,
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/transactions`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -27,10 +28,16 @@ const fetchTransactions = async (token) => {
   }
   return res.json();
 };
+
 const TransactionsHistoryPage = () => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Set page title
+  useEffect(() => {
+    document.title = "Transactions | FlexPulse";
+  }, []);
 
   useEffect(() => {
     const loadTransactions = async () => {
@@ -40,7 +47,7 @@ const TransactionsHistoryPage = () => {
           throw new Error("Unable to retrieve auth token");
         }
         const data = await fetchTransactions(token.token);
-        setTransactions(data);
+        setTransactions(data || []);
       } catch (err) {
         setError(err.message || "Failed to load transactions");
       } finally {
@@ -51,6 +58,7 @@ const TransactionsHistoryPage = () => {
   }, []);
 
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
     const date = new Date(dateString);
     return date.toLocaleString("en-US", {
       month: "short",
@@ -62,6 +70,7 @@ const TransactionsHistoryPage = () => {
   };
 
   const truncateId = (id) => {
+    if (!id) return "-";
     if (id.length <= 20) return id;
     return `${id.slice(0, 10)}...${id.slice(-6)}`;
   };
@@ -69,7 +78,7 @@ const TransactionsHistoryPage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <FaSpinner className="w-8 h-8 text-[#D4845A] animate-spin" />
+        <FaSpinner className="w-8 h-8 text-active animate-spin" />
       </div>
     );
   }
@@ -77,7 +86,7 @@ const TransactionsHistoryPage = () => {
   if (error) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-[#C47A6A] font-['Inter']">{error}</p>
+        <p className="text-rose-500 font-sans">{error}</p>
       </div>
     );
   }
@@ -90,48 +99,48 @@ const TransactionsHistoryPage = () => {
       className="space-y-6 px-4 sm:px-0"
     >
       <div>
-        <h1 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-[#2D2A24] dark:text-[#EAE5DE]">
-          Transactions
+        <h1 className="font-['Outfit'] text-3xl md:text-4xl font-bold text-foreground tracking-wide">
+          Transactions History
         </h1>
-        <p className="font-['Inter'] text-[#6B655A] dark:text-[#B8B0A6] mt-1">
+        <p className="font-sans text-[#535C91] dark:text-[#9290C3] mt-1">
           {transactions.length}{" "}
-          {transactions.length === 1 ? "transaction" : "transactions"} recorded
+          {transactions.length === 1 ? "transaction" : "transactions"} recorded on the platform
         </p>
       </div>
 
       {transactions.length === 0 ? (
-        <div className="bg-white dark:bg-[#2D2A24] rounded-xl p-12 text-center shadow-sm border border-[#E8E0D8] dark:border-[#3A3530]">
-          <p className="text-[#6B655A] dark:text-[#B8B0A6] font-['Inter']">
+        <div className="bg-white dark:bg-brand-800/20 rounded-2xl p-12 text-center shadow-card border border-brand-500/15 dark:border-brand-500/20">
+          <p className="text-[#535C91] dark:text-[#9290C3] font-sans">
             No transactions found.
           </p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-[#2D2A24] rounded-xl shadow-sm border border-[#E8E0D8] dark:border-[#3A3530] overflow-hidden">
+        <div className="bg-white dark:bg-brand-800/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/20 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left font-['Inter'] text-sm">
-              <thead className="bg-[#F5EDE6] dark:bg-[#3A3530] text-[#6B655A] dark:text-[#B8B0A6]">
+            <table className="w-full text-left font-sans text-sm">
+              <thead className="bg-brand-500/10 text-[#535C91] dark:text-[#9290C3]">
                 <tr>
-                  <th className="py-3 px-4 font-semibold">
+                  <th className="py-3.5 px-6 font-semibold">
                     <span className="flex items-center gap-1.5">
-                      <FaUser className="w-3.5 h-3.5" />
+                      <FaUser className="w-3.5 h-3.5 text-active" />
                       User Email
                     </span>
                   </th>
-                  <th className="py-3 px-4 font-semibold">
+                  <th className="py-3.5 px-6 font-semibold">
                     <span className="flex items-center gap-1.5">
-                      <FaMoneyBillWave className="w-3.5 h-3.5" />
+                      <FaMoneyBillWave className="w-3.5 h-3.5 text-active" />
                       Amount
                     </span>
                   </th>
-                  <th className="py-3 px-4 font-semibold">
+                  <th className="py-3.5 px-6 font-semibold">
                     <span className="flex items-center gap-1.5">
-                      <FaCalendarAlt className="w-3.5 h-3.5" />
+                      <FaCalendarAlt className="w-3.5 h-3.5 text-active" />
                       Date
                     </span>
                   </th>
-                  <th className="py-3 px-4 font-semibold">
+                  <th className="py-3.5 px-6 font-semibold">
                     <span className="flex items-center gap-1.5">
-                      <FaHashtag className="w-3.5 h-3.5" />
+                      <FaHashtag className="w-3.5 h-3.5 text-active" />
                       Transaction ID
                     </span>
                   </th>
@@ -141,21 +150,19 @@ const TransactionsHistoryPage = () => {
                 {transactions.map((txn) => (
                   <tr
                     key={txn._id}
-                    className="border-b border-[#E8E0D8] dark:border-[#3A3530] hover:bg-[#F5EDE6] dark:hover:bg-[#3A3530] transition-colors"
+                    className="border-b border-brand-500/10 hover:bg-brand-500/5 transition-colors"
                   >
-                    <td className="py-4 px-4 font-medium text-[#2D2A24] dark:text-[#EAE5DE]">
+                    <td className="py-4 px-6 font-semibold text-foreground">
                       {txn.userEmail}
                     </td>
-                    <td className="py-4 px-4 text-[#2D2A24] dark:text-[#EAE5DE]">
-                      <span className="font-semibold text-[#D4845A]">
-                        ${Number(txn.price || txn.amount || 0).toFixed(2)}
-                      </span>
+                    <td className="py-4 px-6 text-active font-extrabold">
+                      ${Number(txn.price || txn.amount || 0).toFixed(2)}
                     </td>
-                    <td className="py-4 px-4 text-[#2D2A24] dark:text-[#EAE5DE]">
+                    <td className="py-4 px-6 text-foreground font-medium text-xs">
                       {formatDate(txn.bookedAt || txn.createdAt || txn.date)}
                     </td>
-                    <td className="py-4 px-4">
-                      <code className="bg-[#F5EDE6] dark:bg-[#3A3530] px-2 py-1 rounded text-xs font-mono text-[#2D2A24] dark:text-[#EAE5DE]">
+                    <td className="py-4 px-6">
+                      <code className="bg-brand-500/10 px-2.5 py-1 rounded-lg text-xs font-mono text-foreground border border-brand-500/20">
                         {truncateId(txn.transactionId || txn.sessionId || "-")}
                       </code>
                     </td>
@@ -168,5 +175,6 @@ const TransactionsHistoryPage = () => {
       )}
     </motion.div>
   );
-}
+};
+
 export default TransactionsHistoryPage;

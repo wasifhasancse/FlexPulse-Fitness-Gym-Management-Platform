@@ -3,12 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  FaArrowRight,
-  FaComment,
-  FaHeart,
-  FaUserCircle
-} from "react-icons/fa";
+import { FaArrowRight, FaComment, FaHeart, FaUserCircle } from "react-icons/fa";
 import { DeletePostModal } from "./DeletePostModal";
 
 export default function MyForumPostCard({ post }) {
@@ -29,13 +24,13 @@ export default function MyForumPostCard({ post }) {
   const totalLikes = likes?.length || 0;
   const totalComments = comments?.length || 0;
 
-  // Format time ago
-  const timeAgo = (date) => {
-    const diff = Date.now() - new Date(date).getTime();
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    if (hours < 1) return "Just now";
-    if (hours < 24) return `${hours}h ago`;
-    return `${Math.floor(hours / 24)}d ago`;
+  const formatDate = (date) => {
+    if (!date) return "N/A";
+    return new Date(date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
   };
 
   return (
@@ -88,7 +83,7 @@ export default function MyForumPostCard({ post }) {
                   </span>
                 )}
                 <span>•</span>
-                <span className="font-sans">{timeAgo(createdAt)}</span>
+                <span className="font-sans">{formatDate(createdAt)}</span>
               </div>
             </div>
           </div>

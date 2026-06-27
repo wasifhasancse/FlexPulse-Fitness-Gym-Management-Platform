@@ -2,8 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FaXTwitter, FaInstagram, FaYoutube, FaFacebook } from "react-icons/fa6";
-import { FiMail, FiPhone, FiMapPin, FiClock } from "react-icons/fi";
+import {
+    FaFacebook,
+    FaInstagram,
+    FaXTwitter,
+    FaYoutube,
+} from "react-icons/fa6";
+import { FiClock, FiMail, FiMapPin, FiPhone } from "react-icons/fi";
 
 export default function Footer() {
   const pathname = usePathname();
@@ -15,13 +20,17 @@ export default function Footer() {
     <footer className="bg-background border-t border-brand-500/15 dark:border-brand-500/30 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
-
           {/* Brand Column */}
           <div className="flex flex-col space-y-6">
             <Link href="/" className="flex items-center gap-2.5 group w-fit">
               <div className="w-10 h-10 rounded-xl bg-linear-to-br from-[#9290C3] to-[#535C91] dark:from-[#1B1A55] dark:to-[#070F2B] flex items-center justify-center shadow-md border border-brand-500/20 group-hover:scale-105 transition-transform duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6 text-active">
-                  <path d="M6 5H4v14h2V5zm14 0h-2v14h2V5zm-4 6H8v2h8v-2zm-1-4h-2v10h2V7zm-8 0H5v10h2V7z"/>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="h-6 w-6 text-active"
+                >
+                  <path d="M6 5H4v14h2V5zm14 0h-2v14h2V5zm-4 6H8v2h8v-2zm-1-4h-2v10h2V7zm-8 0H5v10h2V7z" />
                 </svg>
               </div>
               <span className="font-['Outfit'] text-2xl font-bold tracking-tight text-foreground">
@@ -29,35 +38,59 @@ export default function Footer() {
               </span>
             </Link>
             <p className="font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3]/80 leading-relaxed">
-              Elevate your body, mind, and spirit with certified elite trainers, customized training programs, and a dedicated community at FlexPulse.
+              Elevate your body, mind, and spirit with certified elite trainers,
+              customized training programs, and a dedicated community at
+              FlexPulse.
             </p>
             {/* Stats Block */}
             <div className="grid grid-cols-3 gap-2 pt-2 border-t border-brand-500/10 dark:border-brand-500/20 font-['Outfit']">
               <div>
                 <p className="text-lg font-bold text-active">15+</p>
-                <p className="text-[10px] text-[#535C91]/80 dark:text-[#9290C3]/60 uppercase tracking-wider font-semibold">Coaches</p>
+                <p className="text-[10px] text-[#535C91]/80 dark:text-[#9290C3]/60 uppercase tracking-wider font-semibold">
+                  Coaches
+                </p>
               </div>
               <div>
                 <p className="text-lg font-bold text-active">50+</p>
-                <p className="text-[10px] text-[#535C91]/80 dark:text-[#9290C3]/60 uppercase tracking-wider font-semibold">Classes</p>
+                <p className="text-[10px] text-[#535C91]/80 dark:text-[#9290C3]/60 uppercase tracking-wider font-semibold">
+                  Classes
+                </p>
               </div>
               <div>
                 <p className="text-lg font-bold text-active">10k+</p>
-                <p className="text-[10px] text-[#535C91]/80 dark:text-[#9290C3]/60 uppercase tracking-wider font-semibold">Members</p>
+                <p className="text-[10px] text-[#535C91]/80 dark:text-[#9290C3]/60 uppercase tracking-wider font-semibold">
+                  Members
+                </p>
               </div>
             </div>
             {/* Social Icons */}
             <div className="flex space-x-3 pt-2">
-              <a href="#" className="p-2.5 bg-[#535C91]/10 dark:bg-[#1B1A55]/60 rounded-xl border border-brand-500/15 text-[#535C91] dark:text-[#9290C3] hover:text-active hover:border-active hover:scale-105 active:scale-95 transition-all duration-300" aria-label="X (Twitter)">
+              <a
+                href="#"
+                className="p-2.5 bg-[#535C91]/10 dark:bg-[#1B1A55]/60 rounded-xl border border-brand-500/15 text-[#535C91] dark:text-[#9290C3] hover:text-active hover:border-active hover:scale-105 active:scale-95 transition-all duration-300"
+                aria-label="X (Twitter)"
+              >
                 <FaXTwitter size={16} />
               </a>
-              <a href="#" className="p-2.5 bg-[#535C91]/10 dark:bg-[#1B1A55]/60 rounded-xl border border-brand-500/15 text-[#535C91] dark:text-[#9290C3] hover:text-active hover:border-active hover:scale-105 active:scale-95 transition-all duration-300" aria-label="Instagram">
+              <a
+                href="#"
+                className="p-2.5 bg-[#535C91]/10 dark:bg-[#1B1A55]/60 rounded-xl border border-brand-500/15 text-[#535C91] dark:text-[#9290C3] hover:text-active hover:border-active hover:scale-105 active:scale-95 transition-all duration-300"
+                aria-label="Instagram"
+              >
                 <FaInstagram size={16} />
               </a>
-              <a href="#" className="p-2.5 bg-[#535C91]/10 dark:bg-[#1B1A55]/60 rounded-xl border border-brand-500/15 text-[#535C91] dark:text-[#9290C3] hover:text-active hover:border-active hover:scale-105 active:scale-95 transition-all duration-300" aria-label="YouTube">
+              <a
+                href="#"
+                className="p-2.5 bg-[#535C91]/10 dark:bg-[#1B1A55]/60 rounded-xl border border-brand-500/15 text-[#535C91] dark:text-[#9290C3] hover:text-active hover:border-active hover:scale-105 active:scale-95 transition-all duration-300"
+                aria-label="YouTube"
+              >
                 <FaYoutube size={16} />
               </a>
-              <a href="#" className="p-2.5 bg-[#535C91]/10 dark:bg-[#1B1A55]/60 rounded-xl border border-brand-500/15 text-[#535C91] dark:text-[#9290C3] hover:text-active hover:border-active hover:scale-105 active:scale-95 transition-all duration-300" aria-label="Facebook">
+              <a
+                href="#"
+                className="p-2.5 bg-[#535C91]/10 dark:bg-[#1B1A55]/60 rounded-xl border border-brand-500/15 text-[#535C91] dark:text-[#9290C3] hover:text-active hover:border-active hover:scale-105 active:scale-95 transition-all duration-300"
+                aria-label="Facebook"
+              >
                 <FaFacebook size={16} />
               </a>
             </div>
@@ -70,22 +103,34 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3 font-['Inter'] text-sm">
               <li>
-                <Link href="/" className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200">
+                <Link
+                  href="/"
+                  className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200"
+                >
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/all-classes" className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200">
+                <Link
+                  href="/all-classes"
+                  className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200"
+                >
                   All Fitness Classes
                 </Link>
               </li>
               <li>
-                <Link href="/forum" className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200">
+                <Link
+                  href="/forum"
+                  className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200"
+                >
                   Community Forum
                 </Link>
               </li>
               <li>
-                <Link href="/auth/login" className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200">
+                <Link
+                  href="/signin"
+                  className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200"
+                >
                   Member Portal Login
                 </Link>
               </li>
@@ -113,7 +158,9 @@ export default function Footer() {
               <li className="flex items-start gap-3 pt-2 border-t border-brand-500/10 dark:border-brand-500/20">
                 <FiClock className="text-active w-5 h-5 shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-semibold text-foreground text-xs uppercase tracking-wider mb-1">Gym Hours</p>
+                  <p className="font-semibold text-foreground text-xs uppercase tracking-wider mb-1">
+                    Gym Hours
+                  </p>
                   <p className="text-xs">Mon - Fri: 6:00 AM - 10:00 PM</p>
                   <p className="text-xs">Sat - Sun: 8:00 AM - 8:00 PM</p>
                 </div>
@@ -127,9 +174,13 @@ export default function Footer() {
               Stay in the Loop
             </h3>
             <p className="font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3]/80 leading-relaxed">
-              Subscribe to get expert fitness tips, healthy workout guides, and class announcements.
+              Subscribe to get expert fitness tips, healthy workout guides, and
+              class announcements.
             </p>
-            <form className="flex flex-col sm:flex-row gap-2.5" onSubmit={(e) => e.preventDefault()}>
+            <form
+              className="flex flex-col sm:flex-row gap-2.5"
+              onSubmit={(e) => e.preventDefault()}
+            >
               <input
                 type="email"
                 placeholder="Enter email address"
@@ -144,20 +195,27 @@ export default function Footer() {
               </button>
             </form>
           </div>
-
         </div>
 
         {/* Copyright Area */}
         <div className="border-t border-brand-500/15 dark:border-brand-500/30 mt-16 pt-8 flex flex-col sm:flex-row justify-between items-center font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3]/60 gap-4">
-          <p>© 2026 FlexPulse Fitness. All Rights Reserved. Empowering your strength.</p>
+          <p>
+            © 2026 FlexPulse Fitness. All Rights Reserved. Empowering your
+            strength.
+          </p>
           <div className="flex space-x-6">
-            <Link href="#" className="hover:text-active transition-colors">Privacy Policy</Link>
-            <Link href="#" className="hover:text-active transition-colors">Terms of Service</Link>
-            <Link href="#" className="hover:text-active transition-colors">Support Portal</Link>
+            <Link href="#" className="hover:text-active transition-colors">
+              Privacy Policy
+            </Link>
+            <Link href="#" className="hover:text-active transition-colors">
+              Terms of Service
+            </Link>
+            <Link href="#" className="hover:text-active transition-colors">
+              Support Portal
+            </Link>
           </div>
         </div>
       </div>
     </footer>
   );
 }
-

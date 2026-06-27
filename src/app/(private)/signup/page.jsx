@@ -1,4 +1,6 @@
+import { getUserSession } from "@/lib/core/getSession";
 import { Spinner } from "@heroui/react";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import SignUpForm from "./SignUpForm";
 
@@ -6,7 +8,12 @@ export const metadata = {
   title: "Sign Up",
 };
 
-const SignUpPage = () => {
+const SignUpPage = async () => {
+  const user = await getUserSession();
+  if (user) {
+    redirect(`/dashboard/${user.role || "member"}`);
+  }
+
   return (
     <Suspense
       fallback={

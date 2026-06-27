@@ -1,4 +1,4 @@
-import { serverFetch } from "../core/serverActions";
+import { serverFetch, serverMutation } from "../core/serverActions";
 
 export const getAllUsers = () => {
   return serverFetch("/api/all-users");

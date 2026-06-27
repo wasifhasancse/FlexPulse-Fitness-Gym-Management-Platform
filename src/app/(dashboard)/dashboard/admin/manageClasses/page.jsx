@@ -11,16 +11,15 @@ import {
   FaUser,
   FaDollarSign,
   FaTag,
-  FaEye,
 } from "react-icons/fa";
 import {
   getAdminAllClasses,
   approveClassByAdmin,
   rejectClassByAdmin,
   deleteClassByAdmin,
-} from "@/lib/api/allClass";
+} from "@/lib/api/getClasses";
 import { authClient } from "@/lib/auth-client";
-import toast from "react-hot-toast";
+import { toast } from "@heroui/react";
 
 const approveClass = async (classId) => {
   const { data: token } = await authClient.token();
@@ -41,16 +40,21 @@ const deleteClass = async (classId) => {
 };
 
 const ManageClasses = () => {
-    const [classes, setClasses] = useState([]);
+  const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
+
+  // Set page title
+  useEffect(() => {
+    document.title = "Manage Classes | FlexPulse";
+  }, []);
 
   useEffect(() => {
     const loadClasses = async () => {
       try {
         const data = await getAdminAllClasses();
-        setClasses(data);
+        setClasses(data || []);
       } catch (err) {
         setError(err.message || "Failed to load classes");
       } finally {
@@ -107,29 +111,29 @@ const ManageClasses = () => {
     }
   };
 
-  const getStatusBadge = (status) => {
-    switch (status) {
+  const getStatusBadge = (status = "") => {
+    switch (status.toLowerCase()) {
       case "approved":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[#A68B6E]/20 text-[#A68B6E] dark:bg-[#A68B6E]/30 dark:text-[#A68B6E]">
-            <FaCheck className="w-3 h-3" /> Approved
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+            <FaCheck className="w-3 h-3" /> APPROVED
           </span>
         );
       case "pending":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[#D4A050]/20 text-[#D4A050] dark:bg-[#D4A050]/30 dark:text-[#D4A050]">
-            <FaTimes className="w-3 h-3" /> Pending
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+            <FaTimes className="w-3 h-3 animate-pulse" /> PENDING
           </span>
         );
       case "rejected":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[#C47A6A]/20 text-[#C47A6A] dark:bg-[#C47A6A]/30 dark:text-[#C47A6A]">
-            <FaTimes className="w-3 h-3" /> Rejected
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+            <FaTimes className="w-3 h-3" /> REJECTED
           </span>
         );
       default:
         return (
-          <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-[#6B655A]/20 text-[#6B655A] dark:bg-[#6B655A]/30 dark:text-[#B8B0A6]">
+          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-slate-500/10 text-slate-600 dark:text-slate-400 border border-slate-500/20">
             {status.toUpperCase()}
           </span>
         );
@@ -139,7 +143,7 @@ const ManageClasses = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <FaSpinner className="w-8 h-8 text-[#D4845A] animate-spin" />
+        <FaSpinner className="w-8 h-8 text-active animate-spin" />
       </div>
     );
   }
@@ -147,15 +151,13 @@ const ManageClasses = () => {
   if (error) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-[#C47A6A] font-['Inter']">{error}</p>
+        <p className="text-rose-500 font-sans">{error}</p>
       </div>
     );
   }
 
-  const pendingCount = classes.filter((cls) => cls.status === "pending").length;
-  const approvedCount = classes.filter(
-    (cls) => cls.status === "approved",
-  ).length;
+  const pendingCount = classes.filter((cls) => cls.status?.toLowerCase() === "pending").length;
+  const approvedCount = classes.filter((cls) => cls.status?.toLowerCase() === "approved").length;
 
   return (
     <motion.div
@@ -166,48 +168,45 @@ const ManageClasses = () => {
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-[#2D2A24] dark:text-[#EAE5DE]">
+          <h1 className="font-['Outfit'] text-3xl md:text-4xl font-bold text-foreground tracking-wide">
             Manage Classes
           </h1>
-          <p className="font-['Inter'] text-[#6B655A] dark:text-[#B8B0A6] mt-1">
-            {classes.length} total classes · {pendingCount} pending ·{" "}
-            {approvedCount} approved
+          <p className="font-sans text-[#535C91] dark:text-[#9290C3] mt-1">
+            {classes.length} total classes · {pendingCount} pending · {approvedCount} approved
           </p>
         </div>
       </div>
 
       {classes.length === 0 ? (
-        <div className="bg-white dark:bg-[#2D2A24] rounded-xl p-12 text-center shadow-sm border border-[#E8E0D8] dark:border-[#3A3530]">
-          <p className="text-[#6B655A] dark:text-[#B8B0A6] font-['Inter']">
+        <div className="bg-white dark:bg-brand-800/20 rounded-2xl p-12 text-center shadow-card border border-brand-500/15 dark:border-brand-500/20">
+          <p className="text-[#535C91] dark:text-[#9290C3] font-sans">
             No classes found.
           </p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-[#2D2A24] rounded-xl shadow-sm border border-[#E8E0D8] dark:border-[#3A3530] overflow-hidden">
+        <div className="bg-white dark:bg-brand-800/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/20 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left font-['Inter'] text-sm">
-              <thead className="bg-[#F5EDE6] dark:bg-[#3A3530] text-[#6B655A] dark:text-[#B8B0A6]">
+            <table className="w-full text-left font-sans text-sm">
+              <thead className="bg-brand-500/10 text-[#535C91] dark:text-[#9290C3]">
                 <tr>
-                  <th className="py-3 px-4 font-semibold">Image</th>
-                  <th className="py-3 px-4 font-semibold">Class Name</th>
-                  <th className="py-3 px-4 font-semibold">Trainer</th>
-                  <th className="py-3 px-4 font-semibold">Category</th>
-                  <th className="py-3 px-4 font-semibold">Price</th>
-                  <th className="py-3 px-4 font-semibold">Status</th>
-                  <th className="py-3 px-4 font-semibold text-right">
-                    Actions
-                  </th>
+                  <th className="py-3.5 px-6 font-semibold">Image</th>
+                  <th className="py-3.5 px-6 font-semibold">Class Name</th>
+                  <th className="py-3.5 px-6 font-semibold">Trainer</th>
+                  <th className="py-3.5 px-6 font-semibold">Category</th>
+                  <th className="py-3.5 px-6 font-semibold">Price</th>
+                  <th className="py-3.5 px-6 font-semibold">Status</th>
+                  <th className="py-3.5 px-6 font-semibold text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {classes.map((cls) => (
                   <tr
                     key={cls._id}
-                    className="border-b border-[#E8E0D8] dark:border-[#3A3530] hover:bg-[#F5EDE6] dark:hover:bg-[#3A3530] transition-colors"
+                    className="border-b border-brand-500/10 hover:bg-brand-500/5 transition-colors"
                   >
-                    <td className="py-3 px-4">
+                    <td className="py-3.5 px-6">
                       {cls.classImage ? (
-                        <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-[#F5EDE6] dark:bg-[#3A3530]">
+                        <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-brand-500/5 border border-brand-500/10 shrink-0">
                           <Image
                             src={cls.classImage}
                             alt={cls.className}
@@ -217,20 +216,20 @@ const ManageClasses = () => {
                           />
                         </div>
                       ) : (
-                        <div className="w-12 h-12 rounded-lg bg-[#F5EDE6] dark:bg-[#3A3530] flex items-center justify-center text-[#6B655A] dark:text-[#B8B0A6] text-xs">
+                        <div className="w-12 h-12 rounded-lg bg-brand-500/5 border border-brand-500/10 flex items-center justify-center text-[#535C91] dark:text-[#9290C3] text-xs">
                           No img
                         </div>
                       )}
                     </td>
-                    <td className="py-4 px-4">
-                      <p className="font-medium text-[#2D2A24] dark:text-[#EAE5DE]">
+                    <td className="py-4 px-6">
+                      <p className="font-bold text-foreground">
                         {cls.className}
                       </p>
-                      <p className="text-xs text-[#6B655A] dark:text-[#B8B0A6]">
+                      <p className="text-xs text-[#535C91] dark:text-[#9290C3] mt-0.5">
                         {cls.classSchedule} · {cls.time}
                       </p>
                     </td>
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-6">
                       <div className="flex items-center gap-2">
                         {cls.authorImage ? (
                           <Image
@@ -238,36 +237,35 @@ const ManageClasses = () => {
                             alt={cls.authorName}
                             width={24}
                             height={24}
-                            className="rounded-full object-cover"
+                            className="rounded-full object-cover border border-brand-500/10"
                           />
                         ) : (
-                          <FaUser className="w-4 h-4 text-[#6B655A] dark:text-[#B8B0A6]" />
+                          <FaUser className="w-4 h-4 text-active" />
                         )}
-                        <span className="text-[#2D2A24] dark:text-[#EAE5DE]">
-                          {cls.authorName}
+                        <span className="font-medium text-foreground">
+                          {cls.authorName || "Anonymous"}
                         </span>
                       </div>
                     </td>
-                    <td className="py-4 px-4">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-[#D4845A]/10 dark:bg-[#D4845A]/20 rounded-full text-xs text-[#D4845A]">
-                        <FaTag className="w-3 h-3" />
+                    <td className="py-4 px-6">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-active/10 rounded-full text-xs font-semibold text-active">
+                        <FaTag className="w-3.5 h-3.5" />
                         {cls.category}
                       </span>
                     </td>
-                    <td className="py-4 px-4">
-                      <span className="flex items-center gap-1 text-[#2D2A24] dark:text-[#EAE5DE]">
-                        <FaDollarSign className="w-3.5 h-3.5 text-[#D4845A]" />
-                        {cls.price}
+                    <td className="py-4 px-6 text-foreground font-bold">
+                      <span className="flex items-center gap-0.5">
+                        ${cls.price}
                       </span>
                     </td>
-                    <td className="py-4 px-4">{getStatusBadge(cls.status)}</td>
-                    <td className="py-4 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5 flex-wrap">
-                        {cls.status !== "approved" && (
+                    <td className="py-4 px-6">{getStatusBadge(cls.status)}</td>
+                    <td className="py-4 px-6 text-right">
+                      <div className="flex items-center justify-end gap-2 flex-wrap">
+                        {cls.status?.toLowerCase() !== "approved" && (
                           <button
                             onClick={() => handleApprove(cls._id)}
                             disabled={actionLoading === cls._id}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#A68B6E] text-white rounded-lg text-xs font-medium hover:bg-[#8B7A5E] transition-colors disabled:opacity-50"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-xs font-bold hover:bg-emerald-600 transition-colors disabled:opacity-50 cursor-pointer shadow-sm"
                           >
                             {actionLoading === cls._id ? (
                               <FaSpinner className="w-3 h-3 animate-spin" />
@@ -277,11 +275,11 @@ const ManageClasses = () => {
                             Approve
                           </button>
                         )}
-                        {cls.status !== "rejected" && (
+                        {cls.status?.toLowerCase() !== "rejected" && (
                           <button
                             onClick={() => handleReject(cls._id)}
                             disabled={actionLoading === cls._id}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 border border-[#D4A050] text-[#D4A050] rounded-lg text-xs font-medium hover:bg-[#D4A050] hover:text-white transition-colors disabled:opacity-50"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 border border-amber-500 text-amber-600 dark:text-amber-400 rounded-lg text-xs font-bold hover:bg-amber-500 hover:text-white transition-colors disabled:opacity-50 cursor-pointer shadow-sm"
                           >
                             {actionLoading === cls._id ? (
                               <FaSpinner className="w-3 h-3 animate-spin" />
@@ -294,7 +292,7 @@ const ManageClasses = () => {
                         <button
                           onClick={() => handleDelete(cls._id)}
                           disabled={actionLoading === cls._id}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 border border-[#C47A6A] text-[#C47A6A] rounded-lg text-xs font-medium hover:bg-[#C47A6A] hover:text-white transition-colors disabled:opacity-50"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 border border-rose-500 text-rose-500 rounded-lg text-xs font-bold hover:bg-rose-500 hover:text-white transition-colors disabled:opacity-50 cursor-pointer shadow-sm"
                         >
                           {actionLoading === cls._id ? (
                             <FaSpinner className="w-3 h-3 animate-spin" />
@@ -314,6 +312,6 @@ const ManageClasses = () => {
       )}
     </motion.div>
   );
-}
+};
 
 export default ManageClasses;

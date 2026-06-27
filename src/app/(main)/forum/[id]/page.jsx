@@ -1,13 +1,14 @@
 "use client";
 
 import { useSession } from "@/lib/auth-client";
+import { toast } from "@heroui/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { toast} from "@heroui/react";
 import { useEffect, useState } from "react";
 
+import { getForumsPostById } from "@/lib/api/getForumPosts";
 import {
     FaArrowLeft,
     FaBookmark,
@@ -17,11 +18,11 @@ import {
     FaQuoteLeft,
     FaReply,
     FaShareAlt,
+    FaThumbsDown,
     FaThumbsUp,
     FaUserCircle,
 } from "react-icons/fa";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { getForumsPostById } from "@/lib/api/getForumPosts";
 
 // Sample related articles
 const relatedArticles = [
@@ -50,6 +51,8 @@ export default function ForumPostDetailsPage() {
   const [newComment, setNewComment] = useState("");
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const [isDisliked, setIsDisliked] = useState(false);
+  const [dislikeCount, setDislikeCount] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState("");
@@ -66,8 +69,12 @@ export default function ForumPostDetailsPage() {
         setPost(data);
         setComments(data.comments || []);
         setLikeCount(data.likes?.length || 0);
+        setDislikeCount(data.dislikes?.length || 0);
         if (user?.id && data.likes?.includes(user.id)) {
           setIsLiked(true);
+        }
+        if (user?.id && data.dislikes?.includes(user.id)) {
+          setIsDisliked(true);
         }
       } catch (err) {
         setError(err.message);
@@ -97,11 +104,7 @@ export default function ForumPostDetailsPage() {
   };
 
   const timeAgo = (dateString) => {
-    const diff = Date.now() - new Date(dateString).getTime();
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    if (hours < 1) return "Just now";
-    if (hours < 24) return `${hours}h ago`;
-    return `${Math.floor(hours / 24)}d ago`;
+    return formatDate(dateString);
   };
 
   const handelLike = async () => {
@@ -116,8 +119,12 @@ export default function ForumPostDetailsPage() {
         },
       );
       const data = await res.json();
+      if (!res.ok) {
+        return toast.error(data?.message || "Like action failed");
+      }
       if (data.liked === true) {
         toast.success("Thank you for liking this post!");
+        setIsDisliked(false);
       } else {
         toast.error("Removed your like from this post.");
       }
@@ -128,9 +135,36 @@ export default function ForumPostDetailsPage() {
     }
   };
 
+  const handleDislike = async () => {
+    if (!user) return toast.error("To dislike this post, please login first!");
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/forum/dislike`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ postId, userId: user.id }),
+        },
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        return toast.error(data?.message || "Dislike action failed");
+      }
+
+      setIsDisliked(data.disliked);
+      setDislikeCount(data.dislikeCount);
+      if (data.disliked) {
+        setIsLiked(false);
+      }
+    } catch (err) {
+      console.error("Failed to dislike post:", err);
+    }
+  };
+
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (!user) return toast.error("To comment on this post, please login first!");
+    if (!user)
+      return toast.error("To comment on this post, please login first!");
     if (!newComment.trim()) return;
     setSubmitting(true);
     try {
@@ -150,6 +184,9 @@ export default function ForumPostDetailsPage() {
         },
       );
       const data = await res.json();
+      if (!res.ok) {
+        return toast.error(data?.message || "Comment failed");
+      }
       if (data.success) {
         toast.success("You commented successfully on this post!");
         setComments([data.comment, ...comments]);
@@ -178,7 +215,9 @@ export default function ForumPostDetailsPage() {
       if (data.success) {
         setComments(
           comments.map((c) =>
-            c._id === commentId ? { ...c, content: editingText, edited: true } : c,
+            c._id === commentId
+              ? { ...c, content: editingText, edited: true }
+              : c,
           ),
         );
         setEditingComment(null);
@@ -224,6 +263,9 @@ export default function ForumPostDetailsPage() {
         },
       );
       const data = await res.json();
+      if (!res.ok) {
+        return toast.error(data?.message || "Like action failed");
+      }
       // UI update
       setComments(
         comments.map((comment) =>
@@ -239,6 +281,40 @@ export default function ForumPostDetailsPage() {
       );
     } catch (err) {
       console.error("Failed to like comment:", err);
+    }
+  };
+
+  const handleCommentDislike = async (commentId) => {
+    if (!user) return toast.error("Please login first!");
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/forum/comment/dislike`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ postId, commentId, userId: user.id }),
+        },
+      );
+
+      const data = await res.json();
+      if (!res.ok) {
+        return toast.error(data?.message || "Dislike action failed");
+      }
+
+      setComments(
+        comments.map((comment) =>
+          comment._id === commentId
+            ? {
+                ...comment,
+                dislikes: data.disliked
+                  ? [...(comment.dislikes || []), user.id]
+                  : (comment.dislikes || []).filter((id) => id !== user.id),
+              }
+            : comment,
+        ),
+      );
+    } catch (err) {
+      console.error("Failed to dislike comment:", err);
     }
   };
 
@@ -266,12 +342,18 @@ export default function ForumPostDetailsPage() {
         },
       );
       const data = await res.json();
+      if (!res.ok) {
+        return toast.error(data?.message || "Reply failed");
+      }
       if (data.success) {
         // UI update
         setComments(
           comments.map((comment) =>
             comment._id === commentId
-              ? { ...comment, replies: [...(comment.replies || []), data.reply] }
+              ? {
+                  ...comment,
+                  replies: [...(comment.replies || []), data.reply],
+                }
               : comment,
           ),
         );
@@ -391,9 +473,10 @@ export default function ForumPostDetailsPage() {
                 <div className="mt-8 p-6 bg-[#F5EDE6] dark:bg-[#3A3530] rounded-xl border-l-4 border-[#D4845A]">
                   <FaQuoteLeft className="text-[#D4845A] w-5 h-5 mb-2 opacity-60" />
                   <p className="font-['Inter'] italic text-[#2D2A24] dark:text-[#EAE5DE] leading-relaxed">
-                    &quot;True recovery isn&apos;t just about what you eat; it&apos;s about the
-                    timing and the biological integrity of the nutrient you
-                    provide your body after a high-intensity stimulus.&quot;
+                    &quot;True recovery isn&apos;t just about what you eat;
+                    it&apos;s about the timing and the biological integrity of
+                    the nutrient you provide your body after a high-intensity
+                    stimulus.&quot;
                   </p>
                 </div>
 
@@ -411,6 +494,19 @@ export default function ForumPostDetailsPage() {
                       className={`w-4 h-4 ${isLiked ? "text-white" : "text-[#D4845A]"}`}
                     />
                     {isLiked ? "Liked" : "Like"} ({likeCount})
+                  </button>
+                  <button
+                    onClick={handleDislike}
+                    className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-['Inter'] text-sm font-medium transition-all ${
+                      isDisliked
+                        ? "bg-red-500 text-white"
+                        : "bg-[#F5EDE6] dark:bg-[#3A3530] text-[#2D2A24] dark:text-[#EAE5DE] hover:bg-[#E8E0D8] dark:hover:bg-[#4A4540]"
+                    }`}
+                  >
+                    <FaThumbsDown
+                      className={`w-4 h-4 ${isDisliked ? "text-white" : "text-red-500"}`}
+                    />
+                    {isDisliked ? "Disliked" : "Dislike"} ({dislikeCount})
                   </button>
                   <button className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F5EDE6] dark:bg-[#3A3530] text-[#2D2A24] dark:text-[#EAE5DE] hover:bg-[#E8E0D8] dark:hover:bg-[#4A4540] transition-colors font-['Inter'] text-sm font-medium">
                     <FaComment className="w-4 h-4 text-[#D4845A]" />
@@ -559,6 +655,17 @@ export default function ForumPostDetailsPage() {
                               <span>{comment.likes?.length || 0}</span>
                             </button>
                             <button
+                              onClick={() => handleCommentDislike(comment._id)}
+                              className={`flex items-center gap-1 text-xs transition-colors ${
+                                comment.dislikes?.includes(user?.id)
+                                  ? "text-red-500"
+                                  : "text-[#6B655A] dark:text-[#B8B0A6] hover:text-red-500"
+                              }`}
+                            >
+                              <FaThumbsDown className="w-3 h-3" />
+                              <span>{comment.dislikes?.length || 0}</span>
+                            </button>
+                            <button
                               onClick={() =>
                                 setReplyingTo(
                                   replyingTo === comment._id
@@ -684,7 +791,7 @@ export default function ForumPostDetailsPage() {
                       Please login to join the conversation
                     </p>
                     <Link
-                      href="/auth/login"
+                      href="/signin"
                       className="px-6 py-2 bg-[#D4845A] text-white font-['Inter'] font-medium rounded-lg hover:bg-[#B86A42] transition-colors"
                     >
                       Login

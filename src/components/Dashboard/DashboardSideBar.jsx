@@ -1,27 +1,27 @@
 "use client";
 
-import { useEffect } from "react";
+import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
+import { useEffect } from "react";
 import {
-  FaHome,
-  FaBook,
-  FaHeart,
-  FaUserGraduate,
-  FaSignOutAlt,
-  FaTimes,
-  FaChalkboardTeacher,
-  FaPlusCircle,
-  FaComments,
-  FaChartLine,
-  FaUsers,
+    FaBook,
+    FaChalkboardTeacher,
+    FaChartLine,
+    FaComments,
+    FaHeart,
+    FaHome,
+    FaPlusCircle,
+    FaSignOutAlt,
+    FaTimes,
+    FaUserGraduate,
+    FaUsers,
 } from "react-icons/fa";
 import { LuFileUser, LuGalleryHorizontalEnd } from "react-icons/lu";
 import {
-  MdOutlineManageAccounts,
-  MdOutlineManageSearch,
-  MdPostAdd,
+    MdOutlineManageAccounts,
+    MdOutlineManageSearch,
+    MdPostAdd,
 } from "react-icons/md";
 import { SiGoogleclassroom } from "react-icons/si";
 import { TbTransactionDollar } from "react-icons/tb";
@@ -110,7 +110,7 @@ const DashboardSideBar = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     onClose();
-  }, [pathname]);
+  }, [pathname, onClose]);
 
   const isActive = (href) => {
     if (href === "/dashboard") return pathname === "/dashboard";
@@ -125,7 +125,7 @@ const DashboardSideBar = ({ isOpen, onClose }) => {
     });
   };
 
-  const NavLinks = () => (
+  const navLinks = (
     <>
       <nav className="flex-1 px-4 py-6 space-y-1">
         {navItems.map((item) => {
@@ -174,9 +174,7 @@ const DashboardSideBar = ({ isOpen, onClose }) => {
             </h1>
           </div>
         </Link>
-        <div className="flex flex-col flex-1">
-          <NavLinks />
-        </div>
+        <div className="flex flex-col flex-1">{navLinks}</div>
       </aside>
 
       {/* ========== MOBILE ========== */}
@@ -210,7 +208,7 @@ const DashboardSideBar = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <NavLinks />
+        {navLinks}
       </aside>
     </>
   );

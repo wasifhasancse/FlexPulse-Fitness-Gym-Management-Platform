@@ -1,27 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import {
-  FaSearch,
-  FaUserCircle,
-  FaSpinner,
-  FaCheck,
-  FaTimes,
-} from "react-icons/fa";
-import { authClient } from "@/lib/auth-client";
-import {toast} from "@heroui/react";
-import Image from "next/image";
-import { updateUserRole, blockUser, unblockUser } from "@/lib/actions/AdminUserManage";
+    blockUser,
+    unblockUser,
+    updateUserRole,
+} from "@/lib/actions/adminUserManage";
 import { getAllUsers } from "@/lib/api/getAllUsers";
-
+import { authClient } from "@/lib/auth-client";
+import { toast } from "@heroui/react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import {
+    FaCheck,
+    FaSearch,
+    FaSpinner,
+    FaTimes,
+    FaUserCircle,
+} from "react-icons/fa";
 
 export default function ManageUsersPage() {
   const { data: session } = authClient.useSession();
   const currentUser = session?.user;
 
   const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
@@ -31,7 +33,6 @@ export default function ManageUsersPage() {
       try {
         const data = await getAllUsers();
         setUsers(data);
-        setFilteredUsers(data);
       } catch (err) {
         toast.error("Failed to load users");
       } finally {
@@ -41,18 +42,14 @@ export default function ManageUsersPage() {
     loadUsers();
   }, []);
 
-  useEffect(() => {
-    const query = searchQuery.toLowerCase().trim();
-    setFilteredUsers(
-      !query
-        ? users
-        : users.filter(
-            (u) =>
-              u.name.toLowerCase().includes(query) ||
-              u.email.toLowerCase().includes(query),
-          ),
-    );
-  }, [searchQuery, users]);
+  const query = searchQuery.toLowerCase().trim();
+  const filteredUsers = !query
+    ? users
+    : users.filter(
+        (u) =>
+          u.name.toLowerCase().includes(query) ||
+          u.email.toLowerCase().includes(query),
+      );
 
   const handleBlockToggle = async (userId, currentStatus) => {
     setActionLoading(userId);
@@ -134,9 +131,7 @@ export default function ManageUsersPage() {
       {/* Table */}
       {filteredUsers.length === 0 ? (
         <div className="bg-[#131826] rounded-xl p-12 text-center shadow-sm border border-[#1E293B]">
-          <p className="text-[#94A3B8] font-['Inter']">
-            No users found.
-          </p>
+          <p className="text-[#94A3B8] font-['Inter']">No users found.</p>
         </div>
       ) : (
         <div className="bg-[#131826] rounded-xl shadow-sm border border-[#1E293B] overflow-hidden">
@@ -180,9 +175,7 @@ export default function ManageUsersPage() {
                     </td>
 
                     {/* Email */}
-                    <td className="py-4 px-4 text-[#94A3B8]">
-                      {user.email}
-                    </td>
+                    <td className="py-4 px-4 text-[#94A3B8]">{user.email}</td>
 
                     {/* Role Badge */}
                     <td className="py-4 px-4">

@@ -1,6 +1,7 @@
 import ClassDetailsPageLayout from "@/components/AllClasses/ClassDetailsPage";
 import { getClassById } from "@/lib/api/getClasses";
 import { getUserSession } from "@/lib/core/getSession";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
@@ -18,8 +19,13 @@ export async function generateMetadata({ params }) {
 
 const ClassDetailsPage = async ({ params }) => {
   const { id } = await params;
-  const classDetails = await getClassById(id);
   const user = await getUserSession();
+
+  if (!user) {
+    redirect(`/signin?redirect=/all-classes/${id}`);
+  }
+
+  const classDetails = await getClassById(id);
 
   let isBooked = false;
   let isFavorite = false;

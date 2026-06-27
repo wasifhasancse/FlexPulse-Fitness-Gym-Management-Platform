@@ -1,19 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import { FaImage, FaTimes, FaArrowLeft, FaPencilAlt } from "react-icons/fa";
-import Image from "next/image";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import { addForumPosts } from "@/lib/actions/forumPosts";
-import { imageUpload } from "@/lib/imgUpload";
+import { addForumPost } from "@/lib/actions/addForumPost";
 import { authClient } from "@/lib/auth-client";
-
+import { imageUpload } from "@/lib/imageUpload";
+import { toast } from "@heroui/react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { FaArrowLeft, FaImage, FaPencilAlt, FaTimes } from "react-icons/fa";
 
 const AddAdminForumPost = () => {
- const [title, setTitle] = useState("");
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -23,11 +22,9 @@ const AddAdminForumPost = () => {
 
   const { data: session } = authClient.useSession();
   const user = session?.user;
-  // console.log(user);
 
   const handleRemoveImage = () => {
     setImage(null);
-    // Reset file input
     const fileInput = document.getElementById("imageInput");
     if (fileInput) fileInput.value = "";
   };
@@ -54,11 +51,10 @@ const AddAdminForumPost = () => {
       if (!token) {
         toast.error("authentication faild, please login again.");
       }
-      const result = await addForumPosts(formData, token.token);
+      const result = await addForumPost(formData, token.token);
       if (result.insertedId) {
         toast.success("Post created successfully!");
         resetForm();
-        // router.push("/dashboard/admin/my-posts");
       }
     } catch (error) {
       console.error(error);
@@ -158,13 +154,7 @@ const AddAdminForumPost = () => {
                     PNG, JPG, GIF up to 5MB
                   </p>
                 </div>
-                {/* <input
-                  id="imageInput"
-                  type="file"
-                  accept="image/*"
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                  onChange={handleImageChange}
-                /> */}
+
                 <input
                   type="file"
                   accept="image/*"
@@ -176,7 +166,6 @@ const AddAdminForumPost = () => {
                     try {
                       setUploading(true);
                       const image = await imageUpload(file);
-                      // console.log("uploaded image:", image);
                       setImage(image.url);
                     } catch (error) {
                       console.error(error);
@@ -233,5 +222,5 @@ const AddAdminForumPost = () => {
       </motion.div>
     </div>
   );
-}
+};
 export default AddAdminForumPost;

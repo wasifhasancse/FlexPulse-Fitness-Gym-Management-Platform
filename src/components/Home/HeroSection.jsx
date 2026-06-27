@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { FiArrowRight } from "react-icons/fi";
 import Image from "next/image";
+import Link from "next/link";
+import { FiArrowRight } from "react-icons/fi";
 
 export default function HeroSection() {
   return (
@@ -27,12 +27,18 @@ export default function HeroSection() {
 
             <h1 className="font-['Outfit'] text-5xl sm:text-6xl lg:text-7xl font-extrabold text-foreground leading-[1.1] tracking-tight">
               Forge Your <br />
-              <span className="text-active drop-shadow-[0_0_15px_var(--active-color)/0.2]">Strongest</span><br />
+              <span className="text-active drop-shadow-[0_0_15px_var(--active-color)/0.2]">
+                Strongest
+              </span>
+              <br />
               Self.
             </h1>
 
             <p className="font-['Inter'] text-lg sm:text-xl text-[#535C91] dark:text-[#9290C3] max-w-lg leading-relaxed">
-              Welcome to <span className="font-bold text-foreground">FlexPulse</span> — where certified elite trainers, customized training programs, and a dedicated fitness community empower you to surpass your goals.
+              Welcome to{" "}
+              <span className="font-bold text-foreground">FlexPulse</span> —
+              where certified elite trainers, customized training programs, and
+              a dedicated fitness community empower you to surpass your goals.
             </p>
 
             <div className="flex flex-wrap gap-4 pt-4">
@@ -40,13 +46,22 @@ export default function HeroSection() {
                 href="/all-classes"
                 className="inline-flex items-center px-8 py-4 bg-btn-bg text-btn-text font-extrabold rounded-2xl shadow-lg hover:shadow-xl hover:opacity-95 transform hover:-translate-y-0.5 transition-all duration-300 text-base sm:text-lg border border-brand-500/20"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5 mr-2"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                 </svg>
                 Explore Classes
               </Link>
               <Link
-                href="/auth/register"
+                href="/signup"
                 className="inline-flex items-center px-8 py-4 bg-brand-800 text-foreground font-bold rounded-2xl hover:bg-brand-500/35 border border-brand-500/30 transition-all duration-300 text-base sm:text-lg shadow-sm"
               >
                 Join Free
@@ -57,16 +72,28 @@ export default function HeroSection() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-6 pt-12 border-t border-brand-500/35 mt-8">
               <div>
-                <p className="text-3xl font-black text-active tracking-tight">15,000+</p>
-                <p className="text-[10px] sm:text-xs text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider mt-1">Active Members</p>
+                <p className="text-3xl font-black text-active tracking-tight">
+                  15,000+
+                </p>
+                <p className="text-[10px] sm:text-xs text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider mt-1">
+                  Active Members
+                </p>
               </div>
               <div>
-                <p className="text-3xl font-black text-active tracking-tight">200+</p>
-                <p className="text-[10px] sm:text-xs text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider mt-1">Expert Trainers</p>
+                <p className="text-3xl font-black text-active tracking-tight">
+                  200+
+                </p>
+                <p className="text-[10px] sm:text-xs text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider mt-1">
+                  Expert Trainers
+                </p>
               </div>
               <div>
-                <p className="text-3xl font-black text-active tracking-tight">99%</p>
-                <p className="text-[10px] sm:text-xs text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider mt-1">Satisfaction Rate</p>
+                <p className="text-3xl font-black text-active tracking-tight">
+                  99%
+                </p>
+                <p className="text-[10px] sm:text-xs text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider mt-1">
+                  Satisfaction Rate
+                </p>
               </div>
             </div>
           </motion.div>
@@ -91,7 +118,9 @@ export default function HeroSection() {
                   />
                   <div className="absolute bottom-4 left-4 z-20 bg-brand-900/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-brand-500/20 flex items-center gap-1.5 shadow-lg">
                     <span className="w-2.5 h-2.5 rounded-full bg-active animate-pulse"></span>
-                    <span className="text-[11px] font-bold text-foreground">Free Weights</span>
+                    <span className="text-[11px] font-bold text-foreground">
+                      Free Weights
+                    </span>
                   </div>
                 </div>
                 {/* Image 2 */}
@@ -127,7 +156,9 @@ export default function HeroSection() {
                   />
                   <div className="absolute bottom-4 left-4 z-20 bg-brand-900/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-brand-500/20 flex items-center gap-1.5 shadow-lg">
                     <span className="w-2.5 h-2.5 rounded-full bg-active animate-pulse"></span>
-                    <span className="text-[11px] font-bold text-foreground">Yoga Sessions</span>
+                    <span className="text-[11px] font-bold text-foreground">
+                      Yoga Sessions
+                    </span>
                   </div>
                 </div>
               </div>

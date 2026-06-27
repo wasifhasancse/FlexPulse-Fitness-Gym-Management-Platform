@@ -1,19 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { motion } from "framer-motion";
 import {
-  FaSpinner,
-  FaTrash,
-  FaUser,
-  FaCalendarAlt,
-  FaTag,
+  deleteForumPost,
+  getForumPosts,
+  updateForumPostStatus,
+} from "@/lib/api/getForumPosts";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "@heroui/react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import {
+  FaCheck,
   FaPlus,
+  FaSpinner,
+  FaTag,
+  FaTimes,
+  FaTrash,
+  FaUser
 } from "react-icons/fa";
-import { getForumPosts, deleteForumPost } from "@/lib/api/forumPosts";
-import toast from "react-hot-toast";
 
 const ManageForumPosts = () => {
   const [posts, setPosts] = useState([]);
@@ -21,11 +27,16 @@ const ManageForumPosts = () => {
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
 
+  // Set page title
+  useEffect(() => {
+    document.title = "Manage Forum Posts | FlexPulse";
+  }, []);
+
   useEffect(() => {
     const loadPosts = async () => {
       try {
-        const data = await getForumPosts();
-        setPosts(data);
+        const data = await getForumPosts({ includeAll: true, limit: 0 });
+        setPosts(Array.isArray(data) ? data : data?.items || []);
       } catch (err) {
         setError(err.message || "Failed to load posts");
       } finally {
@@ -36,12 +47,40 @@ const ManageForumPosts = () => {
   }, []);
 
   const handleDelete = async (postId) => {
+    const { data: token } = await authClient.token();
+    if (!token?.token) {
+      toast.error("Authentication required");
+      return;
+    }
+
     setActionLoading(postId);
     try {
-      await deleteForumPost(postId);
+      await deleteForumPost(postId, token.token);
       setPosts((prev) => prev.filter((p) => p._id !== postId));
+      toast.success("Post deleted successfully!");
     } catch (err) {
       toast.error("Failed to delete post: " + (err.message || "Unknown error"));
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleStatusUpdate = async (postId, status) => {
+    const { data: token } = await authClient.token();
+    if (!token?.token) {
+      toast.error("Authentication required");
+      return;
+    }
+
+    setActionLoading(postId);
+    try {
+      await updateForumPostStatus(postId, status, token.token);
+      setPosts((prev) =>
+        prev.map((item) => (item._id === postId ? { ...item, status } : item)),
+      );
+      toast.success(`Post ${status} successfully!`);
+    } catch (err) {
+      toast.error("Failed to update post status");
     } finally {
       setActionLoading(null);
     }
@@ -58,39 +97,10 @@ const ManageForumPosts = () => {
     });
   };
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case "approved":
-        return (
-          <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-[#A68B6E]/20 text-[#A68B6E] dark:bg-[#A68B6E]/30 dark:text-[#A68B6E]">
-            Approved
-          </span>
-        );
-      case "pending":
-        return (
-          <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-[#D4A050]/20 text-[#D4A050] dark:bg-[#D4A050]/30 dark:text-[#D4A050]">
-            Pending
-          </span>
-        );
-      case "rejected":
-        return (
-          <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-[#C47A6A]/20 text-[#C47A6A] dark:bg-[#C47A6A]/30 dark:text-[#C47A6A]">
-            Rejected
-          </span>
-        );
-      default:
-        return (
-          <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-[#6B655A]/20 text-[#6B655A] dark:bg-[#6B655A]/30 dark:text-[#B8B0A6]">
-            {status?.toUpperCase() || "UNKNOWN"}
-          </span>
-        );
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <FaSpinner className="w-8 h-8 text-[#D4845A] animate-spin" />
+        <FaSpinner className="w-8 h-8 text-active animate-spin" />
       </div>
     );
   }
@@ -98,7 +108,7 @@ const ManageForumPosts = () => {
   if (error) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-[#C47A6A] font-['Inter']">{error}</p>
+        <p className="text-rose-500 font-sans">{error}</p>
       </div>
     );
   }
@@ -112,17 +122,17 @@ const ManageForumPosts = () => {
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-[#2D2A24] dark:text-[#EAE5DE]">
-            Forum Posts
+          <h1 className="font-['Outfit'] text-3xl md:text-4xl font-bold text-foreground tracking-wide">
+            Forum Posts Moderation
           </h1>
-          <p className="font-['Inter'] text-[#6B655A] dark:text-[#B8B0A6] mt-1">
-            {posts.length} {posts.length === 1 ? "post" : "posts"} on the
-            platform
+          <p className="font-sans text-[#535C91] dark:text-[#9290C3] mt-1">
+            {posts.length} {posts.length === 1 ? "post" : "posts"} registered on
+            the platform
           </p>
         </div>
         <Link
-          href="/dashboard/admin/add-forum-post"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#D4845A] text-white font-['Inter'] font-medium rounded-lg hover:bg-[#B86A42] transition-colors shadow-sm hover:shadow-md whitespace-nowrap"
+          href="/dashboard/admin/addForumPost"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-btn-bg text-btn-text font-sans font-semibold rounded-xl hover:opacity-90 transition-all shadow-md hover:shadow-lg whitespace-nowrap border border-brand-500/20"
         >
           <FaPlus className="w-4 h-4" />
           Create New Post
@@ -130,34 +140,37 @@ const ManageForumPosts = () => {
       </div>
 
       {posts.length === 0 ? (
-        <div className="bg-white dark:bg-[#2D2A24] rounded-xl p-12 text-center shadow-sm border border-[#E8E0D8] dark:border-[#3A3530]">
-          <p className="text-[#6B655A] dark:text-[#B8B0A6] font-['Inter']">
+        <div className="bg-white dark:bg-brand-800/20 rounded-2xl p-12 text-center shadow-card border border-brand-500/15 dark:border-brand-500/20">
+          <p className="text-[#535C91] dark:text-[#9290C3] font-sans">
             No posts found.
           </p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-[#2D2A24] rounded-xl shadow-sm border border-[#E8E0D8] dark:border-[#3A3530] overflow-hidden">
+        <div className="bg-white dark:bg-brand-800/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/20 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left font-['Inter'] text-sm">
-              <thead className="bg-[#F5EDE6] dark:bg-[#3A3530] text-[#6B655A] dark:text-[#B8B0A6]">
+            <table className="w-full text-left font-sans text-sm">
+              <thead className="bg-brand-500/10 text-[#535C91] dark:text-[#9290C3]">
                 <tr>
-                  <th className="py-3 px-4 font-semibold">Image</th>
-                  <th className="py-3 px-4 font-semibold">Title</th>
-                  <th className="py-3 px-4 font-semibold">Author</th>
-                  <th className="py-3 px-4 font-semibold">Category</th>
-                  <th className="py-3 px-4 font-semibold">Date</th>
-                  <th className="py-3 px-4 font-semibold text-right">Action</th>
+                  <th className="py-3.5 px-6 font-semibold">Image</th>
+                  <th className="py-3.5 px-6 font-semibold">Title</th>
+                  <th className="py-3.5 px-6 font-semibold">Author</th>
+                  <th className="py-3.5 px-6 font-semibold">Category</th>
+                  <th className="py-3.5 px-6 font-semibold">Status</th>
+                  <th className="py-3.5 px-6 font-semibold">Date</th>
+                  <th className="py-3.5 px-6 font-semibold text-right">
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {posts.map((post) => (
                   <tr
                     key={post._id}
-                    className="border-b border-[#E8E0D8] dark:border-[#3A3530] hover:bg-[#F5EDE6] dark:hover:bg-[#3A3530] transition-colors"
+                    className="border-b border-brand-500/10 hover:bg-brand-500/5 transition-colors"
                   >
-                    <td className="py-3 px-4">
+                    <td className="py-3.5 px-6">
                       {post.image ? (
-                        <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#F5EDE6] dark:bg-[#3A3530]">
+                        <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-brand-500/5 border border-brand-500/10 shrink-0">
                           <Image
                             src={post.image}
                             alt={post.title}
@@ -167,20 +180,20 @@ const ManageForumPosts = () => {
                           />
                         </div>
                       ) : (
-                        <div className="w-12 h-12 rounded-lg bg-[#F5EDE6] dark:bg-[#3A3530] flex items-center justify-center text-[#6B655A] dark:text-[#B8B0A6] text-xs">
+                        <div className="w-12 h-12 rounded-lg bg-brand-500/5 border border-brand-500/10 flex items-center justify-center text-[#535C91] dark:text-[#9290C3] text-xs">
                           No img
                         </div>
                       )}
                     </td>
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-6 font-bold text-foreground">
                       <Link
                         href={`/forum/${post._id}`}
-                        className="font-medium text-[#2D2A24] dark:text-[#EAE5DE] hover:text-[#D4845A] transition-colors"
+                        className="hover:text-active transition-colors line-clamp-1"
                       >
                         {post.title}
                       </Link>
                     </td>
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-6 text-foreground">
                       <div className="flex items-center gap-2">
                         {post.userImage ? (
                           <Image
@@ -188,48 +201,95 @@ const ManageForumPosts = () => {
                             alt={post.userName}
                             width={24}
                             height={24}
-                            className="w-6 h-6 rounded-full object-cover"
+                            className="w-6 h-6 rounded-full object-cover border border-brand-500/10"
                           />
                         ) : (
-                          <FaUser className="w-4 h-4 text-[#6B655A] dark:text-[#B8B0A6]" />
+                          <FaUser className="w-4 h-4 text-active" />
                         )}
-                        <span className="text-[#2D2A24] dark:text-[#EAE5DE]">
-                          {post.userName}
+                        <span className="font-medium text-foreground">
+                          {post.userName || "Anonymous"}
                         </span>
-                        <span className="text-xs text-[#6B655A] dark:text-[#B8B0A6]">
-                          ({post.userRole})
+                        <span className="text-xs text-[#535C91] dark:text-[#9290C3]">
+                          ({post.userRole || "Member"})
                         </span>
                       </div>
                     </td>
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-6">
                       {post.category ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-[#D4845A]/10 dark:bg-[#D4845A]/20 rounded-full text-xs text-[#D4845A]">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-active/10 rounded-full text-xs font-semibold text-active">
                           <FaTag className="w-3 h-3" />
                           {post.category}
                         </span>
                       ) : (
-                        <span className="text-[#6B655A] dark:text-[#B8B0A6] text-xs">
+                        <span className="text-[#535C91] dark:text-[#9290C3] text-xs">
                           —
                         </span>
                       )}
                     </td>
-                    <td className="py-4 px-4 text-[#2D2A24] dark:text-[#EAE5DE] text-xs">
+                    <td className="py-4 px-6 text-xs font-bold uppercase">
+                      <span
+                        className={`px-2.5 py-1 rounded-full ${
+                          post.status === "approved"
+                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                            : post.status === "rejected"
+                              ? "bg-rose-500/10 text-rose-500"
+                              : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                        }`}
+                      >
+                        {post.status || "pending"}
+                      </span>
+                    </td>
+                    <td className="py-4 px-6 text-foreground text-xs font-medium">
                       {formatDate(post.createdAt)}
                     </td>
 
-                    <td className="py-4 px-4 text-right">
-                      <button
-                        onClick={() => handleDelete(post._id)}
-                        disabled={actionLoading === post._id}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#C47A6A] text-[#C47A6A] rounded-lg text-xs font-medium hover:bg-[#C47A6A] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {actionLoading === post._id ? (
-                          <FaSpinner className="w-3.5 h-3.5 animate-spin" />
-                        ) : (
-                          <FaTrash className="w-3.5 h-3.5" />
+                    <td className="py-4 px-6 text-right">
+                      <div className="inline-flex items-center gap-2">
+                        {post.status !== "approved" && (
+                          <button
+                            onClick={() =>
+                              handleStatusUpdate(post._id, "approved")
+                            }
+                            disabled={actionLoading === post._id}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 rounded-lg text-xs font-bold hover:bg-emerald-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          >
+                            {actionLoading === post._id ? (
+                              <FaSpinner className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <FaCheck className="w-3.5 h-3.5" />
+                            )}
+                            Approve
+                          </button>
                         )}
-                        Delete
-                      </button>
+                        {post.status !== "rejected" && (
+                          <button
+                            onClick={() =>
+                              handleStatusUpdate(post._id, "rejected")
+                            }
+                            disabled={actionLoading === post._id}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-amber-500/30 text-amber-600 dark:text-amber-400 rounded-lg text-xs font-bold hover:bg-amber-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          >
+                            {actionLoading === post._id ? (
+                              <FaSpinner className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <FaTimes className="w-3.5 h-3.5" />
+                            )}
+                            Reject
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDelete(post._id)}
+                          disabled={actionLoading === post._id}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-rose-500/30 text-rose-500 rounded-lg text-xs font-bold hover:bg-rose-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        >
+                          {actionLoading === post._id ? (
+                            <FaSpinner className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <FaTrash className="w-3.5 h-3.5" />
+                          )}
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -240,5 +300,6 @@ const ManageForumPosts = () => {
       )}
     </motion.div>
   );
-}
+};
+
 export default ManageForumPosts;

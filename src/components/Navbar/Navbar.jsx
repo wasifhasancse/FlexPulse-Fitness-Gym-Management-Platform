@@ -1,11 +1,22 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { authClient } from "@/lib/auth-client";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { FaBars, FaTimes, FaUserCircle, FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { FiLogOut, FiGrid, FiEdit3, FiBookOpen, FiMessageSquare, FiSettings } from "react-icons/fi";
-import Image from "next/image";
-import { authClient } from "@/lib/auth-client";
+import { useEffect, useRef, useState } from "react";
+import {
+  FaBars,
+  FaChevronDown,
+  FaChevronUp,
+  FaTimes,
+  FaUserCircle,
+} from "react-icons/fa";
+import {
+  FiEdit3,
+  FiGrid,
+  FiLogOut,
+  FiSettings
+} from "react-icons/fi";
 import DarkModeSwitch from "./DarkModeSwitch";
 
 export default function Navbar() {
@@ -16,12 +27,6 @@ export default function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const pathname = usePathname();
   const dropdownRef = useRef(null);
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    setIsOpen(false);
-    setIsProfileOpen(false);
-  }, [pathname]);
 
   // Click outside listener for profile dropdown
   useEffect(() => {
@@ -56,7 +61,7 @@ export default function Navbar() {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.push("/auth/login");
+          router.push("/signin");
         },
       },
     });
@@ -69,9 +74,13 @@ export default function Navbar() {
           {/* Logo & Website Name */}
           <Link href="/" className="shrink-0 flex items-center gap-2 group">
             <div className="w-10 h-10 rounded-xl bg-linear-to-br from-[#9290C3] to-[#535C91] dark:from-[#1B1A55] dark:to-[#070F2B] flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300 border border-brand-500/20">
-
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6 text-active">
-                <path d="M6 5H4v14h2V5zm14 0h-2v14h2V5zm-4 6H8v2h8v-2zm-1-4h-2v10h2V7zm-8 0H5v10h2V7z"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="h-6 w-6 text-active"
+              >
+                <path d="M6 5H4v14h2V5zm14 0h-2v14h2V5zm-4 6H8v2h8v-2zm-1-4h-2v10h2V7zm-8 0H5v10h2V7z" />
               </svg>
             </div>
             <span className="font-['Outfit'] text-2xl font-bold tracking-tight text-foreground group-hover:opacity-90 transition-opacity">
@@ -98,7 +107,7 @@ export default function Navbar() {
 
           {/* Right side: Theme Toggle + Auth */}
           <div className="hidden md:flex items-center space-x-4">
-            <DarkModeSwitch/>
+            <DarkModeSwitch />
 
             {user ? (
               <div className="relative" ref={dropdownRef}>
@@ -172,7 +181,6 @@ export default function Navbar() {
                         <span>Profile Management</span>
                       </Link>
 
-                      
                       <Link
                         href="#"
                         className="flex items-center gap-3 w-full px-4 py-2.5 text-sm rounded-xl font-medium text-gray-700 dark:text-gray-200 hover:bg-[#F3F0FF] dark:hover:bg-[#1B1A55]/50 hover:text-[#5e41de] dark:hover:text-[#9290C3] transition-colors"

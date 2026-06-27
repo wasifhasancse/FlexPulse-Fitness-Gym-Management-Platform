@@ -1,6 +1,6 @@
 "use client";
 
-import { addForumPost } from "@/lib/actions/AddForumPost";
+import { addForumPost } from "@/lib/actions/addForumPost";
 import { authClient } from "@/lib/auth-client";
 import { imageUpload } from "@/lib/imageUpload";
 import { toast } from "@heroui/react";

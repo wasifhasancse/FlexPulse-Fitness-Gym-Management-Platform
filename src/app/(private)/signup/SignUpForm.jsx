@@ -1,24 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import {
-  FaUser,
-  FaEnvelope,
-  FaImage,
-  FaLock,
-  FaCheckCircle,
-  FaTimesCircle,
-  FaUserTag,
-  FaArrowRight,
-} from "react-icons/fa";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
 import { toast } from "@heroui/react";
+import { motion } from "framer-motion";
 import Image from "next/image";
-import { IoEye } from "react-icons/io5";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import {
+    FaArrowRight,
+    FaCheckCircle,
+    FaEnvelope,
+    FaImage,
+    FaLock,
+    FaTimesCircle,
+    FaUser,
+    FaUserTag,
+} from "react-icons/fa";
 import { IoMdEyeOff } from "react-icons/io";
+import { IoEye } from "react-icons/io5";
 
 export const dynamic = "force-dynamic";
 
@@ -64,7 +64,6 @@ const SignUpForm = () => {
 
   return (
     <div className="min-h-screen flex bg-background transition-colors duration-300">
-
       {/* Right side - Image/Branding (Hidden on mobile, reversed from login) */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-brand-900 flex-col justify-between p-12 overflow-hidden order-last">
         <div className="absolute inset-0 z-0">
@@ -91,10 +90,12 @@ const SignUpForm = () => {
 
         <div className="relative z-20 mb-12 text-right">
           <h2 className="font-['Inter'] text-5xl font-extrabold text-white mb-6 leading-tight">
-            Start your journey <br/> <span className="text-[#CFFF04]">today.</span>
+            Start your journey <br />{" "}
+            <span className="text-[#CFFF04]">today.</span>
           </h2>
           <p className="font-['Inter'] text-lg text-brand-300 max-w-md ml-auto">
-            Join thousands of driven individuals pushing their limits in our world-class facilities.
+            Join thousands of driven individuals pushing their limits in our
+            world-class facilities.
           </p>
         </div>
       </div>
@@ -102,7 +103,7 @@ const SignUpForm = () => {
       {/* Left side - Register Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative overflow-hidden order-first">
         <div className="absolute lg:hidden top-0 left-0 w-full h-full bg-brand-900 -z-10">
-           <div className="absolute bottom-0 left-0 w-100 h-100 bg-[#CFFF04]/5 rounded-full blur-[100px]"></div>
+          <div className="absolute bottom-0 left-0 w-100 h-100 bg-[#CFFF04]/5 rounded-full blur-[100px]"></div>
         </div>
 
         <motion.div
@@ -231,8 +232,18 @@ const SignUpForm = () => {
                   {/* <option value="trainer">Trainer</option> */}
                 </select>
                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-brand-500">
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </div>
               </div>
@@ -270,22 +281,56 @@ const SignUpForm = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center text-brand-500 hover:text-[#CFFF04] text-xs font-bold uppercase tracking-wider font-['Inter']"
                 >
-                  {showPassword ? <IoMdEyeOff className="h-5 w-5" /> : <IoEye className="h-5 w-5" /> }
+                  {showPassword ? (
+                    <IoMdEyeOff className="h-5 w-5" />
+                  ) : (
+                    <IoEye className="h-5 w-5" />
+                  )}
                 </button>
               </div>
 
               {/* Password Requirements */}
               <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 font-['Inter'] text-xs text-brand-500">
-                <p className={`flex items-center gap-1.5 ${password.length > 0 ? (hasMinLength ? 'text-[#CFFF04]' : 'text-red-400') : ''}`}>
-                  {password.length > 0 ? (hasMinLength ? <FaCheckCircle /> : <FaTimesCircle />) : <div className="w-3 h-3 rounded-full border border-brand-500" />}
+                <p
+                  className={`flex items-center gap-1.5 ${password.length > 0 ? (hasMinLength ? "text-[#CFFF04]" : "text-red-400") : ""}`}
+                >
+                  {password.length > 0 ? (
+                    hasMinLength ? (
+                      <FaCheckCircle />
+                    ) : (
+                      <FaTimesCircle />
+                    )
+                  ) : (
+                    <div className="w-3 h-3 rounded-full border border-brand-500" />
+                  )}
                   6+ characters
                 </p>
-                <p className={`flex items-center gap-1.5 ${password.length > 0 ? (hasUpperCase ? 'text-[#CFFF04]' : 'text-red-400') : ''}`}>
-                  {password.length > 0 ? (hasUpperCase ? <FaCheckCircle /> : <FaTimesCircle />) : <div className="w-3 h-3 rounded-full border border-brand-500" />}
+                <p
+                  className={`flex items-center gap-1.5 ${password.length > 0 ? (hasUpperCase ? "text-[#CFFF04]" : "text-red-400") : ""}`}
+                >
+                  {password.length > 0 ? (
+                    hasUpperCase ? (
+                      <FaCheckCircle />
+                    ) : (
+                      <FaTimesCircle />
+                    )
+                  ) : (
+                    <div className="w-3 h-3 rounded-full border border-brand-500" />
+                  )}
                   Uppercase letter
                 </p>
-                <p className={`flex items-center gap-1.5 ${password.length > 0 ? (hasLowerCase ? 'text-[#CFFF04]' : 'text-red-400') : ''}`}>
-                  {password.length > 0 ? (hasLowerCase ? <FaCheckCircle /> : <FaTimesCircle />) : <div className="w-3 h-3 rounded-full border border-brand-500" />}
+                <p
+                  className={`flex items-center gap-1.5 ${password.length > 0 ? (hasLowerCase ? "text-[#CFFF04]" : "text-red-400") : ""}`}
+                >
+                  {password.length > 0 ? (
+                    hasLowerCase ? (
+                      <FaCheckCircle />
+                    ) : (
+                      <FaTimesCircle />
+                    )
+                  ) : (
+                    <div className="w-3 h-3 rounded-full border border-brand-500" />
+                  )}
                   Lowercase letter
                 </p>
               </div>
@@ -309,7 +354,7 @@ const SignUpForm = () => {
           <p className="text-center font-['Inter'] text-sm text-brand-300 mt-6">
             Already have an account?{" "}
             <Link
-              href="/auth/login"
+              href="/signin"
               className="text-[#CFFF04] hover:text-[#b0d903] font-bold transition-colors underline decoration-[#CFFF04]/30 underline-offset-4"
             >
               Sign in

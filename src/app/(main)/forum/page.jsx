@@ -10,20 +10,20 @@ export const metadata = {
 
 export default async function ForumPage({ searchParams }) {
   const params = await searchParams;
-  const search = (await params.search) || "";
-  let posts = await getForumPosts();
+  const search = params.search || "";
+  const page = Number(params.page || 1);
+  const limit = 6;
+  const postsResponse = await getForumPosts({ search, page, limit });
+  const posts = postsResponse?.items || [];
+  const total = postsResponse?.total || 0;
+  const totalPages = postsResponse?.totalPages || 1;
 
-  // Filter posts based on search input
-  if (search.trim()) {
-    const query = search.toLowerCase();
-    posts = posts.filter(
-      (post) =>
-        post.title?.toLowerCase().includes(query) ||
-        post.description?.toLowerCase().includes(query) ||
-        post.userName?.toLowerCase().includes(query) ||
-        post.userRole?.toLowerCase().includes(query),
-    );
-  }
+  const buildPageLink = (targetPage) => {
+    const query = new URLSearchParams();
+    if (search) query.set("search", search);
+    query.set("page", String(targetPage));
+    return `/forum?${query.toString()}`;
+  };
 
   return (
     <div className="min-h-screen bg-background py-16 px-6 sm:px-6 lg:px-8 transition-colors duration-300">
@@ -64,11 +64,11 @@ export default async function ForumPage({ searchParams }) {
         {/* Action Header: Search & Create Post */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 max-w-3xl mx-auto">
           <div className="flex-1">
-            <SearchingForum totalPosts={posts.length} />
+            <SearchingForum totalPosts={total} />
           </div>
           <div className="flex justify-center shrink-0">
             <Link
-              href="/forum/create"
+              href="/dashboard/trainer/forum-post"
               className="inline-flex items-center gap-2 px-6 py-3.5 bg-btn-bg text-btn-text font-bold rounded-2xl shadow-md border border-brand-500/20 hover:opacity-90 transition-all text-sm whitespace-nowrap cursor-pointer"
             >
               <FaPlus className="w-4 h-4" />
@@ -115,9 +115,37 @@ export default async function ForumPage({ searchParams }) {
         {/* View More Button */}
         {posts.length > 0 && (
           <div className="mt-16 text-center">
-            <button className="px-8 py-3.5 border border-brand-500/30 dark:border-brand-500/50 hover:bg-btn-bg text-[#535C91] dark:text-[#9290C3] hover:text-btn-text font-bold rounded-xl transition-all shadow-sm hover:shadow-md cursor-pointer text-sm">
-              View More
-            </button>
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3]">
+                <a
+                  href={buildPageLink(Math.max(1, page - 1))}
+                  className="px-3.5 py-1.5 rounded-lg border border-brand-500/10 hover:bg-[#535C91]/10 dark:hover:bg-[#1B1A55]/60 hover:text-foreground transition-colors cursor-pointer"
+                >
+                  &lt;
+                </a>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (pageNo) => (
+                    <a
+                      key={pageNo}
+                      href={buildPageLink(pageNo)}
+                      className={`px-3.5 py-1.5 rounded-lg border font-bold transition-colors cursor-pointer ${
+                        pageNo === page
+                          ? "bg-btn-bg text-btn-text border-brand-500/20"
+                          : "border-brand-500/10 hover:bg-[#535C91]/10 dark:hover:bg-[#1B1A55]/60 hover:text-foreground"
+                      }`}
+                    >
+                      {pageNo}
+                    </a>
+                  ),
+                )}
+                <a
+                  href={buildPageLink(Math.min(totalPages, page + 1))}
+                  className="px-3.5 py-1.5 rounded-lg border border-brand-500/10 hover:bg-[#535C91]/10 dark:hover:bg-[#1B1A55]/60 hover:text-foreground transition-colors cursor-pointer"
+                >
+                  &gt;
+                </a>
+              </div>
+            )}
           </div>
         )}
       </div>

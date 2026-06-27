@@ -20,8 +20,9 @@ import {
   rejectTrainerApplication,
   cancelTrainerApplication,
 } from "@/lib/api/getTrainerApplication";
+import { toast } from "@heroui/react";
 
-const ManageTrainerAppication = () => {
+const ManageTrainerApplication = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,6 +36,11 @@ const ManageTrainerAppication = () => {
     (app) => app.status?.toLowerCase() === "pending",
   );
   const pendingCount = pendingApplications.length;
+
+  // Set page title
+  useEffect(() => {
+    document.title = "Trainer Applications | FlexPulse";
+  }, []);
 
   useEffect(() => {
     const loadApps = async () => {
@@ -81,6 +87,7 @@ const ManageTrainerAppication = () => {
               : app,
           ),
         );
+        toast.success("Trainer application approved successfully!");
       } else if (action === "reject") {
         await rejectTrainerApplication(selectedApp._id, feedback, token);
         setApplications((prev) =>
@@ -90,21 +97,24 @@ const ManageTrainerAppication = () => {
               : app,
           ),
         );
+        toast.success("Trainer application rejected.");
       } else if (action === "cancel") {
         await cancelTrainerApplication(selectedApp._id, token);
         setApplications((prev) =>
           prev.filter((app) => app._id !== selectedApp._id),
         );
+        toast.success("Trainer application cancelled.");
       }
       closeModal();
     } catch (err) {
-      alert(`Failed to ${action}: ${err.message}`);
+      toast.error(`Failed to ${action}: ${err.message}`);
     } finally {
       setActionLoading(false);
     }
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
     const date = new Date(dateString);
     return date.toLocaleString("en-US", {
       month: "short",
@@ -118,7 +128,7 @@ const ManageTrainerAppication = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <FaSpinner className="w-8 h-8 text-[#D4845A] animate-spin" />
+        <FaSpinner className="w-8 h-8 text-active animate-spin" />
       </div>
     );
   }
@@ -126,7 +136,7 @@ const ManageTrainerAppication = () => {
   if (error) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-[#C47A6A] font-['Inter']">{error}</p>
+        <p className="text-rose-500 font-sans">{error}</p>
       </div>
     );
   }
@@ -139,44 +149,42 @@ const ManageTrainerAppication = () => {
         transition={{ duration: 0.4 }}
         className="space-y-6 px-4 sm:px-0"
       >
+        {/* Header */}
         <div>
-          <h1 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-[#2D2A24] dark:text-[#EAE5DE]">
+          <h1 className="font-['Outfit'] text-3xl md:text-4xl font-bold text-foreground tracking-wide">
             Applied Trainers
           </h1>
-          <p className="font-['Inter'] text-[#6B655A] dark:text-[#B8B0A6] mt-1">
-            {pendingCount} pending{" "}
-            {pendingCount === 1 ? "application" : "applications"}
+          <p className="font-sans text-[#535C91] dark:text-[#9290C3] mt-1">
+            {pendingCount} pending {pendingCount === 1 ? "application" : "applications"}
           </p>
         </div>
 
         {pendingCount === 0 ? (
-          <div className="bg-white dark:bg-[#2D2A24] rounded-xl p-12 text-center shadow-sm border border-[#E8E0D8] dark:border-[#3A3530]">
-            <p className="text-[#6B655A] dark:text-[#B8B0A6] font-['Inter']">
+          <div className="bg-white dark:bg-brand-800/20 rounded-2xl p-12 text-center shadow-card border border-brand-500/15 dark:border-brand-500/20">
+            <p className="text-[#535C91] dark:text-[#9290C3] font-sans">
               No pending trainer applications.
             </p>
           </div>
         ) : (
-          <div className="bg-white dark:bg-[#2D2A24] rounded-xl shadow-sm border border-[#E8E0D8] dark:border-[#3A3530] overflow-hidden">
+          <div className="bg-white dark:bg-brand-800/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/20 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left font-['Inter'] text-sm">
-                <thead className="bg-[#F5EDE6] dark:bg-[#3A3530] text-[#6B655A] dark:text-[#B8B0A6]">
+              <table className="w-full text-left font-sans text-sm">
+                <thead className="bg-brand-500/10 text-[#535C91] dark:text-[#9290C3]">
                   <tr>
-                    <th className="py-3 px-4 font-semibold">Applicant</th>
-                    <th className="py-3 px-4 font-semibold">Specialty</th>
-                    <th className="py-3 px-4 font-semibold">Experience</th>
-                    <th className="py-3 px-4 font-semibold">Applied At</th>
-                    <th className="py-3 px-4 font-semibold text-right">
-                      Action
-                    </th>
+                    <th className="py-3.5 px-6 font-semibold">Applicant</th>
+                    <th className="py-3.5 px-6 font-semibold">Specialty</th>
+                    <th className="py-3.5 px-6 font-semibold">Experience</th>
+                    <th className="py-3.5 px-6 font-semibold">Applied At</th>
+                    <th className="py-3.5 px-6 font-semibold text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {pendingApplications.map((app) => (
                     <tr
                       key={app._id}
-                      className="border-b border-[#E8E0D8] dark:border-[#3A3530] hover:bg-[#F5EDE6] dark:hover:bg-[#3A3530] transition-colors"
+                      className="border-b border-brand-500/10 hover:bg-brand-500/5 transition-colors"
                     >
-                      <td className="py-4 px-4">
+                      <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           {app.userImage ? (
                             <Image
@@ -184,34 +192,34 @@ const ManageTrainerAppication = () => {
                               height={36}
                               src={app.userImage}
                               alt={app.userName}
-                              className="w-9 h-9 rounded-full object-cover border-2 border-[#D4845A]"
+                              className="w-9 h-9 rounded-full object-cover border border-brand-500/10"
                             />
                           ) : (
-                            <FaUserCircle className="w-9 h-9 text-[#D4845A]" />
+                            <FaUserCircle className="w-9 h-9 text-active shrink-0" />
                           )}
                           <div>
-                            <p className="font-medium text-[#2D2A24] dark:text-[#EAE5DE]">
+                            <p className="font-bold text-foreground">
                               {app.userName}
                             </p>
-                            <p className="text-xs text-[#6B655A] dark:text-[#B8B0A6]">
+                            <p className="text-xs text-[#535C91] dark:text-[#9290C3] mt-0.5">
                               {app.userEmail}
                             </p>
                           </div>
                         </div>
                       </td>
-                      <td className="py-4 px-4 text-[#2D2A24] dark:text-[#EAE5DE]">
+                      <td className="py-4 px-6 text-foreground font-medium">
                         {app.specialty}
                       </td>
-                      <td className="py-4 px-4 text-[#2D2A24] dark:text-[#EAE5DE]">
+                      <td className="py-4 px-6 text-foreground font-semibold">
                         {app.experience} years
                       </td>
-                      <td className="py-4 px-4 text-[#2D2A24] dark:text-[#EAE5DE] text-sm">
-                        {formatDate(app.time)}
+                      <td className="py-4 px-6 text-foreground text-xs font-medium">
+                        {formatDate(app.appliedAt || app.time)}
                       </td>
-                      <td className="py-4 px-4 text-right">
+                      <td className="py-4 px-6 text-right">
                         <button
                           onClick={() => openModal(app)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#D4845A] text-white rounded-lg text-xs font-medium hover:bg-[#B86A42] transition-colors shadow-sm"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-btn-bg text-btn-text rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-sm cursor-pointer"
                         >
                           <FaEye className="w-3.5 h-3.5" />
                           Details
@@ -226,80 +234,82 @@ const ManageTrainerAppication = () => {
         )}
       </motion.div>
 
-      {/* Modal */}
+      {/* Details Modal */}
       {isModalOpen && selectedApp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2 }}
-            className="bg-white dark:bg-[#2D2A24] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#E8E0D8] dark:border-[#3A3530] max-h-[90vh] overflow-y-auto"
+            className="bg-background rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-brand-500/20 max-h-[90vh] overflow-y-auto"
           >
-            <h2 className="font-['Playfair_Display'] text-2xl font-bold text-[#2D2A24] dark:text-[#EAE5DE] mb-4">
+            <h2 className="font-['Outfit'] text-2xl font-bold text-foreground mb-4">
               Application Details
             </h2>
 
-            <div className="space-y-4">
+            <div className="space-y-5">
               {/* Applicant info */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 bg-brand-500/5 p-4 rounded-xl border border-brand-500/10">
                 {selectedApp.userImage ? (
                   <Image
                     width={48}
                     height={48}
                     src={selectedApp.userImage}
                     alt={selectedApp.userName}
-                    className="w-12 h-12 rounded-full object-cover border-2 border-[#D4845A]"
+                    className="w-12 h-12 rounded-full object-cover border border-brand-500/10"
                   />
                 ) : (
-                  <FaUserCircle className="w-12 h-12 text-[#D4845A]" />
+                  <FaUserCircle className="w-12 h-12 text-active shrink-0" />
                 )}
                 <div>
-                  <p className="font-['Inter'] font-semibold text-[#2D2A24] dark:text-[#EAE5DE]">
+                  <p className="font-sans font-bold text-foreground">
                     {selectedApp.userName}
                   </p>
-                  <p className="text-sm text-[#6B655A] dark:text-[#B8B0A6]">
+                  <p className="text-sm text-[#535C91] dark:text-[#9290C3] mt-0.5">
                     {selectedApp.userEmail}
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <p className="text-[#6B655A] dark:text-[#B8B0A6] flex items-center gap-1">
-                    <FaTag className="w-3.5 h-3.5 text-[#D4845A]" />
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="bg-brand-500/5 p-3 rounded-xl border border-brand-500/10">
+                  <p className="text-[#535C91] dark:text-[#9290C3] text-xs flex items-center gap-1.5 font-bold uppercase tracking-wider mb-1">
+                    <FaTag className="w-3.5 h-3.5 text-active" />
                     Specialty
                   </p>
-                  <p className="font-medium text-[#2D2A24] dark:text-[#EAE5DE]">
+                  <p className="font-bold text-foreground">
                     {selectedApp.specialty}
                   </p>
                 </div>
-                <div>
-                  <p className="text-[#6B655A] dark:text-[#B8B0A6] flex items-center gap-1">
-                    <FaCalendarAlt className="w-3.5 h-3.5 text-[#D4845A]" />
+                <div className="bg-brand-500/5 p-3 rounded-xl border border-brand-500/10">
+                  <p className="text-[#535C91] dark:text-[#9290C3] text-xs flex items-center gap-1.5 font-bold uppercase tracking-wider mb-1">
+                    <FaCalendarAlt className="w-3.5 h-3.5 text-active" />
                     Experience
                   </p>
-                  <p className="font-medium text-[#2D2A24] dark:text-[#EAE5DE]">
+                  <p className="font-bold text-foreground">
                     {selectedApp.experience} years
                   </p>
                 </div>
               </div>
 
-              <div>
-                <p className="text-[#6B655A] dark:text-[#B8B0A6] flex items-center gap-1">
-                  <FaClock className="w-3.5 h-3.5 text-[#D4845A]" />
+              <div className="bg-brand-500/5 p-3.5 rounded-xl border border-brand-500/10 text-sm">
+                <p className="text-[#535C91] dark:text-[#9290C3] text-xs flex items-center gap-1.5 font-bold uppercase tracking-wider mb-1">
+                  <FaClock className="w-3.5 h-3.5 text-active" />
                   Applied At
                 </p>
-                <p className="font-medium text-[#2D2A24] dark:text-[#EAE5DE]">
+                <p className="font-bold text-foreground">
                   {formatDate(selectedApp.appliedAt || selectedApp.time)}
                 </p>
               </div>
-              <div>
-                <p className="text-[#6B655A] dark:text-[#B8B0A6] flex items-center gap-1">
-                  <FaTag className="w-3.5 h-3.5 text-[#D4845A]" />
-                  Status
+
+              {/* Bio */}
+              <div className="bg-brand-500/5 p-4 rounded-xl border border-brand-500/10 text-sm">
+                <p className="text-[#535C91] dark:text-[#9290C3] text-xs flex items-center gap-1.5 font-bold uppercase tracking-wider mb-1.5">
+                  <FaTag className="w-3.5 h-3.5 text-active" />
+                  Professional Bio
                 </p>
-                <p className="font-medium text-[#2D2A24] dark:text-[#EAE5DE] capitalize">
-                  {selectedApp.status || "pending"}
+                <p className="text-foreground leading-relaxed font-sans">
+                  {selectedApp.bio || "No bio description provided."}
                 </p>
               </div>
 
@@ -307,64 +317,66 @@ const ManageTrainerAppication = () => {
               <div>
                 <label
                   htmlFor="feedback"
-                  className="block font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] mb-1"
+                  className="block font-sans text-sm font-bold text-foreground mb-2"
                 >
-                  Feedback
+                  Feedback Message
                 </label>
                 <textarea
                   id="feedback"
                   rows="3"
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
-                  placeholder="Provide feedback for the applicant..."
-                  className="w-full px-4 py-2 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#E8E0D8] dark:border-[#4A4540] rounded-lg text-[#2D2A24] dark:text-[#EAE5DE] placeholder-[#8A847C] dark:placeholder-[#6B655A] focus:outline-none focus:border-[#D4845A] focus:ring-2 focus:ring-[#D4845A]/20 transition-all font-['Inter'] text-sm resize-none"
+                  placeholder="Provide feedback for the applicant (mandatory if rejecting)..."
+                  className="w-full px-4 py-3 bg-brand-50/5 dark:bg-brand-800/40 border border-brand-500/20 dark:border-brand-500/30 rounded-xl text-foreground placeholder-[#535C91]/50 dark:placeholder-[#9290C3]/50 focus:outline-none focus:border-active focus:ring-1 focus:ring-active transition-all font-sans text-sm resize-none shadow-inner"
                 />
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                <button
-                  onClick={() => handleAction("approve")}
-                  disabled={actionLoading}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#A68B6E] text-white font-['Inter'] font-medium rounded-lg hover:bg-[#8B7A5E] transition-colors disabled:opacity-50"
-                >
-                  {actionLoading ? (
-                    <FaSpinner className="animate-spin" />
-                  ) : (
-                    <FaCheck />
-                  )}
-                  Approve
-                </button>
-                <button
-                  onClick={() => handleAction("reject")}
-                  disabled={actionLoading}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 border-2 border-[#C47A6A] text-[#C47A6A] font-['Inter'] font-medium rounded-lg hover:bg-[#C47A6A] hover:text-white transition-colors disabled:opacity-50"
-                >
-                  {actionLoading ? (
-                    <FaSpinner className="animate-spin" />
-                  ) : (
-                    <FaTimes />
-                  )}
-                  Reject
-                </button>
+              <div className="flex flex-col gap-2 pt-2">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleAction("approve")}
+                    disabled={actionLoading}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-emerald-500 text-white font-sans font-bold rounded-xl hover:bg-emerald-600 transition-colors disabled:opacity-50 cursor-pointer shadow-md text-sm"
+                  >
+                    {actionLoading ? (
+                      <FaSpinner className="animate-spin" />
+                    ) : (
+                      <FaCheck />
+                    )}
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleAction("reject")}
+                    disabled={actionLoading}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 border border-rose-500/35 text-rose-500 font-sans font-bold rounded-xl hover:bg-rose-500 hover:text-white transition-colors disabled:opacity-50 cursor-pointer shadow-md text-sm"
+                  >
+                    {actionLoading ? (
+                      <FaSpinner className="animate-spin" />
+                    ) : (
+                      <FaTimes />
+                    )}
+                    Reject
+                  </button>
+                </div>
                 <button
                   onClick={() => handleAction("cancel")}
                   disabled={actionLoading}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-[#C47A6A] text-[#6B655A] dark:text-[#B8B0A6] font-['Inter'] font-medium rounded-lg hover:bg-[#F5EDE6] dark:hover:bg-[#3A3530] transition-colors disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 py-3 border border-brand-500/30 text-[#535C91] dark:text-[#9290C3] hover:bg-brand-500/10 font-sans font-bold rounded-xl transition-colors disabled:opacity-50 cursor-pointer text-xs"
                 >
                   {actionLoading ? (
                     <FaSpinner className="animate-spin" />
                   ) : (
                     <FaTimes />
                   )}
-                  Cancel Application
+                  Cancel Application Record
                 </button>
                 <button
                   onClick={closeModal}
-                  className="py-2.5 px-4 text-[#6B655A] dark:text-[#B8B0A6] font-['Inter'] text-sm hover:text-[#2D2A24] dark:hover:text-[#EAE5DE] transition-colors"
+                  className="w-full py-2.5 px-4 text-[#535C91] dark:text-[#9290C3] font-sans font-bold text-sm hover:text-foreground transition-colors cursor-pointer text-center"
                   disabled={actionLoading}
                 >
-                  Close
+                  Close Detail Modal
                 </button>
               </div>
             </div>
@@ -373,5 +385,6 @@ const ManageTrainerAppication = () => {
       )}
     </>
   );
-}
-export default ManageTrainerAppication;
+};
+
+export default ManageTrainerApplication;

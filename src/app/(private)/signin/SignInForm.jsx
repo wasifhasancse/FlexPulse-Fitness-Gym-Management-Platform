@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import { FaGoogle, FaEnvelope, FaLock, FaArrowRight } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@heroui/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import Image from "next/image";
-import { IoEye } from "react-icons/io5";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { FaArrowRight, FaEnvelope, FaLock } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 import { IoMdEyeOff } from "react-icons/io";
+import { IoEye } from "react-icons/io5";
 
 export const dynamic = "force-dynamic";
 
@@ -75,10 +75,12 @@ const SignInForm = () => {
 
         <div className="relative z-20 mb-12">
           <h2 className="font-['Inter'] text-5xl font-extrabold text-white mb-6 leading-tight">
-            Welcome back to the <br/> <span className="text-[#CFFF04]">FlexPulse.</span>
+            Welcome back to the <br />{" "}
+            <span className="text-[#CFFF04]">FlexPulse.</span>
           </h2>
           <p className="font-['Inter'] text-lg text-brand-300 max-w-md">
-            Log in to access your personalized workout plans, track your progress, and book your next premium session.
+            Log in to access your personalized workout plans, track your
+            progress, and book your next premium session.
           </p>
         </div>
       </div>
@@ -87,7 +89,7 @@ const SignInForm = () => {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative overflow-hidden">
         {/* Mobile background elements */}
         <div className="absolute lg:hidden top-0 left-0 w-full h-full bg-brand-900 -z-10">
-           <div className="absolute top-0 right-0 w-100 h-100 bg-[#CFFF04]/5 rounded-full blur-[100px]"></div>
+          <div className="absolute top-0 right-0 w-100 h-100 bg-[#CFFF04]/5 rounded-full blur-[100px]"></div>
         </div>
 
         <motion.div
@@ -195,7 +197,11 @@ const SignInForm = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center text-brand-500 hover:text-[#CFFF04] font-['Inter'] text-xs font-bold uppercase tracking-wider"
                 >
-                  {showPassword ? <IoMdEyeOff className="h-5 w-5" /> : <IoEye className="h-5 w-5" /> }
+                  {showPassword ? (
+                    <IoMdEyeOff className="h-5 w-5" />
+                  ) : (
+                    <IoEye className="h-5 w-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -213,7 +219,7 @@ const SignInForm = () => {
           <p className="text-center font-['Inter'] text-sm text-brand-300 mt-8">
             Don&amp;t have an account?{" "}
             <Link
-              href="/auth/register"
+              href="/signup"
               className="text-[#CFFF04] hover:text-[#b0d903] font-bold transition-colors underline decoration-[#CFFF04]/30 underline-offset-4"
             >
               Create one now
@@ -223,7 +229,7 @@ const SignInForm = () => {
           {/* Footer note */}
           <div className="mt-12 text-center">
             <p className="font-['Inter'] text-xs text-brand-500 font-medium">
-             FlexPulse &copy; {new Date().getFullYear()}. All rights reserved.
+              FlexPulse &copy; {new Date().getFullYear()}. All rights reserved.
             </p>
           </div>
         </motion.div>

@@ -7,5 +7,5 @@ export const createClasses = async (data) => {
 };
 
 export const trainerApplication = async (data) => {
-  return serverMutation("/api/trainerApplication", data);
+  return serverMutation("/api/trainer-application", data);
 };

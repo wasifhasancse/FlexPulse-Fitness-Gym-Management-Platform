@@ -2,11 +2,11 @@ import { stripe } from "@/lib/stripe";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
-  FaCalendarCheck,
-  FaCheckCircle,
-  FaClock,
-  FaDollarSign,
-  FaUser,
+    FaCalendarCheck,
+    FaCheckCircle,
+    FaClock,
+    FaDollarSign,
+    FaUser,
 } from "react-icons/fa";
 
 export const metadata = {
@@ -47,9 +47,9 @@ export default async function Success({ searchParams, params }) {
     const checkRes = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/api/checkBooking?userId=${userId}&classId=${classId}`,
     );
-    const { isBooking } = await checkRes.json();
+    const { isBooked } = await checkRes.json();
 
-    if (!isBooking) {
+    if (!isBooked) {
       const bookData = {
         classId,
         className,
@@ -63,6 +63,7 @@ export default async function Success({ searchParams, params }) {
         paymentStatus: "paid",
         status: "pending",
         sessionId: session_id,
+        transactionId: session_id,
         bookedAt: new Date(),
       };
       await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/bookClass`, {

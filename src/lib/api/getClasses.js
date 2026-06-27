@@ -1,4 +1,4 @@
-import { serverFetch } from "../core/serverActions";
+import { serverFetch, serverMutation } from "../core/serverActions";
 
 const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
@@ -7,14 +7,16 @@ export const getAllClasses = async (
   category = "",
   page = 1,
   limit = 6,
+  includeAll = false,
 ) => {
   const params = new URLSearchParams();
 
   if (search) params.set("search", search);
   if (category && category !== "All Categories")
     params.set("category", category);
-  if (page > 1) params.set("page", String(page));
+  if (page > 0) params.set("page", String(page));
   if (limit) params.set("limit", String(limit));
+  if (includeAll) params.set("includeAll", "true");
 
   const requestUrl = `${baseUrl}/api/all-class?${params.toString()}`;
   const res = await fetch(requestUrl);
@@ -32,6 +34,14 @@ export const getClassesById = async (id, token) => {
   });
   const data = await res.json();
   return data;
+};
+
+export const getClassById = async (id) => {
+  const res = await fetch(`${baseUrl}/api/all-classes/${id}`);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch class details: ${res.status}`);
+  }
+  return res.json();
 };
 
 export const getFeaturedClass = async () => {
@@ -55,7 +65,7 @@ export const getTotalBookings = async () => {
 };
 
 export const getAdminAllClasses = async () => {
-  return serverFetch(`/admin/all-classesByAdmin`);
+  return serverFetch(`/api/admin/all-classesByAdmin`);
 };
 
 export const approveClassByAdmin = (classId, token) => {

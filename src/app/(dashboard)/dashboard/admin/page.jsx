@@ -1,25 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { getAllUsers } from "@/lib/api/getAllUsers";
+import { getAllClasses } from "@/lib/api/getClasses";
+import { authClient } from "@/lib/auth-client";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import {
-  FaUsers,
-  FaCheckCircle,
-  FaUserCircle,
-  FaChartPie,
+    FaChartPie,
+    FaCheckCircle,
+    FaUserCircle,
+    FaUsers,
 } from "react-icons/fa";
 import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Legend,
-  Tooltip,
+    Cell,
+    Legend,
+    Pie,
+    PieChart,
+    ResponsiveContainer,
+    Tooltip,
 } from "recharts";
-import { authClient } from "@/lib/auth-client";
-import Image from "next/image";
-import { getAllClasses } from "@/lib/api/getClasses";
-import { getAllUsers } from "@/lib/api/getAllUsers";
 
 const COLORS = ["#9FA1FF", "#535C91", "#3B82F6", "#FF3366"];
 
@@ -41,8 +41,11 @@ export default function AdminDashboardPage() {
     const fetchData = async () => {
       try {
         const data = await getAllUsers();
-        const classesData = await getAllClasses();
-        setClasses(classesData || []);
+        const classesData = await getAllClasses("", "", 1, 0, true);
+        const classItems = Array.isArray(classesData)
+          ? classesData
+          : classesData?.items || [];
+        setClasses(classItems);
         setUsers(data || []);
       } catch (err) {
         console.error("Failed to fetch admin stats:", err);

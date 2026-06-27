@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
-import { FaUserCircle, FaHeart, FaComment, FaArrowRight } from "react-icons/fa";
+import Image from "next/image";
+import Link from "next/link";
+import { FaArrowRight, FaComment, FaHeart, FaUserCircle } from "react-icons/fa";
 
 export default function ForumPostCard({ post }) {
   const {
@@ -21,13 +21,13 @@ export default function ForumPostCard({ post }) {
   const totalLikes = likes?.length || 0;
   const totalComments = comments?.length || 0;
 
-  // Format time ago
-  const timeAgo = (date) => {
-    const diff = Date.now() - new Date(date).getTime();
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    if (hours < 1) return "Just now";
-    if (hours < 24) return `${hours}h ago`;
-    return `${Math.floor(hours / 24)}d ago`;
+  const formatDate = (date) => {
+    if (!date) return "N/A";
+    return new Date(date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
   };
 
   return (
@@ -76,7 +76,7 @@ export default function ForumPostCard({ post }) {
                 </span>
               )}
               <span>•</span>
-              <span className="font-['Inter']">{timeAgo(createdAt)}</span>
+              <span className="font-['Inter']">{formatDate(createdAt)}</span>
             </div>
           </div>
         </div>
