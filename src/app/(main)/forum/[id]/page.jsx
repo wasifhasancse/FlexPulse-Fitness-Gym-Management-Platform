@@ -24,12 +24,6 @@ import {
 } from "react-icons/fa";
 import { RiDeleteBin5Line } from "react-icons/ri";
 
-export const metadata = {
-  title: "Community Forum - FlexPulse",
-  description:
-    "Connect with trainers, share your fitness journey, and learn from the FlexPulse community. Explore discussions, ask questions, and engage with fellow fitness enthusiasts in our interactive forum.",
-};
-
 export default function ForumPostDetailsPage() {
   const params = useParams();
   const postId = params?.id;

@@ -21,12 +21,6 @@ import {
   FaUser
 } from "react-icons/fa";
 
-export const metadata = {
-  title: "Admin - Manage Forum Posts",
-  description:
-    "Manage and moderate all forum posts submitted by users. Approve, reject, or delete posts as needed. This section allows administrators to maintain the quality and integrity of the forum community within FlexPulse.",
-};
-
 const ManageForumPosts = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);

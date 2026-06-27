@@ -9,12 +9,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaEdit, FaList, FaPlus, FaSpinner, FaUser } from "react-icons/fa";
 
-export const metadata = {
-  title: "Trainer - Dashboard",
-  description:
-    "Manage your fitness classes and forum posts on the FlexPulse platform. Track your classes, engage with students, and share your expertise with the community.",
-};
-
 export default function TrainerDashboardPage() {
   const { data: session } = authClient.useSession();
   const user = session?.user;

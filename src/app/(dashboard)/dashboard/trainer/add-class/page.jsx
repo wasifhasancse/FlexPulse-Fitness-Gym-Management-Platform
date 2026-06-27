@@ -20,11 +20,6 @@ import {
     FaUsers,
 } from "react-icons/fa";
 
-export const metadata = {
-  title: "Trainer - Add Class",
-  description:
-    "Add a new fitness class to the FlexPulse platform. Share your expertise and help others achieve their fitness goals.",
-};
 
 export default function AddClassPage() {
   // Form state

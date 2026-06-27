@@ -12,11 +12,6 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@heroui/react";
 
-export const metadata = {
-  title: "Admin - Transactions",
-  description:
-    "View and manage all transactions on the platform. This section allows administrators to maintain the quality and integrity of the financial records within FlexPulse.",
-};
 
 const fetchTransactions = async (token) => {
   const res = await fetch(

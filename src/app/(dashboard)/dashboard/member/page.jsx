@@ -16,12 +16,6 @@ import {
   FaUserCircle,
 } from "react-icons/fa";
 
-export const metadata = {
-  title: "Member - Dashboard",
-  description:
-    "Manage your fitness journey with ease. View your booked classes, favorite sessions, and trainer application status. This dashboard provides a comprehensive overview of your activities and progress within the FlexPulse platform.",
-};
-
 export default function MemberDashboard() {
   const [bookings, setBookings] = useState([]);
   const [favorites, setFavorites] = useState([]);

@@ -3,11 +3,6 @@ import { getFavoriteClass } from "@/lib/api/getFavoriteClasses";
 import { getUserSession } from "@/lib/core/getSession";
 import Link from "next/link";
 
-export const metadata = {
-  title: "Member - My Favorites",
-  description:
-    "View and manage your favorite fitness classes. Access class details and quick booking options.",
-};
 
 export default async function FavoritesPage() {
   const user = await getUserSession();

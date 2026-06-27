@@ -20,12 +20,6 @@ import {
 } from "react-icons/fa";
 import { TfiMoney } from "react-icons/tfi";
 
-export const metadata = {
-  title: "Trainer - My Classes",
-  description:
-    "Manage your fitness classes on the FlexPulse platform. View details, update information, and track student enrollments.",
-};
-
 export default function MyClassesPage() {
   const { data: session } = authClient.useSession();
   const user = session?.user;

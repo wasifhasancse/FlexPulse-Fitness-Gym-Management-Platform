@@ -11,13 +11,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaArrowLeft, FaImage, FaPencilAlt, FaTimes } from "react-icons/fa";
 
-export const metadata = {
-  title: "Admin - Add Forum Post",
-  description:
-    "Add a new forum post to share insights, tips, or success stories with the fitness community. Engage with trainers and members by contributing valuable content to the FlexPulse forum.",
-};
-
-
 const AddAdminForumPost = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");

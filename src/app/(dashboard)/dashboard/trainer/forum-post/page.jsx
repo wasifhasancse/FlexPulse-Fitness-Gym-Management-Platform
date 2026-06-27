@@ -11,12 +11,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaArrowLeft, FaImage, FaPencilAlt, FaTimes } from "react-icons/fa";
 
-export const metadata = {
-  title: "Trainer - Create Forum Post",
-  description:
-    "Create a new forum post on the FlexPulse platform. Share your insights and connect with the fitness community.",
-};
-
 export default function CreateForumPostPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");

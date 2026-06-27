@@ -4,12 +4,6 @@ import { getUserSession } from "@/lib/core/getSession";
 import Link from "next/link";
 import { FaPlus } from "react-icons/fa";
 
-export const metadata = {
-  title: "Trainer - My Posts",
-  description:
-    "Manage your forum posts on the FlexPulse platform. Create, update, and track your content.",
-};
-
 export default async function MyPostsPage() {
   const user = await getUserSession();
   const trainerId = user?.id;
