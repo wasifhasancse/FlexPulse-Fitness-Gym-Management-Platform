@@ -3,7 +3,9 @@ import Link from "next/link";
 import { FiCompass, FiHome, FiLogIn } from "react-icons/fi";
 
 export const metadata = {
-  title: "Page Not Found",
+  title: "404 - Page Not Found - FlexPulse",
+  description:
+    "Oops! The page you are looking for does not exist. Explore our fitness classes, community forum, and more on FlexPulse. Get back on track with your fitness journey.",
 };
 
 const NotFound = () => {

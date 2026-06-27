@@ -24,12 +24,17 @@ import {
 } from "react-icons/fa";
 import { RiDeleteBin5Line } from "react-icons/ri";
 
+export const metadata = {
+  title: "Community Forum - FlexPulse",
+  description:
+    "Connect with trainers, share your fitness journey, and learn from the FlexPulse community. Explore discussions, ask questions, and engage with fellow fitness enthusiasts in our interactive forum.",
+};
+
 export default function ForumPostDetailsPage() {
   const params = useParams();
   const postId = params?.id;
   const { data: session } = useSession();
   const user = session?.user;
-
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -44,7 +49,6 @@ export default function ForumPostDetailsPage() {
   const [replyText, setReplyText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [relatedArticles, setRelatedArticles] = useState([]);
-
   const [editingComment, setEditingComment] = useState(null);
   const [editingText, setEditingText] = useState("");
 
@@ -109,7 +113,7 @@ export default function ForumPostDetailsPage() {
     return formatDate(dateString);
   };
 
-  const handelLike = async () => {
+  const handleLike = async () => {
     if (!user) return toast.error("To like this post, please login first!");
     try {
       const res = await fetch(
@@ -481,14 +485,14 @@ export default function ForumPostDetailsPage() {
                 <div className="mt-8 p-6 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 rounded-xl border-l-4 border-active">
                   <FaQuoteLeft className="text-active w-5 h-5 mb-2 opacity-60" />
                   <p className="font-['Inter'] italic text-[#535C91] dark:text-[#9290C3] leading-relaxed">
-                    &quot;Success in fitness is not about random effort; it's about the consistency and building healthy daily habits with dedicated guidance.&quot;
+                    &quot;Success in fitness is not about random effort; it&apos;s about the consistency and building healthy daily habits with dedicated guidance.&quot;
                   </p>
                 </div>
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap items-center gap-4 mt-6 pt-4 border-t border-brand-500/10 dark:border-brand-800/40">
                   <button
-                    onClick={handelLike}
+                    onClick={handleLike}
                     className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-['Inter'] text-sm font-medium transition-all cursor-pointer ${
                       isLiked
                         ? "bg-active text-btn-text"

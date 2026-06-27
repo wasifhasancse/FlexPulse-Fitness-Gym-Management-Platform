@@ -10,7 +10,9 @@ import {
 } from "react-icons/fa";
 
 export const metadata = {
-  title: "Payment Successful",
+  title: "Payment Successful - FlexPulse",
+  description:
+    "Your payment was successful. A confirmation email has been sent to your inbox. Thank you for booking a class with FlexPulse. We look forward to seeing you in the class!",
 };
 
 export default async function Success({ searchParams, params }) {

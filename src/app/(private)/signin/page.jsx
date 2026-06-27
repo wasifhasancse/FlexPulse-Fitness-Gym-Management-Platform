@@ -5,8 +5,11 @@ import { Suspense } from "react";
 import SignInForm from "./SignInForm";
 
 export const metadata = {
-  title: "Sign In",
+  title: "Sign In - FlexPulse",
+  description:
+    "Sign in to your FlexPulse account to access personalized fitness classes, track your progress, and engage with the community. Securely log in to continue your fitness journey.",
 };
+
 
 const SignInPage = async () => {
   const user = await getUserSession();

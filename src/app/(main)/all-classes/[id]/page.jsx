@@ -3,6 +3,13 @@ import { getClassById } from "@/lib/api/getClasses";
 import { getUserSession } from "@/lib/core/getSession";
 import { redirect } from "next/navigation";
 
+export const metadata = {
+  title: "All Classes - FlexPulse",
+  description:
+    "Browse our curated fitness classes led by expert trainers. Filter by category and discover the right fit for your goals.",
+};
+
+
 export async function generateMetadata({ params }) {
   const { id } = await params;
   try {

@@ -3,7 +3,9 @@ import SearchingClasses from "@/components/AllClasses/SearchingClasses";
 import { getAllClasses } from "@/lib/api/getClasses";
 
 export const metadata = {
-  title: "All Classes",
+  title: "All Classes - FlexPulse",
+  description:
+    "Browse our curated fitness classes led by expert trainers. Filter by category and discover the right fit for your goals.",
 };
 
 export default async function AllClassesPage({ searchParams }) {

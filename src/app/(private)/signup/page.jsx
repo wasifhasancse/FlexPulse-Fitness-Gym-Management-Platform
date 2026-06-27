@@ -5,7 +5,9 @@ import { Suspense } from "react";
 import SignUpForm from "./SignUpForm";
 
 export const metadata = {
-  title: "Sign Up",
+  title: "Sign Up - FlexPulse",
+  description:
+    "Create a FlexPulse account to access personalized fitness classes, track your progress, and engage with the community. Join us in your fitness journey.",
 };
 
 const SignUpPage = async () => {

@@ -5,7 +5,9 @@ import Link from "next/link";
 import { FaPlus } from "react-icons/fa";
 
 export const metadata = {
-  title: "Community Forum",
+  title: "Community Forum - FlexPulse",
+  description:
+    "Connect with trainers, share your fitness journey, and learn from the FlexPulse community. Explore discussions, ask questions, and engage with fellow fitness enthusiasts in our interactive forum.",
 };
 
 export default async function ForumPage({ searchParams }) {
