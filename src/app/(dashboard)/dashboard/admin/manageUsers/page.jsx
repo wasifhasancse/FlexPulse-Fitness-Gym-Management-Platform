@@ -19,6 +19,12 @@ import {
     FaUserCircle,
 } from "react-icons/fa";
 
+export const metadata = {
+  title: "Admin - Manage Users",
+  description:
+    "Manage and review all users on the platform. Block, unblock, or update user roles as needed. This section allows administrators to maintain the quality and integrity of the user community within FlexPulse.",
+};
+
 export default function ManageUsersPage() {
   const { data: session } = authClient.useSession();
   const currentUser = session?.user;

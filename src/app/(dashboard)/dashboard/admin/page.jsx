@@ -21,6 +21,12 @@ import {
     Tooltip,
 } from "recharts";
 
+export const metadata = {
+  title: "Admin - Dashboard",
+  description:
+    "Manage and monitor the FlexPulse platform. View key metrics, user information, and class details to ensure optimal performance and user satisfaction. This section allows administrators to maintain the quality and integrity of the platform.",
+};
+
 const COLORS = ["#9FA1FF", "#535C91", "#3B82F6", "#FF3366"];
 
 export default function AdminDashboardPage() {

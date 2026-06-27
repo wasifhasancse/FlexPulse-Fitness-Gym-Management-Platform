@@ -22,6 +22,12 @@ import {
 } from "@/lib/api/getTrainerApplication";
 import { toast } from "@heroui/react";
 
+export const metadata = {
+  title: "Admin - Manage Trainer Applications",
+  description:
+    "Manage and review all trainer applications submitted by users. Approve, reject, or cancel applications as needed. This section allows administrators to maintain the quality and integrity of the trainer community within FlexPulse.",
+};
+
 const ManageTrainerApplication = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);

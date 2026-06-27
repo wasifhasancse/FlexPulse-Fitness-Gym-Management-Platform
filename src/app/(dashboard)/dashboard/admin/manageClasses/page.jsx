@@ -21,6 +21,12 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@heroui/react";
 
+export const metadata = {
+  title: "Admin - Manage Classes",
+  description:
+    "Manage and review all classes submitted by trainers. Approve, reject, or delete classes as needed. This section allows administrators to maintain the quality and integrity of the class offerings within FlexPulse.",
+};
+
 const approveClass = async (classId) => {
   const { data: token } = await authClient.token();
   if (!token) throw new Error("Authentication required");

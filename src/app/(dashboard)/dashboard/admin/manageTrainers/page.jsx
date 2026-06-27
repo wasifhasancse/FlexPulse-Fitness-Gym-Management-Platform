@@ -15,11 +15,17 @@ import { setUserRole } from "@/lib/api/getAllUsers";
 import { toast } from "@heroui/react";
 import Image from "next/image";
 
+export const metadata = {
+  title: "Admin - Manage Trainers",
+  description:
+    "Manage and review all trainers on the platform. Approve, reject, or demote trainers as needed. This section allows administrators to maintain the quality and integrity of the trainer community within FlexPulse.",
+};
+
 const demoteTrainer = async (trainerId, token) => {
   return setUserRole(trainerId, "member", token);
 };
 
-const ManageTrainiers = () => {
+const ManageTrainers = () => {
   const [trainers, setTrainers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -264,4 +270,4 @@ const ManageTrainiers = () => {
   );
 };
 
-export default ManageTrainiers;
+export default ManageTrainers;
