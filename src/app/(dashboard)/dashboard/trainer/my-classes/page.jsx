@@ -2,23 +2,29 @@
 
 import { DeleteClassModal } from "@/components/Dashboard/trainer/DeleteClassModal";
 import UpdateModal from "@/components/Dashboard/trainer/UpdateModal";
-import { getMyClasses, getClassStudents } from "@/lib/api/getClasses";
+import { getClassStudents, getMyClasses } from "@/lib/api/getClasses";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "@heroui/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
-    FaCalendarAlt,
-    FaClock,
-    FaEye,
-    FaPlus,
-    FaSpinner,
-    FaUsers,
-    FaTimes
+  FaCalendarAlt,
+  FaClock,
+  FaEye,
+  FaPlus,
+  FaSpinner,
+  FaTimes,
+  FaUsers,
 } from "react-icons/fa";
 import { TfiMoney } from "react-icons/tfi";
-import { toast } from "@heroui/react";
+
+export const metadata = {
+  title: "Trainer - My Classes",
+  description:
+    "Manage your fitness classes on the FlexPulse platform. View details, update information, and track student enrollments.",
+};
 
 export default function MyClassesPage() {
   const { data: session } = authClient.useSession();
@@ -28,7 +34,7 @@ export default function MyClassesPage() {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const [selectedClass, setSelectedClass] = useState(null);
   const [students, setStudents] = useState([]);
   const [studentsLoading, setStudentsLoading] = useState(false);
@@ -246,9 +252,7 @@ export default function MyClassesPage() {
 
                     {/* Bookings */}
                     <td className="py-4 px-6 text-foreground font-bold">
-                      <span>
-                        {cls.bookedCount || 0}
-                      </span>
+                      <span>{cls.bookedCount || 0}</span>
                       <span className="text-[#535C91] dark:text-[#9290C3] font-normal">
                         /{cls.slot}
                       </span>
@@ -326,13 +330,18 @@ export default function MyClassesPage() {
             </div>
 
             <p className="font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3] mb-4">
-              Class: <span className="font-bold text-foreground">{selectedClass.className}</span>
+              Class:{" "}
+              <span className="font-bold text-foreground">
+                {selectedClass.className}
+              </span>
             </p>
 
             {studentsLoading ? (
               <div className="flex flex-col items-center justify-center py-10">
                 <FaSpinner className="w-8 h-8 text-active animate-spin mb-2" />
-                <p className="text-xs text-[#535C91] dark:text-[#9290C3]">Fetching student list...</p>
+                <p className="text-xs text-[#535C91] dark:text-[#9290C3]">
+                  Fetching student list...
+                </p>
               </div>
             ) : students.length === 0 ? (
               <div className="bg-brand-500/5 p-8 rounded-xl text-center border border-brand-500/10">
@@ -352,8 +361,12 @@ export default function MyClassesPage() {
                       key={index}
                       className="p-3 bg-white dark:bg-brand-800/20 border border-brand-500/10 rounded-xl grid grid-cols-2 text-sm text-foreground hover:bg-brand-500/5 transition-colors"
                     >
-                      <span className="font-semibold truncate">{student.name}</span>
-                      <span className="truncate text-[#535C91] dark:text-[#9290C3]">{student.email}</span>
+                      <span className="font-semibold truncate">
+                        {student.name}
+                      </span>
+                      <span className="truncate text-[#535C91] dark:text-[#9290C3]">
+                        {student.email}
+                      </span>
                     </div>
                   ))}
                 </div>
