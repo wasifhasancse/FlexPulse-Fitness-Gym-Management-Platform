@@ -36,6 +36,12 @@ const specialties = [
   "Other",
 ];
 
+export const metadata = {
+  title: "Member - Apply as Trainer",
+  description:
+    "Apply to become a trainer on the FlexPulse platform. Share your expertise and help others achieve their fitness goals. This section allows members to submit their trainer applications for review and approval.",
+};
+
 export default function ApplyTrainerPage() {
   const { data: session } = authClient.useSession();
   const user = session?.user;

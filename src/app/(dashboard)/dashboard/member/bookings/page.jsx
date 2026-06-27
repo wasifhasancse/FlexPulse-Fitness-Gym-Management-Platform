@@ -8,6 +8,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaCalendarAlt, FaClock, FaSpinner } from "react-icons/fa";
 
+export const metadata = {
+  title: "Member - My Bookings",
+  description:
+    "View and manage your scheduled fitness classes. Access class details, trainer information, and booking confirmations.",
+};
+
 // Helper to format date/time from ISO string
 const formatDate = (isoString) => {
   const date = new Date(isoString);

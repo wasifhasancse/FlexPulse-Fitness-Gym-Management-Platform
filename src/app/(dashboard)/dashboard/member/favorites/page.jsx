@@ -4,7 +4,9 @@ import { getUserSession } from "@/lib/core/getSession";
 import Link from "next/link";
 
 export const metadata = {
-  title: "My Favorites | FlexPulse",
+  title: "Member - My Favorites",
+  description:
+    "View and manage your favorite fitness classes. Access class details and quick booking options.",
 };
 
 export default async function FavoritesPage() {
@@ -26,7 +28,7 @@ export default async function FavoritesPage() {
       {favorites.length === 0 ? (
         <div className="bg-white dark:bg-brand-800/20 rounded-2xl p-12 text-center shadow-card border border-brand-500/15 dark:border-brand-500/20 max-w-2xl">
           <p className="font-sans text-[#535C91] dark:text-[#9290C3] mb-4">
-            You haven't added any classes to your favorites yet.
+            You haven&apos;t added any classes to your favorites yet.
           </p>
           <Link
             href="/all-classes"
