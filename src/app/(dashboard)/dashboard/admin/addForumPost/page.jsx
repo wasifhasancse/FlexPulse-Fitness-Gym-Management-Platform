@@ -22,9 +22,6 @@ const AddAdminForumPost = () => {
 
   const { data: session } = authClient.useSession();
   const user = session?.user;
-
-   const { data: token } = authClient.token();
-
   const handleRemoveImage = () => {
     setImage(null);
     const fileInput = document.getElementById("imageInput");
@@ -49,11 +46,10 @@ const AddAdminForumPost = () => {
       userId: user?.id,
     };
     try {
-
+      const { data: token } = await authClient.token();
       if (!token) {
         toast.error("authentication faild, please login again.");
       }
-      console.log(token);
       const result = await addForumPost(formData, token.token);
       if (result.insertedId) {
         toast.success("Post created successfully!");

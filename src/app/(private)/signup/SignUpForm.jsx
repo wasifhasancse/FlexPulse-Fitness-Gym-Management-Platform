@@ -291,7 +291,7 @@ const SignUpForm = () => {
 
               {/* Password Requirements */}
               <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 font-['Inter'] text-xs text-brand-500">
-                <p
+                <div
                   className={`flex items-center gap-1.5 ${password.length > 0 ? (hasMinLength ? "text-[#CFFF04]" : "text-red-400") : ""}`}
                 >
                   {password.length > 0 ? (
@@ -304,8 +304,8 @@ const SignUpForm = () => {
                     <div className="w-3 h-3 rounded-full border border-brand-500" />
                   )}
                   6+ characters
-                </p>
-                <p
+                </div>
+                <div
                   className={`flex items-center gap-1.5 ${password.length > 0 ? (hasUpperCase ? "text-[#CFFF04]" : "text-red-400") : ""}`}
                 >
                   {password.length > 0 ? (
@@ -318,8 +318,8 @@ const SignUpForm = () => {
                     <div className="w-3 h-3 rounded-full border border-brand-500" />
                   )}
                   Uppercase letter
-                </p>
-                <p
+                </div>
+                <div
                   className={`flex items-center gap-1.5 ${password.length > 0 ? (hasLowerCase ? "text-[#CFFF04]" : "text-red-400") : ""}`}
                 >
                   {password.length > 0 ? (
@@ -332,7 +332,7 @@ const SignUpForm = () => {
                     <div className="w-3 h-3 rounded-full border border-brand-500" />
                   )}
                   Lowercase letter
-                </p>
+                </div>
               </div>
             </div>
 

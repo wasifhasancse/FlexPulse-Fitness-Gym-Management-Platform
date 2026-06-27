@@ -10,7 +10,6 @@ const db = client.db(process.env.MONGODB_DATABASE_NAME);
 
 export const auth = betterAuth({
   database: mongodbAdapter(db, {
-    // Optional: if you don't provide a client, database transactions won't be enabled.
     client,
   }),
 
@@ -57,6 +56,12 @@ export const auth = betterAuth({
     admin({
       defaultRole: "member",
       roles: {
+        // admin: {
+        //   name: "admin",
+        //   description: "Super Admin with full control over users",
+        //   // Give it permission to manage roles
+        //   permissions: ["read", "write", "manage_users"],
+        // },
         reader: {
           name: "member",
           description: "Can read content",
