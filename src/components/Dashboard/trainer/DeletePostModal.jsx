@@ -23,10 +23,10 @@ export function DeletePostModal({ post }) {
   return (
     <AlertDialog>
       <Button
-        className="absolute top-3 right-3 z-10 p-1.5 bg-black/60 text-white rounded-full hover:bg-[#C47A6A] transition-colors"
+        className="absolute top-3 right-3 z-10 p-2 bg-black/60 text-white rounded-full hover:bg-rose-600 transition-colors cursor-pointer"
         title="Delete Post"
       >
-        <FaTrash className="w-4 h-4" />
+        <FaTrash className="w-3.5 h-3.5" />
       </Button>
 
       <AlertDialog.Backdrop>

@@ -14,11 +14,7 @@ import {
   FaChalkboardTeacher,
   FaPlusCircle,
   FaComments,
-  FaTools,
   FaChartLine,
-  FaIdCard,
-  FaBuilding,
-  FaCog,
   FaUsers,
 } from "react-icons/fa";
 import { LuFileUser, LuGalleryHorizontalEnd } from "react-icons/lu";
@@ -56,7 +52,7 @@ const navItemsByRole = {
     {
       name: "Forum Posts",
       icon: FaComments,
-      href: "/dashboard/trainer/forum-posts",
+      href: "/dashboard/trainer/forum-post",
     },
     {
       name: "My Forum Posts",
@@ -74,38 +70,38 @@ const navItemsByRole = {
     {
       name: "Applied Trainers",
       icon: LuFileUser,
-      href: "/dashboard/admin/trainers",
+      href: "/dashboard/admin/manageTrainerApplication",
     },
     {
       name: "Manage Trainers",
       icon: MdOutlineManageAccounts,
-      href: "/dashboard/admin/memberships",
+      href: "/dashboard/admin/manageTrainers",
     },
     {
       name: "Manage Classes",
       icon: SiGoogleclassroom,
-      href: "/dashboard/admin/facilities",
+      href: "/dashboard/admin/manageClasses",
     },
     {
       name: "Add Forum Post",
       icon: MdPostAdd,
-      href: "/dashboard/admin/settings",
+      href: "/dashboard/admin/addForumPost",
     },
     {
       name: "Transactions",
       icon: TbTransactionDollar,
-      href: "/dashboard/admin/settings",
+      href: "/dashboard/admin/transactions",
     },
     {
       name: "Forum Post Manage",
       icon: MdOutlineManageSearch,
-      href: "/dashboard/admin/settings",
+      href: "/dashboard/admin/manageForumPosts",
     },
   ],
 };
 
 const DashboardSideBar = ({ isOpen, onClose }) => {
-const pathname = usePathname();
+  const pathname = usePathname();
   const router = useRouter();
   const { data } = authClient.useSession();
   const user = data?.user;
@@ -139,25 +135,25 @@ const pathname = usePathname();
               key={item.name}
               href={item.href}
               onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-['Inter'] text-sm font-medium transition-all ${
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl font-sans text-sm font-semibold transition-all ${
                 isActive(item.href)
-                  ? "bg-[#CCFF00]/10 text-[#CCFF00] shadow-sm border border-[#CCFF00]/20"
-                  : "text-[#94A3B8] hover:bg-[#1E293B] hover:text-[#E2E8F0]"
+                  ? "bg-btn-bg/15 text-active shadow-sm border border-active/20"
+                  : "text-[#535C91] dark:text-[#9290C3] hover:bg-brand-500/10 hover:text-foreground"
               }`}
             >
-              <Icon className="w-5 h-5" />
+              <Icon className="w-5 h-5 shrink-0" />
               {item.name}
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 border-t border-[#1E293B]">
+      <div className="p-4 border-t border-brand-500/15">
         <button
           onClick={onSignOut}
-          className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg font-['Inter'] text-sm font-medium text-[#FF3366] hover:bg-[#FF3366]/10 transition-colors border border-transparent hover:border-[#FF3366]/20"
+          className="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl font-sans text-sm font-semibold text-rose-500 hover:bg-rose-500/10 transition-colors border border-transparent hover:border-rose-500/20 cursor-pointer"
         >
-          <FaSignOutAlt className="w-5 h-5" />
+          <FaSignOutAlt className="w-5 h-5 shrink-0" />
           Logout
         </button>
       </div>
@@ -166,14 +162,15 @@ const pathname = usePathname();
 
   return (
     <>
-      <aside className="hidden md:flex md:flex-col md:w-64 bg-[#131826] border-r border-[#1E293B] h-screen sticky top-0 overflow-y-auto">
+      {/* ========== DESKTOP ========== */}
+      <aside className="hidden md:flex md:flex-col md:w-64 bg-white dark:bg-[#070F2B]/95 border-r border-brand-500/20 h-screen sticky top-0 overflow-y-auto transition-colors duration-300">
         <Link href="/">
-          <div className="p-6 border-b border-[#1E293B] flex items-center gap-2">
-            <div className="bg-[#CCFF00] p-1.5 rounded-md">
-              <FaChartLine className="text-[#0B0F19] w-5 h-5" />
+          <div className="p-6 border-b border-brand-500/25 flex items-center gap-2 group">
+            <div className="bg-btn-bg/10 p-1.5 rounded-lg group-hover:scale-105 transition-transform">
+              <FaChartLine className="text-active w-5 h-5" />
             </div>
-            <h1 className="font-['Outfit'] text-2xl font-bold text-white tracking-wide">
-              IronPulse
+            <h1 className="font-['Outfit'] text-2xl font-bold text-foreground tracking-wide">
+              Flex<span className="text-active">Pulse</span>
             </h1>
           </div>
         </Link>
@@ -183,32 +180,31 @@ const pathname = usePathname();
       </aside>
 
       {/* ========== MOBILE ========== */}
-
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          className="fixed inset-0 bg-black/60 z-40 md:hidden"
           onClick={onClose}
         />
       )}
 
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-[#131826] z-50 flex flex-col
+        className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-[#070F2B]/95 z-50 flex flex-col border-r border-brand-500/20
           transform transition-transform duration-300 ease-in-out md:hidden
           ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <div className="flex items-center justify-between p-4 border-b border-[#1E293B]">
+        <div className="flex items-center justify-between p-4 border-b border-brand-500/25">
           <Link href="/" onClick={onClose} className="flex items-center gap-2">
-            <div className="bg-[#CCFF00] p-1.5 rounded-md">
-              <FaChartLine className="text-[#0B0F19] w-4 h-4" />
+            <div className="bg-btn-bg/10 p-1.5 rounded-lg">
+              <FaChartLine className="text-active w-4 h-4" />
             </div>
-            <h1 className="font-['Outfit'] text-xl font-bold text-white tracking-wide">
-              IronPulse
+            <h1 className="font-['Outfit'] text-xl font-bold text-foreground tracking-wide">
+              Flex<span className="text-active">Pulse</span>
             </h1>
           </Link>
 
           <button
             onClick={onClose}
-            className="text-[#94A3B8] hover:text-[#CCFF00] transition-colors"
+            className="text-[#535C91] dark:text-[#9290C3] hover:text-active transition-colors cursor-pointer"
           >
             <FaTimes size={22} />
           </button>
@@ -218,7 +214,6 @@ const pathname = usePathname();
       </aside>
     </>
   );
-}
-
+};
 
 export default DashboardSideBar;

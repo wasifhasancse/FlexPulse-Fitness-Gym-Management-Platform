@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import {
   FaUsers,
   FaCheckCircle,
-  FaMoneyBillWave,
   FaUserCircle,
   FaChartPie,
 } from "react-icons/fa";
@@ -22,7 +21,7 @@ import Image from "next/image";
 import { getAllClasses } from "@/lib/api/getClasses";
 import { getAllUsers } from "@/lib/api/getAllUsers";
 
-const COLORS = ["#CCFF00", "#FF3366", "#3B82F6", "#8B5CF6"];
+const COLORS = ["#9FA1FF", "#535C91", "#3B82F6", "#FF3366"];
 
 export default function AdminDashboardPage() {
   const { data: session } = authClient.useSession();
@@ -32,16 +31,21 @@ export default function AdminDashboardPage() {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Set page title
+  useEffect(() => {
+    document.title = "Admin Dashboard | FlexPulse";
+  }, []);
+
   useEffect(() => {
     if (!user) return;
     const fetchData = async () => {
       try {
         const data = await getAllUsers();
-        const classes = await getAllClasses();
-        setClasses(classes);
-        setUsers(data);
+        const classesData = await getAllClasses();
+        setClasses(classesData || []);
+        setUsers(data || []);
       } catch (err) {
-        console.error(err);
+        console.error("Failed to fetch admin stats:", err);
       } finally {
         setLoading(false);
       }
@@ -69,8 +73,8 @@ export default function AdminDashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-100">
-        <div className="w-10 h-10 border-4 border-[#CCFF00] border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-64">
+        <div className="w-10 h-10 border-4 border-active border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -84,36 +88,37 @@ export default function AdminDashboardPage() {
     >
       {/* Header */}
       <div>
-        <h1 className="font-['Outfit'] text-3xl md:text-4xl font-bold text-white tracking-wide">
+        <h1 className="font-['Outfit'] text-3xl md:text-4xl font-bold text-foreground tracking-wide">
           Admin Overview
         </h1>
-        <p className="font-['Inter'] text-[#94A3B8] mt-1">
+        <p className="font-['Inter'] text-[#535C91] dark:text-[#9290C3] mt-1">
           Welcome back, {user?.name?.split(" ")[0] || "Admin"}!
         </p>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {[
           { label: "Total Users", value: totalUsers, icon: FaUsers },
           { label: "Total Classes", value: totalClasses, icon: FaUserCircle },
           {
             label: "Total Booked Classes",
-            value: trainerCount,
+            value: trainerCount, // Keep the original metric representation
             icon: FaCheckCircle,
           },
         ].map((stat) => (
           <div
             key={stat.label}
-            className="bg-[#131826] rounded-xl p-5 shadow-sm border border-[#1E293B] flex items-center gap-4"
+            className="bg-white dark:bg-brand-800/20 rounded-2xl p-6 shadow-card border border-brand-500/15 dark:border-brand-500/20 flex items-center gap-4 hover:-translate-y-0.5 transition-all duration-300"
           >
-            <div className="p-3 bg-[#CCFF00]/10 rounded-lg">
-              <stat.icon className="w-6 h-6 text-[#CCFF00]" />
+            <div className="p-3.5 bg-btn-bg/10 rounded-xl">
+              <stat.icon className="w-6 h-6 text-btn-bg dark:text-active" />
             </div>
             <div>
-              <p className="font-['Inter'] text-sm text-[#94A3B8]">
+              <p className="font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3]">
                 {stat.label}
               </p>
-              <p className="font-['Inter'] text-2xl font-bold text-white">
+              <p className="font-['Inter'] text-2xl font-extrabold text-foreground mt-0.5">
                 {stat.value}
               </p>
             </div>
@@ -124,45 +129,45 @@ export default function AdminDashboardPage() {
       {/* Profile + Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Card */}
-        <div className="bg-[#131826] rounded-xl p-6 shadow-sm border border-[#1E293B] flex flex-col items-center text-center">
+        <div className="bg-white dark:bg-brand-800/20 rounded-2xl p-6 shadow-card border border-brand-500/15 dark:border-brand-500/20 flex flex-col items-center text-center">
           {user?.image ? (
             <Image
               src={user.image}
               alt={user.name}
               width={80}
               height={80}
-              className="w-20 h-20 rounded-full object-cover border-2 border-[#FF3366]"
+              className="w-20 h-20 rounded-full object-cover border-2 border-active/40"
             />
           ) : (
-            <FaUserCircle className="w-20 h-20 text-[#CCFF00]" />
+            <FaUserCircle className="w-20 h-20 text-active" />
           )}
-          <h3 className="font-['Inter'] text-xl font-semibold text-white mt-3">
+          <h3 className="font-['Inter'] text-xl font-bold text-foreground mt-4">
             {user?.name || "Admin"}
           </h3>
-          <p className="font-['Inter'] text-sm text-[#94A3B8]">
+          <p className="font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3]">
             {user?.email}
           </p>
-          <span className="mt-2 px-4 py-1 bg-transparent border border-[#FF3366] text-[#FF3366] font-['Inter'] text-xs font-semibold rounded-full uppercase tracking-wider">
+          <span className="mt-2.5 px-4 py-1.5 bg-transparent border border-active text-active font-['Inter'] text-xs font-bold rounded-full uppercase tracking-wider">
             Administrator
           </span>
 
-          <div className="mt-4 w-full space-y-2">
+          <div className="mt-6 w-full space-y-3 pt-4 border-t border-brand-500/10">
             {[
               { label: "Admins", value: adminCount, color: "bg-[#FF3366]" },
               { label: "Trainers", value: trainerCount, color: "bg-[#3B82F6]" },
-              { label: "Members", value: memberCount, color: "bg-[#CCFF00]" },
+              { label: "Members", value: memberCount, color: "bg-[#9FA1FF]" },
             ].map((item) => (
               <div
                 key={item.label}
                 className="flex items-center justify-between px-2"
               >
-                <div className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${item.color}`} />
-                  <span className="font-['Inter'] text-xs text-[#94A3B8]">
+                <div className="flex items-center gap-2.5">
+                  <div className={`w-2.5 h-2.5 rounded-full ${item.color}`} />
+                  <span className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3]">
                     {item.label}
                   </span>
                 </div>
-                <span className="font-['Inter'] text-xs font-semibold text-white">
+                <span className="font-['Inter'] text-xs font-bold text-foreground">
                   {item.value}
                 </span>
               </div>
@@ -171,9 +176,9 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Category Chart */}
-        <div className="bg-[#131826] rounded-xl p-6 shadow-sm border border-[#1E293B]">
-          <h3 className="font-['Inter'] font-semibold text-white text-sm mb-4 flex items-center gap-2">
-            <FaChartPie className="text-[#CCFF00]" />
+        <div className="bg-white dark:bg-brand-800/20 rounded-2xl p-6 shadow-card border border-brand-500/15 dark:border-brand-500/20">
+          <h3 className="font-['Inter'] font-bold text-foreground text-sm mb-4 flex items-center gap-2">
+            <FaChartPie className="text-active" />
             Classes by Category
           </h3>
           <div className="h-52">
@@ -195,9 +200,10 @@ export default function AdminDashboardPage() {
                 <Tooltip
                   formatter={(v) => `${v} classes`}
                   contentStyle={{
-                    backgroundColor: "#FFF",
-                    border: "1px solid #E8E0D8",
-                    borderRadius: "8px",
+                    backgroundColor: "var(--bg-color)",
+                    borderColor: "var(--primary-color)",
+                    color: "var(--text-color)",
+                    borderRadius: "12px",
                   }}
                 />
                 <Legend verticalAlign="bottom" iconType="circle" />
@@ -206,9 +212,10 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        <div className="bg-[#131826] rounded-xl p-6 shadow-sm border border-[#1E293B]">
-          <h3 className="font-['Inter'] font-semibold text-white text-sm mb-4 flex items-center gap-2">
-            <FaChartPie className="text-[#3B82F6]" />
+        {/* User Distribution Chart */}
+        <div className="bg-white dark:bg-brand-800/20 rounded-2xl p-6 shadow-card border border-brand-500/15 dark:border-brand-500/20">
+          <h3 className="font-['Inter'] font-bold text-foreground text-sm mb-4 flex items-center gap-2">
+            <FaChartPie className="text-active" />
             User Role Distribution
           </h3>
           <div className="h-52">
@@ -230,9 +237,10 @@ export default function AdminDashboardPage() {
                 <Tooltip
                   formatter={(value, name) => [`${value} users`, name]}
                   contentStyle={{
-                    backgroundColor: "#FFF",
-                    border: "1px solid #E8E0D8",
-                    borderRadius: "8px",
+                    backgroundColor: "var(--bg-color)",
+                    borderColor: "var(--primary-color)",
+                    color: "var(--text-color)",
+                    borderRadius: "12px",
                   }}
                 />
                 <Legend verticalAlign="bottom" iconType="circle" />

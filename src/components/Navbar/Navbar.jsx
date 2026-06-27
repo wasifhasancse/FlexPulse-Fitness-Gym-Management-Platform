@@ -172,22 +172,7 @@ export default function Navbar() {
                         <span>Profile Management</span>
                       </Link>
 
-                      <Link
-                        href="#"
-                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm rounded-xl font-medium text-gray-700 dark:text-gray-200 hover:bg-[#F3F0FF] dark:hover:bg-[#1B1A55]/50 hover:text-[#5e41de] dark:hover:text-[#9290C3] transition-colors"
-                      >
-                        <FiBookOpen className="w-4 h-4" />
-                        <span>My Ideas</span>
-                      </Link>
-
-                      <Link
-                        href="#"
-                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm rounded-xl font-medium text-gray-700 dark:text-gray-200 hover:bg-[#F3F0FF] dark:hover:bg-[#1B1A55]/50 hover:text-[#5e41de] dark:hover:text-[#9290C3] transition-colors"
-                      >
-                        <FiMessageSquare className="w-4 h-4" />
-                        <span>My Interactions</span>
-                      </Link>
-
+                      
                       <Link
                         href="#"
                         className="flex items-center gap-3 w-full px-4 py-2.5 text-sm rounded-xl font-medium text-gray-700 dark:text-gray-200 hover:bg-[#F3F0FF] dark:hover:bg-[#1B1A55]/50 hover:text-[#5e41de] dark:hover:text-[#9290C3] transition-colors"

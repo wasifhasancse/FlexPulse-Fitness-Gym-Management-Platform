@@ -43,15 +43,14 @@ export default function MyForumPostCard({ post }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="bg-white dark:bg-[#2D2A24] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-[#E8E0D8] dark:border-[#3A3530] flex flex-col relative"
+      className="bg-white dark:bg-brand-800/20 rounded-2xl overflow-hidden shadow-card hover:shadow-lg transition-all duration-300 border border-brand-500/15 dark:border-brand-500/20 flex flex-col relative"
     >
       {/* Delete Button */}
-
-      <DeletePostModal post={post}></DeletePostModal>
+      <DeletePostModal post={post} />
 
       {/* Post Image */}
       {image && (
-        <div className="relative w-full h-48 bg-[#F5EDE6] dark:bg-[#3A3530]">
+        <div className="relative w-full h-48 bg-brand-500/10">
           <Image
             src={image}
             alt={title}
@@ -63,63 +62,65 @@ export default function MyForumPostCard({ post }) {
       )}
 
       {/* Content */}
-      <div className="p-6 flex-1 flex flex-col">
-        {/* Author & Date */}
-        <div className="flex items-center gap-3 mb-3">
-          {userImage ? (
-            <Image
-              src={userImage}
-              alt={userName}
-              width={40}
-              height={40}
-              className="w-10 h-10 rounded-full object-cover border-2 border-[#D4845A]"
-            />
-          ) : (
-            <FaUserCircle className="w-10 h-10 text-[#D4845A]" />
-          )}
-          <div>
-            <p className="font-['Inter'] font-semibold text-[#2D2A24] dark:text-[#EAE5DE] text-sm">
-              {userName || "Anonymous"}
-            </p>
-            <div className="flex items-center gap-2 text-xs text-[#6B655A] dark:text-[#B8B0A6]">
-              {userRole && (
-                <span className="font-['Inter'] font-medium text-[#D4845A] bg-[#D4845A]/10 dark:bg-[#D4845A]/20 px-2 py-0.5 rounded-full">
-                  {userRole}
-                </span>
-              )}
-              <span>•</span>
-              <span className="font-['Inter']">{timeAgo(createdAt)}</span>
+      <div className="p-6 flex-1 flex flex-col justify-between gap-4">
+        <div className="space-y-3">
+          {/* Author & Date */}
+          <div className="flex items-center gap-3">
+            {userImage ? (
+              <Image
+                src={userImage}
+                alt={userName}
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded-full object-cover border-2 border-active/40"
+              />
+            ) : (
+              <FaUserCircle className="w-10 h-10 text-active" />
+            )}
+            <div>
+              <p className="font-sans font-bold text-foreground text-sm">
+                {userName || "Anonymous"}
+              </p>
+              <div className="flex items-center gap-2 text-xs text-[#535C91] dark:text-[#9290C3] mt-0.5">
+                {userRole && (
+                  <span className="font-sans font-semibold text-active bg-active/10 px-2 py-0.5 rounded-full">
+                    {userRole}
+                  </span>
+                )}
+                <span>•</span>
+                <span className="font-sans">{timeAgo(createdAt)}</span>
+              </div>
             </div>
           </div>
+
+          {/* Title */}
+          <h3 className="font-sans text-lg font-bold text-foreground line-clamp-1 pt-1">
+            <Link
+              href={`/forum/${_id}`}
+              className="hover:text-active transition-colors"
+            >
+              {title}
+            </Link>
+          </h3>
+
+          {/* Excerpt */}
+          <p className="font-sans text-sm text-[#535C91] dark:text-[#9290C3] leading-relaxed line-clamp-3">
+            {description || "No description available."}
+          </p>
         </div>
 
-        {/* Title */}
-        <h3 className="font-['Playfair_Display'] text-xl font-bold text-[#2D2A24] dark:text-[#EAE5DE] mb-2">
-          <Link
-            href={`/forum/${_id}`}
-            className="hover:text-[#D4845A] transition-colors"
-          >
-            {title}
-          </Link>
-        </h3>
-
-        {/* Excerpt */}
-        <p className="font-['Inter'] text-sm text-[#6B655A] dark:text-[#B8B0A6] leading-relaxed line-clamp-3 flex-1 mb-3">
-          {description || "No description available."}
-        </p>
-
-        <div className="flex items-center justify-between text-sm font-['Inter'] text-[#6B655A] dark:text-[#B8B0A6] pt-3 border-t border-[#E8E0D8] dark:border-[#3A3530]">
+        <div className="flex items-center justify-between text-sm font-sans text-[#535C91] dark:text-[#9290C3] pt-3.5 border-t border-brand-500/10">
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1">
-              <FaHeart className="w-4 h-4 text-[#D4845A]" /> {totalLikes}
+            <span className="flex items-center gap-1.5">
+              <FaHeart className="w-4 h-4 text-rose-500" /> {totalLikes}
             </span>
-            <span className="flex items-center gap-1">
-              <FaComment className="w-4 h-4 text-[#D4845A]" /> {totalComments}
+            <span className="flex items-center gap-1.5">
+              <FaComment className="w-4 h-4 text-active" /> {totalComments}
             </span>
           </div>
           <Link
             href={`/forum/${_id}`}
-            className="flex items-center gap-1 text-[#D4845A] hover:text-[#B86A42] font-medium transition-colors"
+            className="flex items-center gap-1 text-active hover:underline font-bold transition-all"
           >
             Read More <FaArrowRight className="w-3.5 h-3.5" />
           </Link>

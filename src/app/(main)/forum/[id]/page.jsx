@@ -78,6 +78,14 @@ export default function ForumPostDetailsPage() {
     fetchPost();
   }, [postId, user]);
 
+  useEffect(() => {
+    if (post?.title) {
+      document.title = `${post.title} | FlexPulse`;
+    } else {
+      document.title = "Forum Post Details | FlexPulse";
+    }
+  }, [post]);
+
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);

@@ -9,6 +9,10 @@ import {
   FaUser,
 } from "react-icons/fa";
 
+export const metadata = {
+  title: "Payment Successful",
+};
+
 export default async function Success({ searchParams, params }) {
   const { id } = await params;
   const { session_id } = await searchParams;

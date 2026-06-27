@@ -2,6 +2,9 @@ import ClassCard from "@/components/AllClasses/ClassCard";
 import SearchingClasses from "@/components/AllClasses/SearchingClasses";
 import { getAllClasses } from "@/lib/api/getClasses";
 
+export const metadata = {
+  title: "All Classes",
+};
 
 export default async function AllClassesPage({ searchParams }) {
   const params = await searchParams;

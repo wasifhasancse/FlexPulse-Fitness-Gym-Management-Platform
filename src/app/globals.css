@@ -2,6 +2,8 @@
 @import "@heroui/styles";
 
 @theme {
+  --font-sans: var(--font-poppins), sans-serif;
+
   --color-brand-900: var(--brand-900);
   --color-brand-800: var(--brand-800);
   --color-brand-500: var(--brand-500);
@@ -22,6 +24,9 @@
   --color-active: var(--active-color);
   --color-btn-bg: var(--btn-bg);
   --color-btn-text: var(--btn-text);
+
+  --shadow-glow: 0 0 20px var(--active-color);
+  --shadow-card: 0 4px 20px -4px rgba(83, 92, 145, 0.15);
 }
 
 :root {
@@ -72,4 +77,10 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
   transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: var(--font-poppins), sans-serif;
+}
+
+/* Force Poppins font globally to replace arbitrary font declarations */
+*, *::before, *::after {
+  font-family: var(--font-poppins), sans-serif !important;
 }

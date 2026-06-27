@@ -9,7 +9,7 @@ const DashboardLayout = ({ children }) => {
   const { data } = authClient.useSession();
   const user = data?.user;
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-[#E2E8F0] flex font-['Inter']">
+    <div className="min-h-screen bg-background text-foreground flex font-sans transition-colors duration-300">
       <DashboardSideBar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}

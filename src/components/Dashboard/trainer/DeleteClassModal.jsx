@@ -23,7 +23,7 @@ export function DeleteClassModal({ classes, onDelete }) {
   return (
     <AlertDialog>
       <Button
-        className="bg-transparent p-1.5 text-[#6B655A] dark:text-[#B8B0A6] hover:text-[#C47A6A] transition-colors"
+        className="bg-transparent p-1.5 text-[#535C91] dark:text-[#9290C3] hover:text-rose-500 transition-colors cursor-pointer"
         title="Delete"
       >
         <FaTrash className="w-4 h-4" />

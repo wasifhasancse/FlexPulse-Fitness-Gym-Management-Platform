@@ -2,6 +2,10 @@ import FavoriteCard from "@/components/Dashboard/member/FavoriteCard";
 import { getFavoriteClass } from "@/lib/api/getFavoriteClasses";
 import { getUserSession } from "@/lib/core/getSession";
 
+export const metadata = {
+  title: "My Favorites",
+};
+
 export default async function FavoritesPage() {
   const user = await getUserSession();
 

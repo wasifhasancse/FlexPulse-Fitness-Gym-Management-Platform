@@ -4,20 +4,18 @@ import { authClient } from "@/lib/auth-client";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { toast} from "@heroui/react";
+import { toast } from "@heroui/react";
 import {
-    FaAward,
-    FaCalendarAlt,
-    FaCheckCircle,
-    FaClock,
-    FaFileAlt,
-    FaPaperPlane,
-    FaShieldAlt,
-    FaTag,
-    FaUsers,
+  FaAward,
+  FaCalendarAlt,
+  FaCheckCircle,
+  FaClock,
+  FaFileAlt,
+  FaPaperPlane,
+  FaShieldAlt,
+  FaTag,
+  FaUsers,
 } from "react-icons/fa";
-
-const API = process.env.NEXT_PUBLIC_API_URL;
 
 const specialties = [
   "Select a specialty",
@@ -52,6 +50,11 @@ export default function ApplyTrainerPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Set page title
+  useEffect(() => {
+    document.title = "Apply as Trainer | FlexPulse";
+  }, []);
+
   useEffect(() => {
     if (!user?.id) return;
     const checkApplication = async () => {
@@ -64,7 +67,7 @@ export default function ApplyTrainerPage() {
           setApplicationStatus(data.status);
         }
       } catch (err) {
-        console.error(err);
+        console.error("Failed to check trainer application:", err);
       } finally {
         setCheckLoading(false);
       }
@@ -98,64 +101,62 @@ export default function ApplyTrainerPage() {
             userId: user?.id,
             userName: user?.name,
             userEmail: user?.email,
-            experience: parseInt(formData.experience),
+            experience: formData.experience,
             specialty: formData.specialty,
             bio: formData.bio,
-            status: "pending",
-            appliedAt: new Date().toISOString(),
+            status: "Pending",
+            appliedAt: new Date(),
           }),
         },
       );
 
-      const data = await res.json();
-
-      if (data.acknowledged) {
+      if (res.ok) {
         toast.success("Application submitted successfully!");
         setApplicationStatus("pending");
-        setFormData({ experience: "", specialty: "", bio: "" });
       } else {
-        toast.error(data.error || "Something went wrong!");
+        toast.error("Failed to submit application. Please try again.");
       }
-    } catch (error) {
-      toast.error("Failed to submit application!");
-      console.error(error);
+    } catch (err) {
+      toast.error("An error occurred. Please try again.");
+      console.error(err);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Loading
   if (checkLoading) {
     return (
-      <div className="flex items-center justify-center min-h-100">
-        <div className="w-10 h-10 border-4 border-[#D4845A] border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center h-64">
+        <div className="w-8 h-8 border-4 border-active border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
+  // Submitted application screen
   if (applicationStatus) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-2xl mx-auto px-4 sm:px-0"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+        className="max-w-xl mx-auto py-12 px-4 sm:px-0"
       >
-        <div className="bg-white dark:bg-[#2D2A24] rounded-2xl shadow-lg border border-[#E8E0D8] dark:border-[#3A3530] p-8 md:p-12 text-center">
+        <div className="bg-white dark:bg-brand-800/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/20 p-8 md:p-12 text-center flex flex-col items-center gap-6">
           {/* Status Icon */}
-          <div className="flex justify-center mb-6">
+          <div>
             {applicationStatus === "pending" && (
-              <div className="w-20 h-20 rounded-full bg-yellow-100 dark:bg-yellow-900/20 flex items-center justify-center">
-                <FaClock className="w-10 h-10 text-yellow-500" />
+              <div className="w-20 h-20 rounded-full bg-amber-500/10 flex items-center justify-center">
+                <FaClock className="w-10 h-10 text-amber-500" />
               </div>
             )}
             {applicationStatus === "approved" && (
-              <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
-                <FaCheckCircle className="w-10 h-10 text-green-500" />
+              <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                <FaCheckCircle className="w-10 h-10 text-emerald-500" />
               </div>
             )}
             {applicationStatus === "rejected" && (
-              <div className="w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
-                <FaAward className="w-10 h-10 text-red-500" />
+              <div className="w-20 h-20 rounded-full bg-rose-500/10 flex items-center justify-center">
+                <FaAward className="w-10 h-10 text-rose-500" />
               </div>
             )}
           </div>
@@ -163,16 +164,16 @@ export default function ApplyTrainerPage() {
           {/* Status Text */}
           {applicationStatus === "pending" && (
             <>
-              <h2 className="font-['Playfair_Display'] text-2xl font-bold text-[#2D2A24] dark:text-[#EAE5DE]">
+              <h2 className="font-['Outfit'] text-2xl font-bold text-foreground">
                 Application Submitted!
               </h2>
-              <p className="font-['Inter'] text-[#6B655A] dark:text-[#B8B0A6] mt-3">
+              <p className="font-sans text-[#535C91] dark:text-[#9290C3] max-w-sm">
                 Your trainer application is under review. We&apos;ll notify you once
                 it&apos;s been processed.
               </p>
-              <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 dark:bg-yellow-900/20 rounded-full">
-                <FaClock className="w-4 h-4 text-yellow-500" />
-                <span className="font-['Inter'] text-sm font-semibold text-yellow-600 dark:text-yellow-400">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 rounded-full border border-amber-500/20">
+                <FaClock className="w-4 h-4 text-amber-500" />
+                <span className="font-sans text-sm font-semibold text-amber-600 dark:text-amber-400">
                   Status: Pending Review
                 </span>
               </div>
@@ -181,16 +182,16 @@ export default function ApplyTrainerPage() {
 
           {applicationStatus === "approved" && (
             <>
-              <h2 className="font-['Playfair_Display'] text-2xl font-bold text-[#2D2A24] dark:text-[#EAE5DE]">
+              <h2 className="font-['Outfit'] text-2xl font-bold text-foreground">
                 Congratulations! 🎉
               </h2>
-              <p className="font-['Inter'] text-[#6B655A] dark:text-[#B8B0A6] mt-3">
+              <p className="font-sans text-[#535C91] dark:text-[#9290C3] max-w-sm">
                 Your application has been approved! You are now a certified
-                VITALIS trainer.
+                FlexPulse trainer.
               </p>
-              <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900/20 rounded-full">
-                <FaCheckCircle className="w-4 h-4 text-green-500" />
-                <span className="font-['Inter'] text-sm font-semibold text-green-600 dark:text-green-400">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+                <FaCheckCircle className="w-4 h-4 text-emerald-500" />
+                <span className="font-sans text-sm font-semibold text-emerald-600 dark:text-emerald-400">
                   Status: Approved ✅
                 </span>
               </div>
@@ -199,25 +200,25 @@ export default function ApplyTrainerPage() {
 
           {applicationStatus === "rejected" && (
             <>
-              <h2 className="font-['Playfair_Display'] text-2xl font-bold text-[#2D2A24] dark:text-[#EAE5DE]">
+              <h2 className="font-['Outfit'] text-2xl font-bold text-foreground">
                 Application Not Approved
               </h2>
-              <p className="font-['Inter'] text-[#6B655A] dark:text-[#B8B0A6] mt-3">
+              <p className="font-sans text-[#535C91] dark:text-[#9290C3] max-w-sm">
                 Unfortunately your application was not approved this time.
-                Please try again later.
+                Please contact support for more information.
               </p>
-              <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-red-100 dark:bg-red-900/20 rounded-full">
-                <span className="font-['Inter'] text-sm font-semibold text-red-600 dark:text-red-400">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-rose-500/10 rounded-full border border-rose-500/20">
+                <span className="font-sans text-sm font-semibold text-rose-600 dark:text-rose-400">
                   Status: Rejected ❌
                 </span>
               </div>
             </>
           )}
 
-          <div className="mt-8">
+          <div className="mt-4 w-full">
             <Link
               href="/dashboard/member"
-              className="inline-flex items-center gap-2 px-8 py-3 bg-[#D4845A] text-white font-['Inter'] font-semibold rounded-lg hover:bg-[#B86A42] transition-colors shadow-md"
+              className="inline-flex items-center justify-center gap-2 w-full px-8 py-3.5 bg-btn-bg text-btn-text font-sans font-bold rounded-xl hover:opacity-95 transition-all shadow-md"
             >
               Go to Overview
             </Link>
@@ -236,12 +237,12 @@ export default function ApplyTrainerPage() {
     >
       {/* Header */}
       <div>
-        <h1 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-[#2D2A24] dark:text-[#EAE5DE]">
+        <h1 className="font-['Outfit'] text-3xl md:text-4xl font-bold text-foreground tracking-wide">
           Apply as Trainer
         </h1>
-        <p className="font-['Inter'] text-[#6B655A] dark:text-[#B8B0A6] mt-2 max-w-2xl">
+        <p className="font-sans text-[#535C91] dark:text-[#9290C3] mt-2 max-w-2xl">
           Join our elite team of fitness professionals and share your expertise
-          with our community.
+          with the FlexPulse community.
         </p>
       </div>
 
@@ -250,32 +251,32 @@ export default function ApplyTrainerPage() {
         {[
           {
             icon: FaShieldAlt,
-            title: "VITALIS Certified",
+            title: "FlexPulse Certified",
             desc: "Global exposure & premium facilities.",
           },
           {
             icon: FaAward,
             title: "Professional Quality",
-            desc: "Empower our community",
+            desc: "Empower our community.",
           },
           {
             icon: FaUsers,
             title: "Community Impact",
-            desc: "Inspire & transform lives",
+            desc: "Inspire & transform lives.",
           },
         ].map((card) => (
           <div
             key={card.title}
-            className="bg-white dark:bg-[#2D2A24] rounded-xl p-4 shadow-sm border border-[#E8E0D8] dark:border-[#3A3530] flex items-center gap-3"
+            className="bg-white dark:bg-brand-800/20 rounded-2xl p-5 shadow-card border border-brand-500/15 dark:border-brand-500/20 flex items-center gap-3.5 hover:-translate-y-0.5 transition-all duration-300"
           >
-            <div className="p-2 bg-[#D4845A]/10 dark:bg-[#D4845A]/20 rounded-lg">
-              <card.icon className="w-5 h-5 text-[#D4845A]" />
+            <div className="p-3 bg-btn-bg/10 rounded-xl shrink-0">
+              <card.icon className="w-5 h-5 text-active" />
             </div>
             <div>
-              <p className="font-['Inter'] font-semibold text-[#2D2A24] dark:text-[#EAE5DE] text-sm">
+              <p className="font-sans font-bold text-foreground text-sm">
                 {card.title}
               </p>
-              <p className="font-['Inter'] text-xs text-[#6B655A] dark:text-[#B8B0A6]">
+              <p className="font-sans text-xs text-[#535C91] dark:text-[#9290C3] mt-0.5">
                 {card.desc}
               </p>
             </div>
@@ -284,16 +285,16 @@ export default function ApplyTrainerPage() {
       </div>
 
       {/* Form */}
-      <div className="bg-white dark:bg-[#2D2A24] rounded-2xl shadow-lg border border-[#E8E0D8] dark:border-[#3A3530] p-6 md:p-8">
+      <div className="bg-white dark:bg-brand-800/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/20 p-6 md:p-8">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Experience */}
           <div>
             <label
               htmlFor="experience"
-              className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] mb-1 flex items-center gap-2"
+              className="font-sans text-sm font-bold text-foreground mb-2.5 flex items-center gap-2"
             >
-              <FaCalendarAlt className="text-[#D4845A] w-4 h-4" />
-              Years of Experience <span className="text-[#C47A6A]">*</span>
+              <FaCalendarAlt className="text-active w-4 h-4" />
+              Years of Experience <span className="text-rose-500">*</span>
             </label>
             <input
               id="experience"
@@ -304,7 +305,7 @@ export default function ApplyTrainerPage() {
               value={formData.experience}
               onChange={handleChange}
               placeholder="e.g. 5"
-              className="w-full px-4 py-2.5 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#E8E0D8] dark:border-[#4A4540] rounded-lg text-[#2D2A24] dark:text-[#EAE5DE] placeholder-[#8A847C] focus:outline-none focus:border-[#D4845A] focus:ring-2 focus:ring-[#D4845A]/20 font-['Inter'] text-sm"
+              className="w-full px-4 py-3 bg-brand-500/5 dark:bg-brand-800/40 border border-brand-500/20 dark:border-brand-500/30 rounded-xl text-foreground placeholder-[#535C91]/50 dark:placeholder-[#9290C3]/50 focus:outline-none focus:border-active focus:ring-1 focus:ring-active transition-all font-sans text-sm shadow-inner"
               required
             />
           </div>
@@ -313,35 +314,42 @@ export default function ApplyTrainerPage() {
           <div>
             <label
               htmlFor="specialty"
-              className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] mb-1 flex items-center gap-2"
+              className="font-sans text-sm font-bold text-foreground mb-2.5 flex items-center gap-2"
             >
-              <FaTag className="text-[#D4845A] w-4 h-4" />
-              Primary Specialty <span className="text-[#C47A6A]">*</span>
+              <FaTag className="text-active w-4 h-4" />
+              Primary Specialty <span className="text-rose-500">*</span>
             </label>
-            <select
-              id="specialty"
-              name="specialty"
-              value={formData.specialty}
-              onChange={handleChange}
-              className="w-full px-4 py-2.5 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#E8E0D8] dark:border-[#4A4540] rounded-lg text-[#2D2A24] dark:text-[#EAE5DE] focus:outline-none focus:border-[#D4845A] focus:ring-2 focus:ring-[#D4845A]/20 font-['Inter'] text-sm appearance-none"
-              required
-            >
-              {specialties.map((spec) => (
-                <option key={spec} value={spec}>
-                  {spec}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                id="specialty"
+                name="specialty"
+                value={formData.specialty}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-brand-500/5 dark:bg-brand-800/40 border border-brand-500/20 dark:border-brand-500/30 rounded-xl text-foreground focus:outline-none focus:border-active focus:ring-1 focus:ring-active transition-all font-sans text-sm appearance-none shadow-inner"
+                required
+              >
+                {specialties.map((spec) => (
+                  <option key={spec} value={spec} className="bg-background text-foreground">
+                    {spec}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-[#535C91] dark:text-[#9290C3]">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
           </div>
 
           {/* Bio */}
           <div>
             <label
               htmlFor="bio"
-              className="font-['Inter'] text-sm font-medium text-[#2D2A24] dark:text-[#EAE5DE] mb-1 flex items-center gap-2"
+              className="font-sans text-sm font-bold text-foreground mb-2.5 flex items-center gap-2"
             >
-              <FaFileAlt className="text-[#D4845A] w-4 h-4" />
-              Professional Bio <span className="text-[#C47A6A]">*</span>
+              <FaFileAlt className="text-active w-4 h-4" />
+              Professional Bio <span className="text-rose-500">*</span>
             </label>
             <textarea
               id="bio"
@@ -350,7 +358,7 @@ export default function ApplyTrainerPage() {
               value={formData.bio}
               onChange={handleChange}
               placeholder="Tell us about your fitness journey, philosophy, and previous experience..."
-              className="w-full px-4 py-2.5 bg-[#F5EDE6] dark:bg-[#3A3530] border border-[#E8E0D8] dark:border-[#4A4540] rounded-lg text-[#2D2A24] dark:text-[#EAE5DE] placeholder-[#8A847C] focus:outline-none focus:border-[#D4845A] focus:ring-2 focus:ring-[#D4845A]/20 font-['Inter'] text-sm resize-none"
+              className="w-full px-4 py-3 bg-brand-500/5 dark:bg-brand-800/40 border border-brand-500/20 dark:border-brand-500/30 rounded-xl text-foreground placeholder-[#535C91]/50 dark:placeholder-[#9290C3]/50 focus:outline-none focus:border-active focus:ring-1 focus:ring-active transition-all font-sans text-sm resize-none shadow-inner"
               required
             />
           </div>
@@ -358,10 +366,10 @@ export default function ApplyTrainerPage() {
           <button
             type="submit"
             disabled={!isFormValid || isSubmitting}
-            className={`w-full py-3 font-['Inter'] font-semibold rounded-lg shadow-md transition-all flex items-center justify-center gap-2 ${
+            className={`w-full py-3.5 font-sans font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm cursor-pointer ${
               isFormValid && !isSubmitting
-                ? "bg-[#D4845A] text-white hover:bg-[#B86A42]"
-                : "bg-[#E8E0D8] dark:bg-[#3A3530] text-[#8A847C] cursor-not-allowed"
+                ? "bg-btn-bg text-btn-text hover:opacity-95"
+                : "bg-brand-500/10 text-muted cursor-not-allowed opacity-55"
             }`}
           >
             <FaPaperPlane className="w-4 h-4" />

@@ -1,27 +1,47 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import styled from "styled-components";
 
 const DarkModeSwitch = () => {
-  const checkboxRef = useRef(null);
+  const { setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)",
-    ).matches;
-    const isDark = stored === "dark" || (!stored && prefersDark);
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-      if (checkboxRef.current) checkboxRef.current.checked = true;
-    }
+    setMounted(true);
   }, []);
 
+  if (!mounted) {
+    return (
+      <StyledWrapper>
+        <div className="container">
+          <label className="toggle">
+            <div className="icon icon--moon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                width={20}
+                height={20}
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+          </label>
+        </div>
+      </StyledWrapper>
+    );
+  }
+
+  const isDark = resolvedTheme === "dark";
+
   const handleChange = () => {
-    const isDark = checkboxRef.current.checked;
-    document.documentElement.classList.toggle("dark", isDark);
-    localStorage.setItem("theme", isDark ? "dark" : "light");
+    setTheme(isDark ? "light" : "dark");
   };
 
   return (
@@ -32,7 +52,7 @@ const DarkModeSwitch = () => {
             type="checkbox"
             className="input"
             id="switch"
-            ref={checkboxRef}
+            checked={isDark}
             onChange={handleChange}
           />
           <div className="icon icon--moon">

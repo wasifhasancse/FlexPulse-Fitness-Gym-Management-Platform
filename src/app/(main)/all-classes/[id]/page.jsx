@@ -2,6 +2,20 @@ import ClassDetailsPageLayout from "@/components/AllClasses/ClassDetailsPage";
 import { getClassById } from "@/lib/api/getClasses";
 import { getUserSession } from "@/lib/core/getSession";
 
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  try {
+    const classDetails = await getClassById(id);
+    return {
+      title: classDetails?.name || "Class Details",
+    };
+  } catch {
+    return {
+      title: "Class Details",
+    };
+  }
+}
+
 const ClassDetailsPage = async ({ params }) => {
   const { id } = await params;
   const classDetails = await getClassById(id);

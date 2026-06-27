@@ -4,6 +4,10 @@ import { getForumPosts } from "@/lib/api/getForumPosts";
 import Link from "next/link";
 import { FaPlus } from "react-icons/fa";
 
+export const metadata = {
+  title: "Community Forum",
+};
+
 export default async function ForumPage({ searchParams }) {
   const params = await searchParams;
   const search = (await params.search) || "";

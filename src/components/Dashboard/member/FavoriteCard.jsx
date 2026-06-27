@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { FaHeart, FaTrash } from "react-icons/fa";
-import { toast} from "@heroui/react";
+import { toast } from "@heroui/react";
 
 import { deleteFavorite } from "@/lib/actions/deleteFavorite";
 
@@ -19,7 +19,6 @@ export default function FavoriteCard({ fav, userId }) {
 
     try {
       await deleteFavorite(userId, fav.classId);
-
       toast.success("Removed from favorites");
 
       startTransition(() => {
@@ -33,48 +32,49 @@ export default function FavoriteCard({ fav, userId }) {
   return (
     <Link
       href={`/all-classes/${fav.classId}`}
-      className="bg-white dark:bg-[#2D2A24] rounded-2xl shadow-md border border-[#E8E0D8] dark:border-[#3A3530] overflow-hidden hover:shadow-lg transition-shadow"
+      className="bg-white dark:bg-brand-800/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/20 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
     >
       {/* Image */}
-      <div className="relative h-48 w-full">
+      <div className="relative h-48 w-full bg-brand-500/10">
         <Image
           src={fav.classImage}
           alt={fav.className}
           fill
           className="object-cover"
+          unoptimized
         />
 
         <button
           onClick={handleDelete}
           disabled={isPending}
-          className="absolute top-3 left-3 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition"
+          className="absolute top-3 left-3 bg-rose-500 text-white p-2 rounded-full hover:bg-rose-600 transition shadow-md cursor-pointer"
         >
-          <FaTrash />
+          <FaTrash size={14} />
         </button>
 
-        <div className="absolute top-3 right-3">
-          <FaHeart className="w-5 h-5 text-red-500" />
+        <div className="absolute top-3 right-3 bg-white/80 dark:bg-black/50 p-2 rounded-full backdrop-blur-md">
+          <FaHeart className="w-4 h-4 text-rose-500" />
         </div>
       </div>
 
       {/* Info */}
-      <div className="p-4">
-        <span className="text-xs font-semibold uppercase tracking-wider text-[#D4845A] bg-[#D4845A]/10 px-2 py-1 rounded-full">
+      <div className="p-5 space-y-2">
+        <span className="text-xs font-bold uppercase tracking-wider text-active bg-active/10 px-2.5 py-0.5 rounded-full">
           {fav.category}
         </span>
 
-        <h3 className="font-['Playfair_Display'] text-lg font-bold text-[#2D2A24] dark:text-[#EAE5DE] mt-2">
+        <h3 className="font-sans text-lg font-bold text-foreground line-clamp-1 mt-2">
           {fav.className}
         </h3>
 
-        <p className="text-sm text-[#6B655A] dark:text-[#B8B0A6]">
+        <p className="text-sm text-[#535C91] dark:text-[#9290C3]">
           by {fav.author}
         </p>
 
-        <div className="flex items-center justify-between mt-3">
-          <span className="font-bold text-[#D4845A] text-lg">${fav.price}</span>
+        <div className="flex items-center justify-between pt-3 border-t border-brand-500/10 mt-2">
+          <span className="font-extrabold text-active text-lg">${fav.price}</span>
 
-          <span className="text-xs text-[#6B655A] dark:text-[#B8B0A6]">
+          <span className="text-xs text-[#535C91] dark:text-[#9290C3]">
             {fav.duration} min
           </span>
         </div>
