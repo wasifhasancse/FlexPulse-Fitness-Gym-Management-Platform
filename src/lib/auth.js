@@ -1,9 +1,9 @@
 const dns = require("node:dns");
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 import { betterAuth } from "better-auth";
-import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
-import { admin } from "better-auth/plugins";
+import { admin, jwt } from "better-auth/plugins";
+import { MongoClient } from "mongodb";
 
 const client = new MongoClient(process.env.MONGODB_URI);
 const db = client.db(process.env.MONGODB_DATABASE_NAME);
@@ -13,23 +13,7 @@ export const auth = betterAuth({
     // Optional: if you don't provide a client, database transactions won't be enabled.
     client,
   }),
-  plugins: [
-    admin({
-      defaultRole: "member",
-      roles: {
-        reader: {
-          name: "member",
-          description: "Can read content",
-          permissions: ["read", "write"],
-        },
-        trainer: {
-          name: "trainer",
-          description: "Can write content",
-          permissions: ["read", "write"],
-        },
-      },
-    }),
-  ],
+
   emailAndPassword: {
     enabled: true,
   },
@@ -60,4 +44,31 @@ export const auth = betterAuth({
       },
     },
   },
+
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 7 * 24 * 60 * 60,
+      strategy: "jwt",
+    },
+  },
+
+  plugins: [
+    admin({
+      defaultRole: "member",
+      roles: {
+        reader: {
+          name: "member",
+          description: "Can read content",
+          permissions: ["read", "write"],
+        },
+        trainer: {
+          name: "trainer",
+          description: "Can write content",
+          permissions: ["read", "write"],
+        },
+      },
+    }),
+    jwt(),
+  ],
 });
