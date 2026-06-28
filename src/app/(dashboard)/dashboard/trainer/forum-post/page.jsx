@@ -1,6 +1,5 @@
 "use client";
 
-import { addForumPost } from "@/lib/actions/addForumPost";
 import { authClient } from "@/lib/auth-client";
 import { imageUpload } from "@/lib/imageUpload";
 import { toast } from "@heroui/react";
@@ -47,8 +46,6 @@ export default function CreateForumPostPage() {
       userId: user?.id,
     };
     try {
-      // const result = await addForumPost(formData);
-
       const { data: token } = await authClient.token();
       const tokenData = token?.token;
       if (!token) {
