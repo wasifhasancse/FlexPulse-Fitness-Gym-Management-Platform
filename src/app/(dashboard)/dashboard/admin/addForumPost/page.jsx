@@ -58,10 +58,9 @@ const AddAdminForumPost = () => {
       "Content-Type": "application/json",
       ...(tokenData && { authorization: `Bearer ${tokenData}` }),
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify(formData),
   });
   const response = await res.json();
-console.log("response", response);
 
       if (response.insertedId) {
         toast.success("Post created successfully!");

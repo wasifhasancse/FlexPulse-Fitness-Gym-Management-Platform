@@ -47,15 +47,33 @@ export default function CreateForumPostPage() {
       userId: user?.id,
     };
     try {
-      const result = await addForumPost(formData);
-      if (result.insertedId) {
-        toast.success("Class added successfully!");
+      // const result = await addForumPost(formData);
+
+      const { data: token } = await authClient.token();
+      const tokenData = token?.token;
+      if (!token) {
+        toast.error("authentication failed, please login again.");
+      }
+      // const result = await addForumPost(formData, token.token);
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/forumPost`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      ...(tokenData && { authorization: `Bearer ${tokenData}` }),
+    },
+    body: JSON.stringify(formData),
+  });
+  const response = await res.json();
+
+      if (response.insertedId) {
+        toast.success("Post created successfully!");
         resetForm();
         router.push("/dashboard/trainer/my-posts");
       }
     } catch (error) {
       console.error(error);
-      toast.error("Faild to add class");
+      toast.error("Failed to create post. Please try again.");
     }
   };
 
