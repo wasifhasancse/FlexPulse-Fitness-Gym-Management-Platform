@@ -1,6 +1,5 @@
 "use client";
 
-import { updateClass } from "@/lib/actions/updateClass";
 import { authClient } from "@/lib/auth-client";
 import { imageUpload } from "@/lib/imageUpload";
 import { Button, Modal, Surface, toast } from "@heroui/react";
@@ -70,18 +69,31 @@ const UpdateModal = ({ classes, onUpdated }) => {
       time: time + " AM",
       authorId: user?.id,
     };
-
+    // Debugging line to check the updated data
     try {
-      const data = await updateClass(classes._id, updatedData);
+      // const data = await updateClass(classes._id, updatedData);
+      const { data: token } = await authClient.token();
+      const tokenData = token?.token;
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/all-classes/${classes._id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...(tokenData && { authorization: `Bearer ${tokenData}` }),
+          },
+          body: JSON.stringify(updatedData),
+        },
+      );
+      const response = await res.json();
 
-      if (data.modifiedCount > 0) {
+      if (response.modifiedCount > 0) {
         toast.success("Class updated successfully!");
         onUpdated?.();
       } else {
         toast.error("No changes made!");
       }
     } catch (error) {
-      console.error(error);
       toast.error("Failed to update class!");
     } finally {
       setIsSubmitting(false);
@@ -102,7 +114,9 @@ const UpdateModal = ({ classes, onUpdated }) => {
           <Modal.Dialog className="sm:max-w-4xl bg-background border border-brand-500/20 rounded-2xl shadow-xl overflow-hidden">
             <Modal.CloseTrigger />
             <Modal.Header className="px-6 pt-6 pb-4 border-b border-brand-500/10">
-              <Modal.Heading className="text-xl font-bold text-foreground font-sans">Edit Class</Modal.Heading>
+              <Modal.Heading className="text-xl font-bold text-foreground font-sans">
+                Edit Class
+              </Modal.Heading>
               <p className="mt-1 text-sm text-[#535C91] dark:text-[#9290C3] font-sans">
                 Update the class details below.
               </p>
@@ -206,14 +220,28 @@ const UpdateModal = ({ classes, onUpdated }) => {
                               "Cardio",
                               "Stretching",
                             ].map((c) => (
-                              <option key={c} value={c} className="bg-background text-foreground">
+                              <option
+                                key={c}
+                                value={c}
+                                className="bg-background text-foreground"
+                              >
                                 {c}
                               </option>
                             ))}
                           </select>
                           <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-[#535C91] dark:text-[#9290C3]">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2.5"
+                                d="M19 9l-7 7-7-7"
+                              />
                             </svg>
                           </div>
                         </div>
@@ -314,15 +342,31 @@ const UpdateModal = ({ classes, onUpdated }) => {
                             onChange={(e) => setDifficultyLevel(e.target.value)}
                             className="w-full px-4 py-2.5 bg-brand-50/5 dark:bg-brand-800/40 border border-brand-500/20 dark:border-brand-500/30 rounded-xl text-foreground focus:outline-none focus:border-active focus:ring-1 focus:ring-active transition-all font-sans text-sm appearance-none shadow-inner"
                           >
-                            {["Beginner", "Intermediate", "Advanced"].map((d) => (
-                              <option key={d} value={d} className="bg-background text-foreground">
-                                {d}
-                              </option>
-                            ))}
+                            {["Beginner", "Intermediate", "Advanced"].map(
+                              (d) => (
+                                <option
+                                  key={d}
+                                  value={d}
+                                  className="bg-background text-foreground"
+                                >
+                                  {d}
+                                </option>
+                              ),
+                            )}
                           </select>
                           <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-[#535C91] dark:text-[#9290C3]">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2.5"
+                                d="M19 9l-7 7-7-7"
+                              />
                             </svg>
                           </div>
                         </div>
@@ -364,7 +408,13 @@ const UpdateModal = ({ classes, onUpdated }) => {
                   </div>
 
                   {/* Submit */}
-                  <div className="flex justify-end pt-4">
+                  <div className="flex justify-end pt-4 gap-2.5">
+                    <Button
+                      slot="close"
+                      className="bg-transparent border border-brand-500/20 text-[#535C91] dark:text-[#9290C3] hover:bg-brand-500/10 px-8 py-6 font-sans font-bold rounded-xl shadow-md transition-all cursor-pointer"
+                    >
+                      Cancel
+                    </Button>
                     <button
                       type="submit"
                       disabled={isSubmitting}
@@ -380,15 +430,6 @@ const UpdateModal = ({ classes, onUpdated }) => {
                 </form>
               </Surface>
             </Modal.Body>
-
-            <Modal.Footer className="px-6 py-4 border-t border-brand-500/10 flex justify-end">
-              <Button
-                slot="close"
-                className="bg-transparent border border-brand-500/20 text-[#535C91] dark:text-[#9290C3] hover:bg-brand-500/10 px-6 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer"
-              >
-                Cancel
-              </Button>
-            </Modal.Footer>
           </Modal.Dialog>
         </Modal.Container>
       </Modal.Backdrop>

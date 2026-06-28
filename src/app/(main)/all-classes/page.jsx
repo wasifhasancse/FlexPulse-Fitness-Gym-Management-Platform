@@ -1,6 +1,7 @@
 import ClassCard from "@/components/AllClasses/ClassCard";
 import SearchingClasses from "@/components/AllClasses/SearchingClasses";
 import { getAllClasses } from "@/lib/api/getClasses";
+import Link from "next/link";
 
 export const metadata = {
   title: "All Classes - FlexPulse",
@@ -105,15 +106,15 @@ export default async function AllClassesPage({ searchParams }) {
         {/* Pagination Section styled to match the theme */}
         {totalPages > 1 && (
           <div className="flex justify-center items-center gap-2 mt-16 font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3]">
-            <a
+            <Link
               href={buildPageLink(Math.max(1, page - 1))}
               className="px-3.5 py-1.5 rounded-lg border border-brand-500/10 hover:bg-[#535C91]/10 dark:hover:bg-[#1B1A55]/60 hover:text-foreground transition-colors cursor-pointer"
             >
               &lt;
-            </a>
+            </Link>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(
               (pageNo) => (
-                <a
+                <Link
                   key={pageNo}
                   href={buildPageLink(pageNo)}
                   className={`px-3.5 py-1.5 rounded-lg border font-bold transition-colors cursor-pointer ${
@@ -123,15 +124,15 @@ export default async function AllClassesPage({ searchParams }) {
                   }`}
                 >
                   {pageNo}
-                </a>
+                </Link>
               ),
             )}
-            <a
+            <Link
               href={buildPageLink(Math.min(totalPages, page + 1))}
               className="px-3.5 py-1.5 rounded-lg border border-brand-500/10 hover:bg-[#535C91]/10 dark:hover:bg-[#1B1A55]/60 hover:text-foreground transition-colors cursor-pointer"
             >
               &gt;
-            </a>
+            </Link>
           </div>
         )}
       </div>

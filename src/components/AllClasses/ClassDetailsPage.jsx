@@ -35,7 +35,7 @@ export default function ClassDetailsPageLayout({
   const seed = data._id ? data._id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) : 0;
   const rating = (4.5 + (seed % 6) * 0.1).toFixed(1);
   const reviews = 30 + (seed % 150);
-  const capacity = 10 + (seed % 10);
+  // const capacity = 10 + (seed % 10);
 
   const getEquipment = (category = "") => {
     const cat = category.toLowerCase();
@@ -283,7 +283,7 @@ export default function ClassDetailsPageLayout({
                     </span>
                   </div>
                   <span className="text-xs font-bold text-foreground bg-brand-500/10 px-2.5 py-1 rounded-md border border-brand-500/5">
-                    {capacity} / {data.slot} Filled
+                    {0} / {data.slot} Filled
                   </span>
                 </div>
 

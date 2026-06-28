@@ -52,17 +52,18 @@ export default function CreateForumPostPage() {
         toast.error("authentication failed, please login again.");
       }
       // const result = await addForumPost(formData, token.token);
-
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/forumPost`, {
-    method: 'POST',
-    headers: {
-      "Content-Type": "application/json",
-      ...(tokenData && { authorization: `Bearer ${tokenData}` }),
-    },
-    body: JSON.stringify(formData),
-  });
-  const response = await res.json();
-
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/forumPost`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(tokenData && { authorization: `Bearer ${tokenData}` }),
+          },
+          body: JSON.stringify(formData),
+        },
+      );
+      const response = await res.json(); // Debugging line to check the response
       if (response.insertedId) {
         toast.success("Post created successfully!");
         resetForm();

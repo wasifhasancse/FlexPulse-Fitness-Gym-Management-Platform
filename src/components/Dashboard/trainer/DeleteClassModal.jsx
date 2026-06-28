@@ -1,6 +1,5 @@
 "use client";
 
-import { deleteClassById } from "@/lib/actions/deleteClass";
 import { AlertDialog, Button, toast } from "@heroui/react";
 
 import { FaTrash } from "react-icons/fa";
@@ -9,7 +8,21 @@ export function DeleteClassModal({ classes, onDelete }) {
   const classId = classes._id;
   const handleDelete = async (classId) => {
     try {
-      const result = await deleteClassById(classId);
+      // const result = await deleteClassById(classId);
+      const { data: token } = await authClient.token();
+      const tokenData = token?.token;
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/my-class/${classId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            ...(tokenData && { authorization: `Bearer ${tokenData}` }),
+          },
+        },
+      );
+      const response = await res.json();
+      console.log("Delete Response:", response); // Debugging line to check the response
 
       if (result.deletedCount > 0) {
         toast.success("Delete Successfully!");
