@@ -1,27 +1,24 @@
 "use client";
 
-import {
-    blockUser,
-    unblockUser,
-    updateUserRole,
-} from "@/lib/actions/adminUserManage";
 import { getAllUsers } from "@/lib/api/getAllUsers";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@heroui/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-    FaCheck,
-    FaSearch,
-    FaSpinner,
-    FaTimes,
-    FaUserCircle,
+  FaCheck,
+  FaSearch,
+  FaSpinner,
+  FaTimes,
+  FaUserCircle,
 } from "react-icons/fa";
 
 export default function ManageUsersPage() {
   const { data: session } = authClient.useSession();
   const currentUser = session?.user;
+  const router = useRouter();
 
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -53,15 +50,54 @@ export default function ManageUsersPage() {
 
   const handleBlockToggle = async (userId, currentStatus) => {
     setActionLoading(userId);
+    const { data: token } = await authClient.token();
+    const tokenData = token?.token;
     try {
       if (currentStatus === "active") {
-        await blockUser(userId);
-        setUsers((prev) =>
-          prev.map((u) => (u._id === userId ? { ...u, status: "blocked" } : u)),
+        // await blockUser(userId);
+        // setUsers((prev) =>
+        //   prev.map((u) => (u._id === userId ? { ...u, status: "blocked" } : u)),
+        // );
+        // toast.success("User blocked!");
+
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/users/${userId}/block`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              ...(tokenData && { authorization: `Bearer ${tokenData}` }),
+            },
+            body: JSON.stringify({ status: "banned" }),
+          },
         );
-        toast.success("User blocked!");
+        // revalidatePath("/dashboard/admin/manageUsers");
+        const data = await res.json();
+        router.refresh();
+        if (!res.ok) {
+          throw new Error("Failed to block user");
+        }
+        setUsers((prev) =>
+          prev.map((u) => (u._id === userId ? { ...u, status: "banned" } : u)),
+        );
+        toast.warning("User blocked!");
       } else {
-        await unblockUser(userId);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/users/${userId}/block`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              ...(tokenData && { authorization: `Bearer ${tokenData}` }),
+            },
+            body: JSON.stringify({ status: "active" }),
+          },
+        );
+        const data = await res.json();
+        router.refresh();
+        if (!res.ok) {
+          throw new Error("Failed to unblock user");
+        }
         setUsers((prev) =>
           prev.map((u) => (u._id === userId ? { ...u, status: "active" } : u)),
         );
@@ -77,7 +113,22 @@ export default function ManageUsersPage() {
   const handleRoleChange = async (userId, newRole) => {
     setActionLoading(userId);
     try {
-      await updateUserRole(userId, newRole);
+      const { data: token } = await authClient.token();
+      const tokenData = token?.token;
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/users/${userId}/role`,
+        {
+          method: "PATCH",
+          headers: {
+              "Content-Type": "application/json",
+              ...(tokenData && { authorization: `Bearer ${tokenData}` }),
+            },
+          body: JSON.stringify({ userRole: newRole }),
+        },
+      );
+      const data = await res.json();
+      router.refresh();
+      // await updateUserRole(userId, newRole);
       setUsers((prev) =>
         prev.map((u) => (u._id === userId ? { ...u, role: newRole } : u)),
       );
@@ -131,7 +182,9 @@ export default function ManageUsersPage() {
       {/* Table */}
       {filteredUsers.length === 0 ? (
         <div className="bg-white dark:bg-brand-800/20 rounded-xl p-12 text-center shadow-sm border border-brand-500/15 dark:border-brand-500/20">
-          <p className="text-[#535C91] dark:text-[#9290C3] font-['Inter']">No users found.</p>
+          <p className="text-[#535C91] dark:text-[#9290C3] font-['Inter']">
+            No users found.
+          </p>
         </div>
       ) : (
         <div className="bg-white dark:bg-brand-800/20 rounded-xl shadow-sm border border-brand-500/15 dark:border-brand-500/20 overflow-hidden">
@@ -175,7 +228,9 @@ export default function ManageUsersPage() {
                     </td>
 
                     {/* Email */}
-                    <td className="py-4 px-4 text-[#535C91] dark:text-[#9290C3]">{user.email}</td>
+                    <td className="py-4 px-4 text-[#535C91] dark:text-[#9290C3]">
+                      {user.email}
+                    </td>
 
                     {/* Role Badge */}
                     <td className="py-4 px-4">
