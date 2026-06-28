@@ -1,6 +1,5 @@
 "use client";
 
-import { addForumPost } from "@/lib/actions/addForumPost";
 import { authClient } from "@/lib/auth-client";
 import { imageUpload } from "@/lib/imageUpload";
 import { toast } from "@heroui/react";
@@ -47,11 +46,24 @@ const AddAdminForumPost = () => {
     };
     try {
       const { data: token } = await authClient.token();
+      const tokenData = token?.token;
       if (!token) {
         toast.error("authentication failed, please login again.");
       }
-      const result = await addForumPost(formData, token.token);
-      if (result.insertedId) {
+      // const result = await addForumPost(formData, token.token);
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/forumPost`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      ...(tokenData && { authorization: `Bearer ${tokenData}` }),
+    },
+    body: JSON.stringify(data),
+  });
+  const response = await res.json();
+console.log("response", response);
+
+      if (response.insertedId) {
         toast.success("Post created successfully!");
         resetForm();
       }
