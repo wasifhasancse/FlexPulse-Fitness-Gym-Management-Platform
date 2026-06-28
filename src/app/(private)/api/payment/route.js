@@ -15,7 +15,8 @@ export async function POST(request) {
      const price = formData.get("price");
      const className = formData.get("className");
      const trainer = formData.get("trainer");
-     const classId = formData.get("classId");
+    const classId = formData.get("classId");
+    const duration = formData.get("duration");
 
     // Create Checkout Sessions from body params.
     // const price = await stripe.prices.retrieve(PRICE_ID);
@@ -38,9 +39,11 @@ export async function POST(request) {
         price: Number(price),
         userId: user.id,
         userEmail: user.email,
-        trainer,
-        className,
+        userName: user.name,
         classId,
+        className,
+        trainer,
+        duration,
       },
       mode: "payment", // Use "payment" for one-time payments, subscription for recurring payments
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,

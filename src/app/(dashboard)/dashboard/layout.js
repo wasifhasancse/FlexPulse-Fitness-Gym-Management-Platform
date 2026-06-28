@@ -12,7 +12,7 @@ const DashboardLayout = ({ children }) => {
     <div className="min-h-screen bg-background text-foreground flex font-sans transition-colors duration-300">
       <DashboardSideBar
         isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
+        onClose={setSidebarOpen}
       />
       <div className="flex-1 min-w-0">
         <DashboardNavBar

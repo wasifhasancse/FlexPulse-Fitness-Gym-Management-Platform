@@ -1,4 +1,5 @@
 import ForumPostCard from "@/components/ForumPage/ForumPostCard";
+import Pagination from "@/components/ForumPage/Pagination";
 import SearchingForum from "@/components/ForumPage/SearchingForum";
 import { getForumPosts } from "@/lib/api/getForumPosts";
 import Link from "next/link";
@@ -14,6 +15,7 @@ export default async function ForumPage({ searchParams }) {
   const params = await searchParams;
   const search = params.search || "";
   const page = Number(params.page || 1);
+  console.log(page)
   const limit = 6;
   const postsResponse = await getForumPosts({ search, page, limit });
   const posts = postsResponse?.items || [];
@@ -22,6 +24,7 @@ export default async function ForumPage({ searchParams }) {
 
   const buildPageLink = (targetPage) => {
     const query = new URLSearchParams();
+    console.log(query);
     if (search) query.set("search", search);
     query.set("page", String(targetPage));
     return `/forum?${query.toString()}`;
@@ -116,39 +119,7 @@ export default async function ForumPage({ searchParams }) {
 
         {/* View More Button */}
         {posts.length > 0 && (
-          <div className="mt-16 text-center">
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3]">
-                <a
-                  href={buildPageLink(Math.max(1, page - 1))}
-                  className="px-3.5 py-1.5 rounded-lg border border-brand-500/10 hover:bg-[#535C91]/10 dark:hover:bg-[#1B1A55]/60 hover:text-foreground transition-colors cursor-pointer"
-                >
-                  &lt;
-                </a>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (pageNo) => (
-                    <a
-                      key={pageNo}
-                      href={buildPageLink(pageNo)}
-                      className={`px-3.5 py-1.5 rounded-lg border font-bold transition-colors cursor-pointer ${
-                        pageNo === page
-                          ? "bg-btn-bg text-btn-text border-brand-500/20"
-                          : "border-brand-500/10 hover:bg-[#535C91]/10 dark:hover:bg-[#1B1A55]/60 hover:text-foreground"
-                      }`}
-                    >
-                      {pageNo}
-                    </a>
-                  ),
-                )}
-                <a
-                  href={buildPageLink(Math.min(totalPages, page + 1))}
-                  className="px-3.5 py-1.5 rounded-lg border border-brand-500/10 hover:bg-[#535C91]/10 dark:hover:bg-[#1B1A55]/60 hover:text-foreground transition-colors cursor-pointer"
-                >
-                  &gt;
-                </a>
-              </div>
-            )}
-          </div>
+          <Pagination totalPages={totalPages} page={page} buildPageLink={buildPageLink} />
         )}
       </div>
     </div>

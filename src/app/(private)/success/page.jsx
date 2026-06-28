@@ -45,6 +45,8 @@ export default async function Success({ searchParams, params }) {
     userName,
   } = metadata;
 
+  console.log("Payment Metadata:", metadata);
+
   if (status === "complete") {
     const checkRes = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/api/checkBooking?userId=${userId}&classId=${classId}`,

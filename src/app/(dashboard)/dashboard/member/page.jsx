@@ -23,6 +23,13 @@ export default function MemberDashboard() {
 
   const { data } = authClient.useSession();
   const user = data?.user;
+  const memberSince = user?.createdAt
+    ? new Date(user.createdAt).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : null;
   const [application, setApplication] = useState({});
   const { status, feedback } = application || {};
 
@@ -73,6 +80,7 @@ export default function MemberDashboard() {
     };
     fetchFavorites();
   }, [user?.id]);
+  console.log("Bookings:", user?.createdAt);
 
   // Determine status badge color
   const getStatusColor = (status = "") => {
@@ -179,7 +187,7 @@ export default function MemberDashboard() {
               <FaClock className="w-4 h-4 text-active" />
               <span>
                 <strong className="text-foreground">Member Since:</strong>{" "}
-                {user?.memberSince || "N/A"}
+                {memberSince  || "N/A"}
               </span>
             </div>
           </div>

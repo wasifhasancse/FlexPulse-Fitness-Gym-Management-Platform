@@ -161,10 +161,10 @@ const DashboardSideBar = ({ isOpen, onClose }) => {
         })}
       </nav>
 
-      <div className="p-4 border-t border-brand-500/10 bg-black/[0.01] dark:bg-white/[0.01]">
+      <div className="p-4 border-t border-brand-500/10 bg-black/1 dark:bg-white/1">
         <button
           onClick={onSignOut}
-          className="flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sans text-sm font-bold text-rose-500 hover:bg-rose-500/15 transition-all duration-200 border border-transparent hover:border-rose-500/10 cursor-pointer uppercase tracking-wider text-xs"
+          className="flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sans text-sm font-bold text-rose-500 hover:bg-rose-500/15 transition-all duration-200 border border-transparent hover:border-rose-500/10 cursor-pointer uppercase tracking-wider"
         >
           <FaSignOutAlt className="w-4 h-4 shrink-0" />
           Logout Account
@@ -214,7 +214,7 @@ const DashboardSideBar = ({ isOpen, onClose }) => {
           </Link>
 
           <button
-            onClick={onClose}
+            onClick={() => onClose(false)}
             className="w-8 h-8 flex items-center justify-center rounded-lg bg-black/5 dark:bg-white/5 text-[#535C91] dark:text-[#9290C3] hover:text-active transition-colors cursor-pointer"
           >
             <FaTimes size={16} />

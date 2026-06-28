@@ -21,6 +21,7 @@ export async function generateMetadata({ params }) {
 const ClassDetailsPage = async ({ params }) => {
   const { id } = await params;
   const user = await getUserSession();
+  console.log("User Session:", user); // Debugging line to check the user session
 
   if (!user) {
     redirect(`/signin?redirect=/all-classes/${id}`);
