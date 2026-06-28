@@ -45,7 +45,6 @@ export async function POST(request) {
       mode: "payment", // Use "payment" for one-time payments, subscription for recurring payments
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
     });
-    console.log("Stripe session created:", session);
     return NextResponse.redirect(session.url, 303);
   } catch (err) {
     return NextResponse.json(

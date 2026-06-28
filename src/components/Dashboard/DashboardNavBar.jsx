@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { FaBars, FaBell, FaSearch, FaUserCircle } from "react-icons/fa";
+import DarkModeSwitch from "../Navbar/DarkModeSwitch";
 
 const DashboardNavBar = ({ user, onMenuToggle }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,6 +39,7 @@ const DashboardNavBar = ({ user, onMenuToggle }) => {
 
         {/* Right: Notification + User Profile */}
         <div className="flex items-center gap-5 shrink-0">
+          <DarkModeSwitch/>
           {/* Notification Bell */}
           <button
             className="relative text-[#535C91] dark:text-[#9290C3] hover:text-active transition-colors cursor-pointer"

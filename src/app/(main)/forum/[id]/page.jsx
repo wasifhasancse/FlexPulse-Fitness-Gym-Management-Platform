@@ -390,7 +390,6 @@ export default function ForumPostDetailsPage() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
@@ -454,10 +453,9 @@ export default function ForumPostDetailsPage() {
                       {post.userName || "Anonymous"}
                     </p>
                     <div className="flex items-center gap-2 text-sm text-[#535C91] dark:text-[#9290C3]">
-                      {post.userRole && (
+                      {post.role && (
                         <span className="font-['Inter'] font-medium text-active bg-[#535C91]/10 dark:bg-[#1B1A55]/60 px-2 py-0.5 rounded-full text-xs">
-                          {post.userRole.charAt(0).toUpperCase() +
-                            post.userRole.slice(1)}
+                          {post.role.charAt(0).toUpperCase() + post.role.slice(1)}
                         </span>
                       )}
                       <span>•</span>
@@ -833,13 +831,12 @@ export default function ForumPostDetailsPage() {
                   {post.userName || "Anonymous"}
                 </p>
                 <p className="font-['Inter'] text-sm text-active">
-                  {post.userRole
-                    ? post.userRole.charAt(0).toUpperCase() +
-                      post.userRole.slice(1)
+                  {post.role
+                    ? post.role.charAt(0).toUpperCase() + post.role.slice(1)
                     : "Member"}
                 </p>
                 <p className="font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3] mt-2 leading-relaxed">
-                  {post.userRole === "admin"
+                  {post.role === "admin"
                     ? "FlexPulse Platform Administrator dedicated to sharing community guidelines, updates, and general wellness insights for all members."
                     : "Certified FlexPulse fitness instructor focused on supporting client goals, teaching classes, and sharing modern bodyweight training insights."}
                 </p>

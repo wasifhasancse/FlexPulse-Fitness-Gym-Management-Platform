@@ -1,21 +1,22 @@
 "use client";
+
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { toast} from "@heroui/react";
+import { toast } from "@heroui/react";
 import { useState } from "react";
 
 import {
-    FaCalendarAlt,
-    FaClock,
-    FaDumbbell,
-    FaHeart,
-    FaInfoCircle,
-    FaLanguage,
-    FaLevelUpAlt,
-    FaMapMarkerAlt,
-    FaRegHeart,
-    FaStar,
-    FaUsers,
+  FaCalendarAlt,
+  FaClock,
+  FaDumbbell,
+  FaHeart,
+  FaInfoCircle,
+  FaLanguage,
+  FaLevelUpAlt,
+  FaMapMarkerAlt,
+  FaRegHeart,
+  FaStar,
+  FaUsers,
 } from "react-icons/fa";
 
 export default function ClassDetailsPageLayout({
@@ -29,6 +30,7 @@ export default function ClassDetailsPageLayout({
   const data = propClassData;
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [favLoading, setFavLoading] = useState(false);
+
   // Deterministic ratings and reviews based on class ID
   const seed = data._id ? data._id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) : 0;
   const rating = (4.5 + (seed % 6) * 0.1).toFixed(1);
@@ -67,7 +69,7 @@ export default function ClassDetailsPageLayout({
 
   const handleFavoriteToggle = async () => {
     if (!userId) {
-      alert("Please login first!");
+      toast.warning("Please login first!");
       return;
     }
     setFavLoading(true);
@@ -89,7 +91,7 @@ export default function ClassDetailsPageLayout({
             duration: data.duration,
             author: data.author,
           }),
-        },
+        }
       );
 
       const result = await res.json();
@@ -107,222 +109,233 @@ export default function ClassDetailsPageLayout({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300 relative"
+      className="min-h-screen bg-background py-10 px-4 sm:px-6 lg:px-8 transition-colors duration-300 relative overflow-hidden"
     >
-      {/* Background glow */}
-      <div className="absolute left-1/2 top-0 -translate-x-1/2 w-200 h-100 bg-[#CFFF04]/5 rounded-full blur-[120px] pointer-events-none"></div>
+      {/* Structural Ambient Background Glows */}
+      <div className="absolute right-0 top-1/4 w-96 h-96 bg-brand-500/5 dark:bg-brand-800/10 rounded-full blur-[150px] pointer-events-none"></div>
+      <div className="absolute left-0 top-3/4 w-80 h-80 bg-active/5 rounded-full blur-[130px] pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Main Image */}
-        <div className="relative w-full h-72 md:h-112.5 rounded-3xl overflow-hidden mb-12 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-brand-500/30">
+        {/* Cinematic Main Hero Image Section */}
+        <div className="relative w-full h-80 md:h-128 rounded-3xl overflow-hidden mb-12 shadow-2xl border border-brand-500/10 group">
           <Image
             src={data.classImage || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop"}
             alt={data.className}
             fill
             unoptimized
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
           />
-          <div className="absolute inset-0 bg-linear-to-t from-brand-900 via-brand-900/40 to-transparent"></div>
+          <div className="absolute inset-0 bg-linear-to-t from-background via-background/60 to-transparent"></div>
 
-          <div className="absolute bottom-8 left-8 right-8">
-            <span className="font-['Inter'] text-sm font-bold uppercase tracking-widest text-brand-900 bg-[#CFFF04] px-4 py-1.5 rounded-md shadow-md mb-4 inline-block">
+          <div className="absolute bottom-6 left-6 right-6 md:bottom-10 md:left-10 md:right-10 flex flex-col items-start">
+            <span className="text-xs font-bold uppercase tracking-widest text-btn-text bg-btn-bg px-4 py-1.5 rounded-lg shadow-lg mb-4 inline-block">
               {data.category}
             </span>
-            <h1 className="font-['Inter'] text-4xl md:text-6xl font-black text-white tracking-tight leading-none drop-shadow-md">
+            <h1 className="text-4xl md:text-6xl font-black text-foreground tracking-tight leading-none filter drop-shadow-sm">
               {data.className}
             </h1>
           </div>
         </div>
 
+        {/* 2-Column Responsive Layout Block */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          {/* Left Column - Details */}
-          <div className="lg:col-span-2 space-y-10">
-            {/* Title & Trainer */}
-            <div>
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-14 h-14 rounded-full bg-brand-500 overflow-hidden flex items-center justify-center text-xl font-bold text-white shadow-inner border border-brand-300">
+          {/* Left Column - Core Workspace Insights */}
+          <div className="lg:col-span-2 space-y-12">
+
+            {/* Instructor Meta & Dynamic Rating Summary Card */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-brand-500/10">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-[#9290C3] to-[#535C91] dark:from-[#1B1A55] dark:to-[#070F2B] overflow-hidden flex items-center justify-center text-xl font-bold text-active shadow-inner border border-brand-500/20">
                   {data.author?.charAt(0) || "T"}
                 </div>
                 <div>
-                  <p className="font-['Inter'] font-semibold text-foreground text-lg">
+                  <p className="text-lg font-bold text-foreground leading-snug">
                     {data.author}
                   </p>
-                  <p className="font-['Inter'] text-sm text-brand-500 dark:text-brand-300">
-                    Lead Instructor
+                  <p className="text-sm text-brand-500 dark:text-brand-300 font-medium">
+                    Certified Lead Instructor
                   </p>
                 </div>
               </div>
 
-              {/* Rating */}
-              <div className="flex items-center gap-2 mt-4">
-                <div className="flex items-center gap-1 text-[#CFFF04]">
-                  <FaStar className="w-5 h-5 fill-current drop-shadow-[0_0_3px_rgba(207,255,4,0.5)]" />
-                  <FaStar className="w-5 h-5 fill-current drop-shadow-[0_0_3px_rgba(207,255,4,0.5)]" />
-                  <FaStar className="w-5 h-5 fill-current drop-shadow-[0_0_3px_rgba(207,255,4,0.5)]" />
-                  <FaStar className="w-5 h-5 fill-current drop-shadow-[0_0_3px_rgba(207,255,4,0.5)]" />
-                  <FaStar className="w-5 h-5 fill-current drop-shadow-[0_0_3px_rgba(207,255,4,0.5)]" />
+              {/* Dynamic Theme Compliant Rating Badge */}
+              <div className="flex items-center gap-3 bg-brand-800/10 dark:bg-[#070F2B]/30 border border-brand-500/10 rounded-2xl p-3 px-4 self-start sm:self-auto">
+                <div className="flex items-center gap-1 text-active">
+                  <FaStar className="w-4 h-4 fill-current" />
                 </div>
-                <span className="font-['Inter'] text-base font-bold text-foreground ml-2">
-                  {rating}
-                </span>
-                <span className="font-['Inter'] text-sm text-brand-500 dark:text-brand-300">
-                  ({reviews} reviews)
-                </span>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-lg font-black text-foreground">{rating}</span>
+                  <span className="text-xs text-brand-500 dark:text-brand-300 font-medium">
+                    ({reviews} studio reviews)
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* Description */}
+            {/* Structured About Section Description */}
             <div>
-              <h2 className="font-['Inter'] text-2xl font-bold text-foreground mb-4">
+              <h2 className="text-2xl font-extrabold text-foreground tracking-tight mb-4">
                 About this Class
               </h2>
-              <p className="font-['Inter'] text-base text-brand-900 dark:text-brand-300 leading-relaxed">
+              <p className="text-base text-foreground/80 dark:text-brand-300 leading-relaxed font-normal">
                 {data.description}
               </p>
             </div>
 
-            {/* Info Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white dark:bg-brand-800 rounded-2xl p-5 shadow-sm border border-brand-500/20">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-brand-500/10 mb-3 text-[#CFFF04]">
-                  <FaLevelUpAlt className="w-5 h-5" />
+            {/* High-Fidelity Asymmetric Info Grid */}
+            <div>
+              <h3 className="text-lg font-bold text-foreground tracking-tight mb-4">
+                Session Parameters
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                {/* Level Card */}
+                <div className="bg-brand-800/5 dark:bg-[#070F2B]/20 rounded-2xl p-5 border border-brand-500/10">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-500/10 mb-3 text-active">
+                    <FaLevelUpAlt className="w-4 h-4" />
+                  </div>
+                  <p className="text-xs uppercase tracking-wider font-bold text-brand-500 dark:text-brand-300 opacity-80">
+                    Difficulty Level
+                  </p>
+                  <p className="text-base font-bold text-foreground mt-1 tracking-tight">
+                    {data.difficultyLevel || "Intermediate"}
+                  </p>
                 </div>
-                <p className="font-['Inter'] text-xs uppercase tracking-wider font-bold text-brand-500 dark:text-brand-300">
-                  Level
-                </p>
-                <p className="font-['Inter'] text-base font-bold text-foreground mt-1">
-                  {data.difficultyLevel || "Intermediate"}
-                </p>
-              </div>
 
-              <div className="bg-white dark:bg-brand-800 rounded-2xl p-5 shadow-sm border border-brand-500/20">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-brand-500/10 mb-3 text-[#CFFF04]">
-                  <FaDumbbell className="w-5 h-5" />
+                {/* Intensity Card */}
+                <div className="bg-brand-800/5 dark:bg-[#070F2B]/20 rounded-2xl p-5 border border-brand-500/10">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-500/10 mb-3 text-active">
+                    <FaDumbbell className="w-4 h-4" />
+                  </div>
+                  <p className="text-xs uppercase tracking-wider font-bold text-brand-500 dark:text-brand-300 opacity-80">
+                    Target Intensity
+                  </p>
+                  <p className="text-base font-bold text-foreground mt-1 tracking-tight">
+                    {intensity}
+                  </p>
                 </div>
-                <p className="font-['Inter'] text-xs uppercase tracking-wider font-bold text-brand-500 dark:text-brand-300">
-                  Intensity
-                </p>
-                <p className="font-['Inter'] text-base font-bold text-foreground mt-1">
-                  {intensity}
-                </p>
-              </div>
 
-              <div className="bg-white dark:bg-brand-800 rounded-2xl p-5 shadow-sm border border-brand-500/20">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-brand-500/10 mb-3 text-[#CFFF04]">
-                  <FaInfoCircle className="w-5 h-5" />
+                {/* Equipment Card */}
+                <div className="bg-brand-800/5 dark:bg-[#070F2B]/20 rounded-2xl p-5 border border-brand-500/10">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-500/10 mb-3 text-active">
+                    <FaInfoCircle className="w-4 h-4" />
+                  </div>
+                  <p className="text-xs uppercase tracking-wider font-bold text-brand-500 dark:text-brand-300 opacity-80">
+                    Required Gear
+                  </p>
+                  <p className="text-sm font-bold text-foreground mt-1 leading-snug">
+                    {equipment}
+                  </p>
                 </div>
-                <p className="font-['Inter'] text-xs uppercase tracking-wider font-bold text-brand-500 dark:text-brand-300">
-                  Equipment
-                </p>
-                <p className="font-['Inter'] text-base font-bold text-foreground mt-1">
-                  {equipment}
-                </p>
-              </div>
 
-              <div className="bg-white dark:bg-brand-800 rounded-2xl p-5 shadow-sm border border-brand-500/20">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-brand-500/10 mb-3 text-[#CFFF04]">
-                  <FaLanguage className="w-5 h-5" />
+                {/* Language Card */}
+                <div className="bg-brand-800/5 dark:bg-[#070F2B]/20 rounded-2xl p-5 border border-brand-500/10">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-500/10 mb-3 text-active">
+                    <FaLanguage className="w-4 h-4" />
+                  </div>
+                  <p className="text-xs uppercase tracking-wider font-bold text-brand-500 dark:text-brand-300 opacity-80">
+                    Instruction
+                  </p>
+                  <p className="text-base font-bold text-foreground mt-1 tracking-tight">
+                    {language}
+                  </p>
                 </div>
-                <p className="font-['Inter'] text-xs uppercase tracking-wider font-bold text-brand-500 dark:text-brand-300">
-                  Language
-                </p>
-                <p className="font-['Inter'] text-base font-bold text-foreground mt-1">
-                  {language}
-                </p>
               </div>
             </div>
 
-            {/* Amenities */}
-            <div className="bg-white dark:bg-brand-800 rounded-2xl p-6 shadow-sm border border-brand-500/20 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#CFFF04]/10 flex items-center justify-center text-[#CFFF04]">
+            {/* Amenities Glass Block */}
+            <div className="bg-brand-800/10 dark:bg-[#070F2B]/10 rounded-2xl p-5 border border-brand-500/10 flex items-start gap-4 shadow-xs">
+              <div className="w-12 h-12 rounded-xl bg-brand-500/10 flex items-center justify-center text-lg shrink-0 border border-brand-500/10">
                 💧
               </div>
-              <p className="font-['Inter'] text-base text-brand-900 dark:text-brand-300">
-                <span className="font-bold text-foreground block md:inline">
-                  Infused Water
+              <div>
+                <span className="font-bold text-foreground block mb-0.5">
+                  Complimentary Amenities Included
                 </span>{" "}
-                Complimentary station available before and after class
-              </p>
+                <p className="text-sm text-foreground/80 dark:text-brand-300">
+                  Access to infused hydration stations, complimentary fresh premium towels, and secure digital lockers is fully verified before and after your scheduled session.
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Right Column - Booking Card */}
+          {/* Right Column - Premium Booking & Sticky Details Card */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-brand-800 rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.4)] border border-brand-500/20 p-8 sticky top-24">
-              {/* Price */}
-              <div className="mb-8 text-center bg-brand-500/5 py-4 rounded-2xl">
-                <p className="font-['Inter'] text-4xl font-black text-foreground">
+            <div className="bg-white/70 dark:bg-[#070F2B]/40 backdrop-blur-md rounded-3xl border border-brand-500/10 p-8 sticky top-28 shadow-xl dark:shadow-glow/5">
+
+              {/* Dynamic Pricing Layout Module */}
+              <div className="mb-6 text-center bg-brand-800/5 dark:bg-brand-800/20 py-5 rounded-2xl border border-brand-500/5">
+                <p className="text-4xl font-black text-foreground tracking-tight">
                   ${data.price}
                 </p>
-                <p className="font-['Inter'] text-sm font-bold uppercase tracking-widest text-[#CFFF04] mt-1 drop-shadow-[0_0_5px_rgba(207,255,4,0.3)]">
-                  Single Session
+                <p className="text-xs font-bold uppercase tracking-wider text-active mt-1.5">
+                  Single Access Passes Only
                 </p>
               </div>
 
-              <div className="space-y-5">
-                {/* Capacity */}
-                <div className="flex items-center justify-between pb-4 border-b border-brand-500/20">
+              {/* Comprehensive Meta Metrics Parameters */}
+              <div className="space-y-4">
+                {/* Metrics Row - Capacity */}
+                <div className="flex items-center justify-between py-3 border-b border-brand-500/10">
                   <div className="flex items-center gap-3">
-                    <FaUsers className="w-5 h-5 text-brand-500" />
-                    <span className="font-['Inter'] text-sm font-bold text-brand-900 dark:text-brand-300 uppercase">
-                      Capacity
+                    <FaUsers className="w-4 h-4 text-brand-500" />
+                    <span className="text-xs font-bold text-brand-500 dark:text-brand-300 uppercase tracking-wider">
+                      Seat Availability
                     </span>
                   </div>
-                  <span className="font-['Inter'] text-sm font-bold text-foreground bg-brand-500/10 px-3 py-1 rounded-full">
-                    {capacity} / {data.slot}
+                  <span className="text-xs font-bold text-foreground bg-brand-500/10 px-2.5 py-1 rounded-md border border-brand-500/5">
+                    {capacity} / {data.slot} Filled
                   </span>
                 </div>
 
-                {/* Schedule */}
-                <div className="pb-4 border-b border-brand-500/20">
+                {/* Metrics Row - Calendar Schedule */}
+                <div className="py-3 border-b border-brand-500/10">
                   <div className="flex items-center gap-3 mb-2">
-                    <FaCalendarAlt className="w-5 h-5 text-[#CFFF04]" />
-                    <span className="font-['Inter'] text-sm font-bold text-foreground uppercase">
-                      Schedule
+                    <FaCalendarAlt className="w-4 h-4 text-active" />
+                    <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                      Assigned Schedule
                     </span>
                   </div>
-                  <p className="font-['Inter'] text-sm font-medium text-brand-900 dark:text-brand-300 pl-8">
+                  <p className="text-sm font-semibold text-foreground/90 pl-7">
                     {data.classSchedule}
                   </p>
-                  <p className="font-['Inter'] text-sm font-medium text-brand-900 dark:text-brand-300 pl-8 mt-1">
+                  <p className="text-xs font-medium text-brand-500 dark:text-brand-300 pl-7 mt-1">
                     {data.time} — {data.time.split(" ")[0]}:
                     {parseInt(data.time.split(":")[0]) + 1}
                     :00 {data.time.split(" ")[1] || "AM"}
                   </p>
                 </div>
 
-                {/* Duration */}
-                <div className="pb-4 border-b border-brand-500/20">
+                {/* Metrics Row - Exact Clock Duration */}
+                <div className="py-3 border-b border-brand-500/10">
                   <div className="flex items-center gap-3">
-                    <FaClock className="w-5 h-5 text-[#CFFF04]" />
-                    <span className="font-['Inter'] text-sm font-bold text-foreground uppercase">
-                      Duration
+                    <FaClock className="w-4 h-4 text-active" />
+                    <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                      Exact Duration
                     </span>
                   </div>
-                  <p className="font-['Inter'] text-sm font-medium text-brand-900 dark:text-brand-300 pl-8 mt-1">
-                    {data.duration || "60 Min"}
+                  <p className="text-sm font-semibold text-foreground/90 pl-7 mt-1">
+                    {data.duration || "60 Min Run"}
                   </p>
                 </div>
 
-                {/* Location */}
-                <div className="pb-6">
+                {/* Metrics Row - Studio Location Mapping */}
+                <div className="py-3 pb-5">
                   <div className="flex items-center gap-3">
-                    <FaMapMarkerAlt className="w-5 h-5 text-[#CFFF04]" />
-                    <span className="font-['Inter'] text-sm font-bold text-foreground uppercase">
-                      Location
+                    <FaMapMarkerAlt className="w-4 h-4 text-active" />
+                    <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                      Location Venue
                     </span>
                   </div>
-                  <p className="font-['Inter'] text-sm font-medium text-brand-900 dark:text-brand-300 pl-8 mt-1">
-                    {studio}, {location}
+                  <p className="text-sm font-semibold text-foreground/90 pl-7 mt-1 leading-snug">
+                    {studio}, <span className="text-xs text-brand-500 dark:text-brand-300 font-medium block">{location}</span>
                   </p>
                 </div>
               </div>
 
-              {/* Buttons */}
-              <div className="space-y-4 mt-6">
-                {/* <form action={createCheckoutSession}> */}
+              {/* Action Form Integrations Trigger Layout */}
+              <div className="space-y-3.5 mt-4">
                 <form action={'/api/payment'} method="POST">
-                  {/* Hidden fields */}
+                  {/* Hidden metadata bindings */}
                   <input type="hidden" name="price" value={data.price} />
                   <input type="hidden" name="trainer" value={data.author} />
                   <input type="hidden" name="classId" value={data._id} />
@@ -333,48 +346,49 @@ export default function ClassDetailsPageLayout({
                   <button
                     type="submit"
                     disabled={isBooked}
-                    className={`w-full py-4 font-['Inter'] font-bold text-lg uppercase tracking-wider rounded-xl transition-all duration-300 shadow-lg cursor-pointer
-                  ${
-                    isBooked
-                      ? "bg-brand-500 text-white cursor-not-allowed opacity-60"
-                      : "bg-[#CFFF04] text-brand-900 hover:bg-[#b0d903] hover:shadow-[0_0_20px_rgba(207,255,4,0.4)]"
-                  }`}
+                    className={`w-full py-4 font-bold text-sm uppercase tracking-wider rounded-xl transition-all duration-300 shadow-md cursor-pointer
+                    ${
+                      isBooked
+                        ? "bg-brand-500/20 text-brand-500 cursor-not-allowed border border-brand-500/10 opacity-60"
+                        : "bg-btn-bg text-btn-text hover:opacity-95 dark:hover:shadow-glow"
+                    }`}
                   >
-                    {isBooked ? "✅ Already Booked" : "Book Now"}
+                    {isBooked ? "✓ Session Already Booked" : "Instant Registration"}
                   </button>
                 </form>
 
+                {/* Theme Calibrated Secondary Bookmark Button Toggle */}
                 <button
                   onClick={handleFavoriteToggle}
                   disabled={favLoading}
-                  className={`w-full py-4 border-2 font-['Inter'] font-bold text-sm uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer
+                  className={`w-full py-3.5 border font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer
                     ${
                       isFavorite
-                        ? "border-red-400 bg-red-500/10 text-red-500 hover:bg-red-500/20"
-                        : "border-brand-500 text-foreground hover:bg-brand-500/10"
+                        ? "border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/15"
+                        : "border-brand-500/30 text-foreground bg-brand-800/10 hover:bg-brand-500/10"
                     }
                     ${favLoading ? "opacity-60 cursor-not-allowed" : ""}
                   `}
                 >
                   {favLoading ? (
-                    <span>Loading...</span>
+                    <span>Updating Records...</span>
                   ) : isFavorite ? (
                     <>
-                      <FaHeart className="w-4 h-4" />
-                      Remove from Favorites
+                      <FaHeart className="w-3.5 h-3.5" />
+                      Remove Bookmarked Session
                     </>
                   ) : (
                     <>
-                      <FaRegHeart className="w-4 h-4" />
-                      Save to Favorites
+                      <FaRegHeart className="w-3.5 h-3.5" />
+                      Bookmark for Later
                     </>
                   )}
                 </button>
               </div>
 
-              {/* Cancellation Policy */}
-              <p className="mt-6 font-['Inter'] text-xs font-medium text-brand-500 text-center uppercase tracking-wider">
-                Free cancellation up to 12 hours before class.
+              {/* Cancellation Policy Fine Print */}
+              <p className="mt-5 text-[10px] font-bold text-brand-500 text-center uppercase tracking-widest opacity-80">
+                Flexible cancellation applies up to 12 hrs out.
               </p>
             </div>
           </div>

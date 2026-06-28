@@ -11,7 +11,7 @@ export default function ForumPostCard({ post }) {
     title,
     description,
     userName,
-    userRole,
+    role,
     userImage,
     createdAt,
     image,
@@ -70,9 +70,9 @@ export default function ForumPostCard({ post }) {
               {userName || "Anonymous"}
             </p>
             <div className="flex items-center gap-2 text-xs text-[#535C91] dark:text-[#9290C3]">
-              {userRole && (
+              {role && (
                 <span className="font-['Inter'] font-medium text-active bg-[#535C91]/10 dark:bg-[#1B1A55]/60 px-2 py-0.5 rounded-full">
-                  {userRole}
+                  {role}
                 </span>
               )}
               <span>•</span>

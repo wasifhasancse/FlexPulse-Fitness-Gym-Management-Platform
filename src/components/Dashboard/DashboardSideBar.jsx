@@ -99,7 +99,6 @@ const navItemsByRole = {
     },
   ],
 };
-
 const DashboardSideBar = ({ isOpen, onClose }) => {
   const pathname = usePathname();
   const router = useRouter();
@@ -112,8 +111,13 @@ const DashboardSideBar = ({ isOpen, onClose }) => {
     onClose();
   }, [pathname, onClose]);
 
+  // Robust path matching strategy to avoid multiple links highlighting at once
   const isActive = (href) => {
-    if (href === "/dashboard") return pathname === "/dashboard";
+    if (pathname === href) return true;
+    // Prevent root paths matching every deep sub-route layout error
+    if (href === "/dashboard/member" || href === "/dashboard/trainer" || href === "/dashboard/admin") {
+      return pathname === href;
+    }
     return pathname.startsWith(href);
   };
 
@@ -127,34 +131,43 @@ const DashboardSideBar = ({ isOpen, onClose }) => {
 
   const navLinks = (
     <>
-      <nav className="flex-1 px-4 py-6 space-y-1">
+      <nav className="flex-1 px-3 py-6 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;
+          const currentlyActive = isActive(item.href);
           return (
             <Link
               key={item.name}
               href={item.href}
               onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl font-sans text-sm font-semibold transition-all ${
-                isActive(item.href)
-                  ? "bg-btn-bg/15 text-active shadow-sm border border-active/20"
-                  : "text-[#535C91] dark:text-[#9290C3] hover:bg-brand-500/10 hover:text-foreground"
-              }`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl font-sans text-sm font-semibold transition-all duration-200 group relative
+                ${
+                  currentlyActive
+                    ? "bg-btn-bg/10 text-active shadow-xs border border-active/10"
+                    : "text-[#535C91] dark:text-[#9290C3] hover:bg-brand-500/5 hover:text-foreground"
+                }`}
             >
-              <Icon className="w-5 h-5 shrink-0" />
-              {item.name}
+              {/* Dynamic decorative edge indicator bar */}
+              {currentlyActive && (
+                <span className="absolute left-0 top-3 bottom-3 w-0.5 rounded-r-md bg-active" />
+              )}
+              <Icon
+                className={`w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-105
+                  ${currentlyActive ? "text-active" : "text-[#535C91]/80 dark:text-[#9290C3]/80"}`}
+              />
+              <span className="tracking-tight">{item.name}</span>
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 border-t border-brand-500/15">
+      <div className="p-4 border-t border-brand-500/10 bg-black/[0.01] dark:bg-white/[0.01]">
         <button
           onClick={onSignOut}
-          className="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl font-sans text-sm font-semibold text-rose-500 hover:bg-rose-500/10 transition-colors border border-transparent hover:border-rose-500/20 cursor-pointer"
+          className="flex items-center gap-3 w-full px-4 py-3 rounded-xl font-sans text-sm font-bold text-rose-500 hover:bg-rose-500/15 transition-all duration-200 border border-transparent hover:border-rose-500/10 cursor-pointer uppercase tracking-wider text-xs"
         >
-          <FaSignOutAlt className="w-5 h-5 shrink-0" />
-          Logout
+          <FaSignOutAlt className="w-4 h-4 shrink-0" />
+          Logout Account
         </button>
       </div>
     </>
@@ -163,13 +176,13 @@ const DashboardSideBar = ({ isOpen, onClose }) => {
   return (
     <>
       {/* ========== DESKTOP ========== */}
-      <aside className="hidden md:flex md:flex-col md:w-64 bg-white dark:bg-[#070F2B]/95 border-r border-brand-500/20 h-screen sticky top-0 overflow-y-auto transition-colors duration-300">
+      <aside className="hidden md:flex md:flex-col md:w-64 bg-white dark:bg-[#070F2B]/95 border-r border-brand-500/15 h-screen sticky top-0 overflow-y-auto transition-colors duration-300">
         <Link href="/">
-          <div className="p-6 border-b border-brand-500/25 flex items-center gap-2 group">
-            <div className="bg-btn-bg/10 p-1.5 rounded-lg group-hover:scale-105 transition-transform">
-              <FaChartLine className="text-active w-5 h-5" />
+          <div className="p-6 border-b border-brand-500/15 flex items-center gap-2.5 group">
+            <div className="bg-btn-bg/10 p-2 rounded-xl group-hover:scale-105 transition-transform duration-300">
+              <FaChartLine className="text-active w-4 h-4" />
             </div>
-            <h1 className="font-['Outfit'] text-2xl font-bold text-foreground tracking-wide">
+            <h1 className="font-['Outfit'] text-xl font-black text-foreground tracking-tight">
               Flex<span className="text-active">Pulse</span>
             </h1>
           </div>
@@ -180,35 +193,35 @@ const DashboardSideBar = ({ isOpen, onClose }) => {
       {/* ========== MOBILE ========== */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/60 z-40 md:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 md:hidden transition-opacity duration-300"
           onClick={onClose}
         />
       )}
 
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-[#070F2B]/95 z-50 flex flex-col border-r border-brand-500/20
-          transform transition-transform duration-300 ease-in-out md:hidden
+        className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-[#070F2B]/95 z-50 flex flex-col border-r border-brand-500/15
+          transform transition-transform duration-300 ease-in-out md:hidden shadow-2xl
           ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <div className="flex items-center justify-between p-4 border-b border-brand-500/25">
-          <Link href="/" onClick={onClose} className="flex items-center gap-2">
+        <div className="flex items-center justify-between p-4 border-b border-brand-500/15">
+          <Link href="/" onClick={onClose} className="flex items-center gap-2.5">
             <div className="bg-btn-bg/10 p-1.5 rounded-lg">
               <FaChartLine className="text-active w-4 h-4" />
             </div>
-            <h1 className="font-['Outfit'] text-xl font-bold text-foreground tracking-wide">
+            <h1 className="font-['Outfit'] text-lg font-black text-foreground tracking-tight">
               Flex<span className="text-active">Pulse</span>
             </h1>
           </Link>
 
           <button
             onClick={onClose}
-            className="text-[#535C91] dark:text-[#9290C3] hover:text-active transition-colors cursor-pointer"
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-black/5 dark:bg-white/5 text-[#535C91] dark:text-[#9290C3] hover:text-active transition-colors cursor-pointer"
           >
-            <FaTimes size={22} />
+            <FaTimes size={16} />
           </button>
         </div>
 
-        {navLinks}
+        <div className="flex flex-col flex-1 overflow-y-auto">{navLinks}</div>
       </aside>
     </>
   );
