@@ -4,8 +4,6 @@ import DashboardSideBar from "@/components/Dashboard/DashboardSideBar";
 import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
 
-
-
 const DashboardLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { data } = authClient.useSession();
