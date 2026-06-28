@@ -1,6 +1,4 @@
 "use client";
-
-import { createCheckoutSession } from "@/lib/actions/createCheckout";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { toast} from "@heroui/react";
@@ -36,7 +34,7 @@ export default function ClassDetailsPageLayout({
   const rating = (4.5 + (seed % 6) * 0.1).toFixed(1);
   const reviews = 30 + (seed % 150);
   const capacity = 10 + (seed % 10);
-  
+
   const getEquipment = (category = "") => {
     const cat = category.toLowerCase();
     if (cat.includes("yoga") || cat.includes("stretch")) return "Mat, Blocks, Strap";
@@ -322,19 +320,20 @@ export default function ClassDetailsPageLayout({
 
               {/* Buttons */}
               <div className="space-y-4 mt-6">
-                <form action={createCheckoutSession}>
+                {/* <form action={createCheckoutSession}> */}
+                <form action={'/api/payment'} method="POST">
                   {/* Hidden fields */}
+                  <input type="hidden" name="price" value={data.price} />
+                  <input type="hidden" name="trainer" value={data.author} />
                   <input type="hidden" name="classId" value={data._id} />
                   <input type="hidden" name="className" value={data.className} />
-                  <input type="hidden" name="trainer" value={data.author} />
-                  <input type="hidden" name="price" value={data.price} />
                   <input type="hidden" name="duration" value={data.duration} />
                   <input type="hidden" name="image" value={data.classImage} />
 
                   <button
                     type="submit"
                     disabled={isBooked}
-                    className={`w-full py-4 font-['Inter'] font-bold text-lg uppercase tracking-wider rounded-xl transition-all duration-300 shadow-lg
+                    className={`w-full py-4 font-['Inter'] font-bold text-lg uppercase tracking-wider rounded-xl transition-all duration-300 shadow-lg cursor-pointer
                   ${
                     isBooked
                       ? "bg-brand-500 text-white cursor-not-allowed opacity-60"
@@ -348,7 +347,7 @@ export default function ClassDetailsPageLayout({
                 <button
                   onClick={handleFavoriteToggle}
                   disabled={favLoading}
-                  className={`w-full py-4 border-2 font-['Inter'] font-bold text-sm uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2
+                  className={`w-full py-4 border-2 font-['Inter'] font-bold text-sm uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer
                     ${
                       isFavorite
                         ? "border-red-400 bg-red-500/10 text-red-500 hover:bg-red-500/20"
