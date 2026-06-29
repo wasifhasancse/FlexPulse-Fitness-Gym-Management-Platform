@@ -5,6 +5,7 @@ import WhyChooseUs from "@/components/Home/WhyChooseUs";
 import Testimonials from "@/components/Home/Testimonials";
 import { getFeaturedClass } from "@/lib/api/getClasses";
 import { getForumPosts } from "@/lib/api/getForumPosts";
+import CommunityStats from "@/components/Home/CommunityStats";
 
 export const metadata = {
   title: "Home - FlexPulse",
@@ -41,6 +42,7 @@ export default async function Home() {
       <WhyChooseUs />
       <LatestForumPosts posts={latestPosts} />
       <Testimonials />
+      <CommunityStats/>
     </div>
   );
 }
