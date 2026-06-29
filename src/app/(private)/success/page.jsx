@@ -2,11 +2,11 @@ import { stripe } from "@/lib/stripe";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
-    FaCalendarCheck,
-    FaCheckCircle,
-    FaClock,
-    FaDollarSign,
-    FaUser,
+  FaCalendarCheck,
+  FaCheckCircle,
+  FaClock,
+  FaDollarSign,
+  FaUser,
 } from "react-icons/fa";
 
 export const metadata = {
@@ -43,11 +43,41 @@ export default async function Success({ searchParams, params }) {
     classId,
     userId,
     userName,
+    userEmail,
   } = metadata;
 
-  console.log("Payment Metadata:", metadata);
-
   if (status === "complete") {
+    // transaction routes and transactionCollection
+    // app.post("/api/transaction", async (req, res) => {
+    //   const { userId, classId, sessionId, transactionId, amount } = req.body;
+    //   const activeResult = await ensureUserActive({ userId }, res);
+    //   if (!activeResult.ok) return;
+    //   const transactionData = {
+    //     userId,
+    //     classId,
+    //     sessionId,
+    //     transactionId,
+    //     amount,
+    //   };
+    //   const result = await transactionCollection.insertOne(transactionData);
+    //   res.status(201).json(result);
+    // });
+    // this is backend route, if my payment is successful, I will call this route to store the transaction in the database. I will also check if the user has already booked this class, if not, I will book the class for the user.
+
+    const transactionData = {
+      userId,
+      classId,
+      sessionId: session_id,
+      transactionId: session_id,
+      amount: price,
+    };
+
+    await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/transaction`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(transactionData),
+    });
+
     const checkRes = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/api/checkBooking?userId=${userId}&classId=${classId}`,
     );

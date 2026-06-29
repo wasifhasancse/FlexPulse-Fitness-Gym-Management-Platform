@@ -14,8 +14,9 @@ import { toast } from "@heroui/react";
 
 
 const fetchTransactions = async (token) => {
+
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/transactions`,
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/transaction`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -31,6 +32,12 @@ const fetchTransactions = async (token) => {
 };
 
 const TransactionsHistoryPage = () => {
+ const {
+        data: session,
+        isPending,
+ } = authClient.useSession()
+
+  const userId = session?.user?.id; // Debugging line to check the user ID
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -44,6 +51,8 @@ const TransactionsHistoryPage = () => {
     const loadTransactions = async () => {
       try {
         const { data: token } = await authClient.token();
+        // user data
+        const user = await authClient.user();
         if (!token?.token) {
           throw new Error("Unable to retrieve auth token");
         }
@@ -91,6 +100,7 @@ const TransactionsHistoryPage = () => {
       </div>
     );
   }
+  console.log("Transactions Data:", transactions); // Debugging line to check the transactions data
 
   return (
     <motion.div

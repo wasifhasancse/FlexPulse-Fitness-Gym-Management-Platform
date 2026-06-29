@@ -353,7 +353,7 @@ export default function ClassDetailsPageLayout({
                         : "bg-btn-bg text-btn-text hover:opacity-95 dark:hover:shadow-glow"
                     }`}
                   >
-                    {isBooked ? "✓ Session Already Booked" : "Instant Registration"}
+                    {isBooked ? "✓ Session Already Booked" : "Registration Now"}
                   </button>
                 </form>
 
