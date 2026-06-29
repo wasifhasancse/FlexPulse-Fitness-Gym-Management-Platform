@@ -5,8 +5,7 @@ Members can discover classes, book sessions, save favorites, and join forum disc
 
 ## Live URL
 
-- Client: Add your deployed client URL here
-- Server: Add your deployed server URL here
+- Client: https://flex-pulse-fitness-gym.vercel.app
 
 ## Project Purpose
 
