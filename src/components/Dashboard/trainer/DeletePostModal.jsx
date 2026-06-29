@@ -5,20 +5,33 @@ import { useRouter } from "next/navigation";
 import { toast} from "@heroui/react";
 import { FaTrash } from "react-icons/fa";
 import { deletePostById } from "@/lib/actions/deleteClass";
+import { authClient } from "@/lib/auth-client";
 
 export function DeletePostModal({ post }) {
   const postId = post._id;
   const router = useRouter();
   const handleDelete = async (postId) => {
-    try {
-      const result = await deletePostById(postId);
-      if (result.deletedCount > 0) {
+
+// const result = await deleteClassById(classId);
+      const { data: token } = await authClient.token();
+      const tokenData = token?.token;
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/my-post/${postId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            ...(tokenData && { authorization: `Bearer ${tokenData}` }),
+          },
+        },
+      );
+      const response = await res.json();
+
+      if (response.deletedCount > 0) {
         toast.success("Delete Successfully!");
         router.refresh("/dashboard/trainer/my-posts");
+
       }
-    } catch (error) {
-      toast.error("Delete Failed!");
-    }
   };
   return (
     <AlertDialog>

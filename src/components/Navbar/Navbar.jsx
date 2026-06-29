@@ -173,13 +173,13 @@ export default function Navbar() {
                         <span>Dashboard</span>
                       </Link>
 
-                      <Link
+                      {/* <Link
                         href={`/dashboard/${user?.role}`}
                         className="flex items-center gap-3 w-full px-4 py-2.5 text-sm rounded-xl font-medium text-gray-700 dark:text-gray-200 hover:bg-[#535C91]/10 hover:text-active dark:hover:bg-[#1B1A55]/50 dark:hover:text-[#9290C3] transition-colors"
                       >
                         <FiEdit3 className="w-4 h-4" />
                         <span>Profile Management</span>
-                      </Link>
+                      </Link> */}
 
                       <Link
                         href="#"

@@ -1,13 +1,14 @@
 "use client";
 
+import { authClient } from "@/lib/auth-client";
 import { AlertDialog, Button, toast } from "@heroui/react";
-
 import { FaTrash } from "react-icons/fa";
 
 export function DeleteClassModal({ classes, onDelete }) {
+// Debugging line to check the class ID
   const classId = classes._id;
+
   const handleDelete = async (classId) => {
-    try {
       // const result = await deleteClassById(classId);
       const { data: token } = await authClient.token();
       const tokenData = token?.token;
@@ -22,16 +23,11 @@ export function DeleteClassModal({ classes, onDelete }) {
         },
       );
       const response = await res.json();
-      console.log("Delete Response:", response); // Debugging line to check the response
 
-      if (result.deletedCount > 0) {
+      if (response.deletedCount > 0) {
         toast.success("Delete Successfully!");
-
         onDelete?.();
       }
-    } catch (error) {
-      toast.error("Delete Failed!");
-    }
   };
   return (
     <AlertDialog>
