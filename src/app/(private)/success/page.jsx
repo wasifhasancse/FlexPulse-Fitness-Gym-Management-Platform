@@ -45,7 +45,7 @@ export default async function Success({ searchParams, params }) {
     userName,
     userEmail,
   } = metadata;
-
+console.log("Payment Metadata:", metadata); // Debugging line to check the metadata
   if (status === "complete") {
     // transaction routes and transactionCollection
     // app.post("/api/transaction", async (req, res) => {
@@ -66,6 +66,9 @@ export default async function Success({ searchParams, params }) {
 
     const transactionData = {
       userId,
+      userEmail,
+      userName,
+      className,
       classId,
       sessionId: session_id,
       transactionId: session_id,
@@ -84,7 +87,9 @@ export default async function Success({ searchParams, params }) {
     const { isBooked } = await checkRes.json();
 
     if (!isBooked) {
+      // set a dynamic booking count every booking time increment the booking count by 1, and store it in the database, so that we can show the number of bookings for each class.
       const bookData = {
+        bookingCount: 1, // This will be incremented in the backend
         classId,
         className,
         trainer,
