@@ -25,8 +25,11 @@ export default async function Home() {
   }
 
   try {
-    const postData = await getForumPosts({ limit: 3 });
-    latestPosts = postData?.items || [];
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/featured-forumPost`,
+    );
+    const postData = await response.json();
+    latestPosts = postData || [];
   } catch (err) {
     console.error("Failed to load latest forum posts for homepage", err);
   }
