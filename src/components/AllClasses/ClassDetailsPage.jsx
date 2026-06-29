@@ -283,7 +283,7 @@ export default function ClassDetailsPageLayout({
                     </span>
                   </div>
                   <span className="text-xs font-bold text-foreground bg-brand-500/10 px-2.5 py-1 rounded-md border border-brand-500/5">
-                    {0} / {data.slot} Filled
+                    {data.bookingCount || 0} / {data.slot} Filled
                   </span>
                 </div>
 
