@@ -26,8 +26,11 @@ export default function ClassDetailsPageLayout({
   userId,
   userName,
   userEmail,
+  bookingCountData
 }) {
   const data = propClassData;
+  // Debugging line to check the class data
+
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [favLoading, setFavLoading] = useState(false);
 

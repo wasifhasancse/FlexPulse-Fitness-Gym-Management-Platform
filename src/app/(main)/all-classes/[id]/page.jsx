@@ -1,6 +1,8 @@
 import ClassDetailsPageLayout from "@/components/AllClasses/ClassDetailsPage";
 import { getClassById } from "@/lib/api/getClasses";
+import { auth } from "@/lib/auth";
 import { getUserSession } from "@/lib/core/getSession";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 
@@ -20,15 +22,37 @@ export async function generateMetadata({ params }) {
 
 const ClassDetailsPage = async ({ params }) => {
   const { id } = await params;
-  const user = await getUserSession(); // Debugging line to check the user session
-  console.log("User session:", user);
-console.log(user.status);  // Debugging line to check the user session
+  const user = await getUserSession();
+  const { token } = await auth.api.getToken({ headers: await headers() });
+
 
   if (!user) {
     redirect(`/signin?redirect=/all-classes/${id}`);
   }
 
+// app.get('/api/classBookingCount/:id', verifyToken, async (req, res) => {
+//       const { id } = req.params;
+//       const classDoc = await bookingClassCollection.find({
+//         classId: id,
+//       });
+//       const bookingCount = await classDoc.count();
+//       res.send({ bookingCount: bookingCount || 0 });
+  //     });
+  // get the booking count for the class
+
+  const bookingCountRes = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/classBookingCount/${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  const bookingCountData = await bookingCountRes.json();
+
   const classDetails = await getClassById(id);
+
+  console.log("Class details:", classDetails); // Debugging line to check the fetched class details
 
   let isBooked = false;
   let isFavorite = false;
@@ -55,6 +79,7 @@ console.log(user.status);  // Debugging line to check the user session
         userId={user?.id}
         userName={user?.name}
         userEmail={user?.email}
+        bookingCountData={bookingCountData}
       />
     </div>
   );

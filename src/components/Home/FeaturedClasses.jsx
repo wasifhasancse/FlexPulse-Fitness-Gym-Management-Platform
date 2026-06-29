@@ -6,6 +6,7 @@ import Link from "next/link";
 import { FaUser, FaTag, FaClock, FaCalendarAlt } from "react-icons/fa";
 
 export default function FeaturedClasses({ classes }) {
+  console.log("Featured classes data:", classes); // Debugging line to check the classes prop
   const containerVariants = {
     hidden: {},
     visible: {
