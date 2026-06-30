@@ -89,7 +89,7 @@ export default function AddClassPage() {
       }
     } catch (error) {
       console.error(error);
-      toast.error("Faild to add class");
+      toast.danger("Faild to add class");
     }
   };
 

@@ -52,8 +52,6 @@ const ClassDetailsPage = async ({ params }) => {
 
   const classDetails = await getClassById(id);
 
-  console.log("Class details:", classDetails); // Debugging line to check the fetched class details
-
   let isBooked = false;
   let isFavorite = false;
 
@@ -76,6 +74,7 @@ const ClassDetailsPage = async ({ params }) => {
         classData={classDetails}
         isBooked={isBooked}
         isFavorite={isFavorite}
+        user={user}
         userId={user?.id}
         userName={user?.name}
         userEmail={user?.email}

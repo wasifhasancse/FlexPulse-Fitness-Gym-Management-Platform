@@ -35,7 +35,7 @@ const ManageTrainers = () => {
       const { data: token } = await authClient.token();
 
       if (!token) {
-        toast.error("Authentication failed. Please login again.");
+        toast.danger("Authentication failed. Please login again.");
         setLoading(false);
         return;
       }
@@ -54,7 +54,7 @@ const ManageTrainers = () => {
   const handleDemote = async (trainer) => {
     const { data: token } = await authClient.token();
     if (!token) {
-      toast.error("Authentication failed. Please login again.");
+      toast.danger("Authentication failed. Please login again.");
       return;
     }
 
@@ -64,7 +64,7 @@ const ManageTrainers = () => {
       setTrainers((prev) => prev.filter((t) => t._id !== trainer._id));
       toast.success(`${trainer.name} was demoted to User.`);
     } catch (err) {
-      toast.error("Failed to demote trainer: " + err.message);
+      toast.danger("Failed to demote trainer: " + err.message);
     } finally {
       setActionLoading(null);
     }

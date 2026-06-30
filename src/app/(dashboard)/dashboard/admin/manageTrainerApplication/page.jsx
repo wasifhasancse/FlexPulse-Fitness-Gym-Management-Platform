@@ -107,7 +107,7 @@ const ManageTrainerApplication = () => {
       }
       closeModal();
     } catch (err) {
-      toast.error(`Failed to ${action}: ${err.message}`);
+      toast.danger(`Failed to ${action}: ${err.message}`);
     } finally {
       setActionLoading(false);
     }

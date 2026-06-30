@@ -75,7 +75,7 @@ const ManageClasses = () => {
       );
       toast.success("Class approved successfully.");
     } catch (err) {
-      toast.error("Failed to approve class: " + err.message);
+      toast.danger("Failed to approve class: " + err.message);
     } finally {
       setActionLoading(null);
     }
@@ -92,7 +92,7 @@ const ManageClasses = () => {
       );
       toast.success("Class rejected successfully.");
     } catch (err) {
-      toast.error("Failed to reject class: " + err.message);
+      toast.danger("Failed to reject class: " + err.message);
     } finally {
       setActionLoading(null);
     }
@@ -105,7 +105,7 @@ const ManageClasses = () => {
       toast.success("Class deleted successfully.");
       setClasses((prev) => prev.filter((cls) => cls._id !== classId));
     } catch (err) {
-      toast.error("Failed to delete class: " + err.message);
+      toast.danger("Failed to delete class: " + err.message);
     } finally {
       setActionLoading(null);
     }

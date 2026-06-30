@@ -26,10 +26,13 @@ export default function ClassDetailsPageLayout({
   userId,
   userName,
   userEmail,
-  bookingCountData
+  bookingCountData,
+  user
 }) {
   const data = propClassData;
   // Debugging line to check the class data
+  console.log(user)
+  console.log(user.status, "User status in ClassDetailsPageLayout");
 
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [favLoading, setFavLoading] = useState(false);
@@ -337,9 +340,21 @@ export default function ClassDetailsPageLayout({
 
               {/* Action Form Integrations Trigger Layout */}
               <div className="space-y-3.5 mt-4">
-                <form action={'/api/payment'} method="POST">
+                {user.status === "banned"?(<button
+                    onClick={() => toast.danger("Action restricted by Admin.")}
+                    disabled={isBooked}
+                    className={`w-full py-4 font-bold text-sm uppercase tracking-wider rounded-xl transition-all duration-300 shadow-md cursor-pointer
+                    ${
+                      isBooked
+                        ? "bg-brand-500/20 text-brand-500 cursor-not-allowed border border-brand-500/10 opacity-60"
+                        : "bg-btn-bg text-btn-text hover:opacity-95 dark:hover:shadow-glow"
+                    }`}
+                  >
+                    {isBooked ? "✓ Session Already Booked" : "Registration Now"}
+                  </button>):(<form action={'/api/payment'} method="POST">
                   {/* Hidden metadata bindings */}
                   <input type="hidden" name="price" value={data.price} />
+                  <input type="hidden" name="status" value={user.status} />
                   <input type="hidden" name="trainer" value={data.author} />
                   <input type="hidden" name="classId" value={data._id} />
                   <input type="hidden" name="className" value={data.className} />
@@ -358,7 +373,8 @@ export default function ClassDetailsPageLayout({
                   >
                     {isBooked ? "✓ Session Already Booked" : "Registration Now"}
                   </button>
-                </form>
+                </form>)  }
+
 
                 {/* Theme Calibrated Secondary Bookmark Button Toggle */}
                 <button

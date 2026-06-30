@@ -25,7 +25,7 @@ export default function FavoriteCard({ fav, userId }) {
         router.refresh();
       });
     } catch (error) {
-      toast.error("Failed to remove favorite");
+      toast.danger("Failed to remove favorite");
     }
   };
 

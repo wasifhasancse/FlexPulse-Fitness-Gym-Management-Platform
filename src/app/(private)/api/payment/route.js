@@ -17,6 +17,20 @@ export async function POST(request) {
      const trainer = formData.get("trainer");
     const classId = formData.get("classId");
     const duration = formData.get("duration");
+    const status = formData.get("status");
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "User not authenticated" },
+        { status: 401 },
+      );
+    }
+    if (status === "banned") {
+      return NextResponse.json(
+        { error: "Action restricted by Admin." },
+        { status: 403 },
+      );
+    }
 
     // Create Checkout Sessions from body params.
     // const price = await stripe.prices.retrieve(PRICE_ID);

@@ -91,10 +91,10 @@ const UpdateModal = ({ classes, onUpdated }) => {
         toast.success("Class updated successfully!");
         onUpdated?.();
       } else {
-        toast.error("No changes made!");
+        toast.danger("No changes made!");
       }
     } catch (error) {
-      toast.error("Failed to update class!");
+      toast.danger("Failed to update class!");
     } finally {
       setIsSubmitting(false);
     }

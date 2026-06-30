@@ -114,10 +114,10 @@ export default function ApplyTrainerPage() {
         toast.success("Application submitted successfully!");
         setApplicationStatus("pending");
       } else {
-        toast.error("Failed to submit application. Please try again.");
+        toast.danger("Failed to submit application. Please try again.");
       }
     } catch (err) {
-      toast.error("An error occurred. Please try again.");
+      toast.danger("An error occurred. Please try again.");
       console.error(err);
     } finally {
       setIsSubmitting(false);

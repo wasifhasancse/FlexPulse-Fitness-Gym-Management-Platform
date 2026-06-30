@@ -49,7 +49,7 @@ const ManageForumPosts = () => {
   const handleDelete = async (postId) => {
     const { data: token } = await authClient.token();
     if (!token?.token) {
-      toast.error("Authentication required");
+      toast.danger("Authentication required");
       return;
     }
 
@@ -59,7 +59,7 @@ const ManageForumPosts = () => {
       setPosts((prev) => prev.filter((p) => p._id !== postId));
       toast.success("Post deleted successfully!");
     } catch (err) {
-      toast.error("Failed to delete post: " + (err.message || "Unknown error"));
+      toast.danger("Failed to delete post: " + (err.message || "Unknown error"));
     } finally {
       setActionLoading(null);
     }
@@ -68,7 +68,7 @@ const ManageForumPosts = () => {
   const handleStatusUpdate = async (postId, status) => {
     const { data: token } = await authClient.token();
     if (!token?.token) {
-      toast.error("Authentication required");
+      toast.danger("Authentication required");
       return;
     }
 
@@ -80,7 +80,7 @@ const ManageForumPosts = () => {
       );
       toast.success(`Post ${status} successfully!`);
     } catch (err) {
-      toast.error("Failed to update post status");
+      toast.danger("Failed to update post status");
     } finally {
       setActionLoading(null);
     }

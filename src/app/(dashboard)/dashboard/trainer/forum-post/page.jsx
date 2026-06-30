@@ -49,7 +49,7 @@ export default function CreateForumPostPage() {
       const { data: token } = await authClient.token();
       const tokenData = token?.token;
       if (!token) {
-        toast.error("authentication failed, please login again.");
+        toast.danger("authentication failed, please login again.");
       }
       // const result = await addForumPost(formData, token.token);
       const res = await fetch(
@@ -71,7 +71,7 @@ export default function CreateForumPostPage() {
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to create post. Please try again.");
+      toast.danger("Failed to create post. Please try again.");
     }
   };
 

@@ -31,7 +31,7 @@ export default function ManageUsersPage() {
         const data = await getAllUsers();
         setUsers(data);
       } catch (err) {
-        toast.error("Failed to load users");
+        toast.danger("Failed to load users");
       } finally {
         setLoading(false);
       }
@@ -71,8 +71,8 @@ export default function ManageUsersPage() {
             body: JSON.stringify({ status: "banned" }),
           },
         );
-        // revalidatePath("/dashboard/admin/manageUsers");
         const data = await res.json();
+        // revalidatePath("/dashboard/admin/manageUsers");
         router.refresh();
         if (!res.ok) {
           throw new Error("Failed to block user");
@@ -94,6 +94,7 @@ export default function ManageUsersPage() {
           },
         );
         const data = await res.json();
+        // revalidatePath("/dashboard/admin/manageUsers");
         router.refresh();
         if (!res.ok) {
           throw new Error("Failed to unblock user");
@@ -104,7 +105,7 @@ export default function ManageUsersPage() {
         toast.success("User unblocked!");
       }
     } catch (err) {
-      toast.error("Action failed!");
+      toast.danger("Action failed!");
     } finally {
       setActionLoading(null);
     }
@@ -134,7 +135,7 @@ export default function ManageUsersPage() {
       );
       toast.success(`Role updated to ${newRole}!`);
     } catch (err) {
-      toast.error("Failed to update role!");
+      toast.danger("Failed to update role!");
     } finally {
       setActionLoading(null);
     }

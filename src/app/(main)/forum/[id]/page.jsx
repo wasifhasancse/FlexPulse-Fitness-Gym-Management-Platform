@@ -108,7 +108,7 @@ export default function ForumPostDetailsPage() {
   };
 
   const handleLike = async () => {
-    if (!user) return toast.error("To like this post, please login first!");
+    if (!user) return toast.danger("To like this post, please login first!");
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/api/forum/like`,
@@ -120,13 +120,13 @@ export default function ForumPostDetailsPage() {
       );
       const data = await res.json();
       if (!res.ok) {
-        return toast.error(data?.message || "Like action failed");
+        return toast.danger(data?.message || "Like action failed");
       }
       if (data.liked === true) {
         toast.success("Thank you for liking this post!");
         setIsDisliked(false);
       } else {
-        toast.error("Removed your like from this post.");
+        toast.danger("Removed your like from this post.");
       }
       setIsLiked(data.liked);
       setLikeCount(data.likeCount);
@@ -139,7 +139,7 @@ export default function ForumPostDetailsPage() {
   };
 
   const handleDislike = async () => {
-    if (!user) return toast.error("To dislike this post, please login first!");
+    if (!user) return toast.danger("To dislike this post, please login first!");
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/api/forum/dislike`,
@@ -151,7 +151,7 @@ export default function ForumPostDetailsPage() {
       );
       const data = await res.json();
       if (!res.ok) {
-        return toast.error(data?.message || "Dislike action failed");
+        return toast.danger(data?.message || "Dislike action failed");
       }
 
       setIsDisliked(data.disliked);
@@ -170,7 +170,7 @@ export default function ForumPostDetailsPage() {
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!user)
-      return toast.error("To comment on this post, please login first!");
+      return toast.danger("To comment on this post, please login first!");
     if (!newComment.trim()) return;
     setSubmitting(true);
     try {
@@ -191,7 +191,7 @@ export default function ForumPostDetailsPage() {
       );
       const data = await res.json();
       if (!res.ok) {
-        return toast.error(data?.message || "Comment failed");
+        return toast.danger(data?.message || "Comment failed");
       }
       if (data.success) {
         toast.success("You commented successfully on this post!");
@@ -258,7 +258,7 @@ export default function ForumPostDetailsPage() {
   };
 
   const handleCommentLike = async (commentId, currentLikes) => {
-    if (!user) return toast.error("Please login first!");
+    if (!user) return toast.danger("Please login first!");
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/api/forum/comment/like`,
@@ -270,7 +270,7 @@ export default function ForumPostDetailsPage() {
       );
       const data = await res.json();
       if (!res.ok) {
-        return toast.error(data?.message || "Like action failed");
+        return toast.danger(data?.message || "Like action failed");
       }
       // UI update
       setComments(
@@ -291,7 +291,7 @@ export default function ForumPostDetailsPage() {
   };
 
   const handleCommentDislike = async (commentId) => {
-    if (!user) return toast.error("Please login first!");
+    if (!user) return toast.danger("Please login first!");
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/api/forum/comment/dislike`,
@@ -304,7 +304,7 @@ export default function ForumPostDetailsPage() {
 
       const data = await res.json();
       if (!res.ok) {
-        return toast.error(data?.message || "Dislike action failed");
+        return toast.danger(data?.message || "Dislike action failed");
       }
 
       setComments(
@@ -327,7 +327,7 @@ export default function ForumPostDetailsPage() {
   // Reply Submit
   const handleReplySubmit = async (e, commentId) => {
     e.preventDefault();
-    if (!user) return toast.error("To reply to this comment, please login first!");
+    if (!user) return toast.danger("To reply to this comment, please login first!");
     if (!replyText.trim()) return;
     setSubmitting(true);
     try {
@@ -349,7 +349,7 @@ export default function ForumPostDetailsPage() {
       );
       const data = await res.json();
       if (!res.ok) {
-        return toast.error(data?.message || "Reply failed");
+        return toast.danger(data?.message || "Reply failed");
       }
       if (data.success) {
         // UI update

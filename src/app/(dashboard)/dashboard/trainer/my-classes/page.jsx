@@ -106,7 +106,7 @@ export default function MyClassesPage() {
       }
     } catch (err) {
       console.error(err);
-      toast.error("Failed to load students list");
+      toast.danger("Failed to load students list");
     } finally {
       setStudentsLoading(false);
     }
