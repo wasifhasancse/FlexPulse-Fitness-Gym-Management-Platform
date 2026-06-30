@@ -30,10 +30,6 @@ export default function ClassDetailsPageLayout({
   user
 }) {
   const data = propClassData;
-  // Debugging line to check the class data
-  console.log(user)
-  console.log(user.status, "User status in ClassDetailsPageLayout");
-
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [favLoading, setFavLoading] = useState(false);
 

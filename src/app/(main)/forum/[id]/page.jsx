@@ -773,7 +773,17 @@ export default function ForumPostDetailsPage() {
                       required
                     />
                     <div className="flex justify-end mt-3">
-                      <button
+                      {user.status === "banned"?(<button
+                        onClick={() => toast.danger("Action restricted by Admin.")}
+                        
+                        className={`px-6 py-2 font-['Inter'] font-medium rounded-lg transition-all cursor-pointer ${
+                          newComment.trim() && !submitting
+                            ? "bg-btn-bg text-btn-text hover:opacity-90 shadow-md"
+                            : "bg-[#535C91]/10 dark:bg-[#1b1a55]/60 text-[#535C91]/50 dark:text-[#9290C3]/50 cursor-not-allowed"
+                        }`}
+                      >
+                        {submitting ? "Posting..." : "Post Comment"}
+                      </button>):(<button
                         type="submit"
                         disabled={submitting || !newComment.trim()}
                         className={`px-6 py-2 font-['Inter'] font-medium rounded-lg transition-all cursor-pointer ${
@@ -783,7 +793,8 @@ export default function ForumPostDetailsPage() {
                         }`}
                       >
                         {submitting ? "Posting..." : "Post Comment"}
-                      </button>
+                      </button>)}
+
                     </div>
                   </form>
                 ) : (
