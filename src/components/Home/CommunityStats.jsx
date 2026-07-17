@@ -26,7 +26,7 @@ export default function CommunityStats() {
     {
       id: 4,
       label: 'Open Source Projects',
-      value: '1.6K+',
+      value: '2.6K+',
       icon: <FiGithub className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />,
       description: 'Collaborate on projects that impact the world.'
     }
