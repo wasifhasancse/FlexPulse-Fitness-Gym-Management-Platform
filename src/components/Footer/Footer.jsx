@@ -200,8 +200,8 @@ export default function Footer() {
         {/* Copyright Area */}
         <div className="border-t border-brand-500/15 dark:border-brand-500/30 mt-16 pt-8 flex flex-col sm:flex-row justify-between items-center font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3]/60 gap-4">
           <p>
-            © 2026 FlexPulse Fitness. All Rights Reserved. Empowering your
-            strength.
+            `© ${new Date().getFullYear()} FlexPulse Fitness. All Rights Reserved. Empowering your
+            strength.`
           </p>
           <div className="flex space-x-6">
             <Link href="#" className="hover:text-active transition-colors">
