@@ -19,7 +19,7 @@ export default function CommunityStats() {
     {
       id: 3,
       label: 'Solutions Found',
-      value: '98.4%',
+      value: '98.5%',
       icon: <FiCheckCircle className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />,
       description: 'Our community answers questions in record time.'
     },
