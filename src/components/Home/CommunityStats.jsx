@@ -1,4 +1,4 @@
-import { FiUsers, FiMessageSquare, FiCheckCircle } from 'react-icons/fi';
+import { FiUsers, FiMessageSquare, FiCheckCircle, FiGithub } from 'react-icons/fi';
 
 export default function CommunityStats() {
   const stats = [
@@ -23,6 +23,13 @@ export default function CommunityStats() {
       icon: <FiCheckCircle className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />,
       description: 'Our community answers questions in record time.'
     },
+    {
+      id: 4,
+      label: 'Open Source Projects',
+      value: '1.2K+',
+      icon: <FiGithub className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />,
+      description: 'Collaborate on projects that impact the world.'
+    }
   ];
 
   return (
