@@ -5,8 +5,8 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { admin, jwt } from "better-auth/plugins";
 import { MongoClient } from "mongodb";
 
-const client = new MongoClient(process.env.MONGODB_URI);
-const db = client.db(process.env.MONGODB_DATABASE_NAME);
+const client = new MongoClient(process.env.MONGODB_URI || "mongodb://localhost:27017/flex_pulse");
+const db = client.db(process.env.MONGODB_DATABASE_NAME || "flex_pulse");
 
 export const auth = betterAuth({
   database: mongodbAdapter(db, {
