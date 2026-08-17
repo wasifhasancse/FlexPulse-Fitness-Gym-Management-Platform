@@ -39,44 +39,6 @@ https://flex-pulse-fitness-gym.vercel.app
 - Auth: Better Auth + JWT
 - Payment: Stripe
 
-## Environment Variables
-
-### Client (`flex_pulse/.env`)
-
-- `NEXT_PUBLIC_SERVER_URL`
-- `MONGODB_URI`
-- `MONGODB_DATABASE_NAME`
-- `BETTER_AUTH_URL`
-- `BETTER_AUTH_SECRET`
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
-- `STRIPE_SECRET_KEY`
-- `STRIPE_PRICE_ID`
-
-### Server (`flex_pulse_backend/.env`)
-
-- `PORT`
-- `MONGODB_URI`
-- `NEXT_CLIENT_URL`
-
-## Run Locally
-
-### Client
-
-```bash
-cd flex_pulse
-npm install
-npm run dev
-```
-
-### Server
-
-```bash
-cd flex_pulse_backend
-npm install
-npm run dev
-```
-
 ## NPM Packages Used
 
 ### Client
