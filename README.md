@@ -6,7 +6,9 @@ Members can discover classes, book sessions, save favorites, and join forum disc
 ## Live URL
 
 - Client: https://flex-pulse-fitness-gym.vercel.app
-
+```text
+https://flex-pulse-fitness-gym.vercel.app
+```
 ## Project Purpose
 
 - Provide a role-based gym management platform with a modern UX.
