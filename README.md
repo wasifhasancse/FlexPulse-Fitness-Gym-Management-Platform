@@ -104,6 +104,24 @@ npm run dev
 - mongodb
 - jose-cjs
 
+## Challenges Faced
+
+1. **Complex Role-Based Access Control & Session Sync**
+   - **Challenge:** Managing multi-role access (Member, Trainer, Admin) using Better Auth and backend JWT tokens across Next.js App Router client and server components. Ensuring route protection was reload-safe without flashing unauthorized UI states during initial page hydration.
+   - **Solution:** Implemented unified authentication helpers and custom route wrappers that synchronize session state seamlessly on both Next.js App Router and backend API middleware.
+
+2. **Secure Stripe Payment & Booking State Management**
+   - **Challenge:** Integrating Stripe checkout while preserving database consistency in MongoDB. Preventing double-booking or dangling transaction states if a user interrupted the checkout process.
+   - **Solution:** Designed transaction lifecycle states (pending vs. completed) with atomic MongoDB operations, ensuring user bookings update securely upon verified payment completion.
+
+3. **Performance Optimization for Server-Side Pagination & Dynamic Filtering**
+   - **Challenge:** Combining server-side pagination with dynamic search (by class name) and category filtering across All Classes and Forum pages without triggering excessive refetches or UI desynchronization.
+   - **Solution:** Synced search and filter parameters directly with URL query strings in Next.js, and implemented efficient indexed query pipelines in MongoDB.
+
+4. **Nested Community Forum & Dynamic Interaction Hierarchy**
+   - **Challenge:** Structuring database schemas and UI state for deeply nested comments, replies, and like/dislike metrics while enforcing strict ownership rules (only content owners can edit/delete, while admins moderate).
+   - **Solution:** Built scalable MongoDB document references for hierarchical comments and implemented backend middleware validation to verify ownership before executing write operations.
+
 ## Deployment Checklist
 
 - Use environment variables for all secrets and credentials.
