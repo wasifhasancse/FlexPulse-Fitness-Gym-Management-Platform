@@ -30,47 +30,47 @@
 }
 
 :root {
-  /* Light mode theme colors */
+  /* Light mode theme colors - High-energy athletic aesthetic */
   --bg-color: #ffffff;
-  --text-color: #070F2B;
+  --text-color: #0f172a;
 
-  --primary-color: #9FA1FF;
+  --primary-color: #ff1844;
   --primary-fg: #ffffff;
-  --secondary-color: #535C91;
+  --secondary-color: #475569;
   --secondary-fg: #ffffff;
-  --accent-color: #9FA1FF;
-  --accent-fg: #070F2B;
-  --active-color: #535C91;
-  --btn-bg: #535C91;
+  --accent-color: #ff1844;
+  --accent-fg: #ffffff;
+  --active-color: #ff1844;
+  --btn-bg: #ff1844;
   --btn-text: #ffffff;
 
   /* Brand color scales for light mode */
   --brand-900: #ffffff;
-  --brand-800: #9FA1FF;
-  --brand-500: #535C91;
-  --brand-300: #070F2B;
+  --brand-800: #fff1f2;
+  --brand-500: #e11d48;
+  --brand-300: #0f172a;
 }
 
 .dark {
-  /* Dark mode theme colors - using ONLY the 4 requested colors */
-  --bg-color: #070F2B;
-  --text-color: #9FA1FF;
+  /* Dark mode theme colors - Deep athletic obsidian & neon crimson */
+  --bg-color: #090814;
+  --text-color: #f8fafc;
 
-  --primary-color: #1B1A55;
-  --primary-fg: #9FA1FF;
-  --secondary-color: #535C91;
-  --secondary-fg: #070F2B;
-  --accent-color: #9FA1FF;
-  --accent-fg: #070F2B;
-  --active-color: #9FA1FF;
-  --btn-bg: #9FA1FF;
-  --btn-text: #070F2B;
+  --primary-color: #17152f;
+  --primary-fg: #ff2a55;
+  --secondary-color: #94a3b8;
+  --secondary-fg: #090814;
+  --accent-color: #ff2a55;
+  --accent-fg: #ffffff;
+  --active-color: #ff2a55;
+  --btn-bg: #ff2a55;
+  --btn-text: #ffffff;
 
   /* Brand color scales for dark mode */
-  --brand-900: #070F2B;
-  --brand-800: #1B1A55;
-  --brand-500: #535C91;
-  --brand-300: #9FA1FF;
+  --brand-900: #090814;
+  --brand-800: #15132d;
+  --brand-500: #ff2a55;
+  --brand-300: #f8fafc;
 }
 
 body {
