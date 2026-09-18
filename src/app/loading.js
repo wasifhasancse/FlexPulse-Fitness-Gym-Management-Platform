@@ -1,20 +1,38 @@
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
-
-const loading = () => {
+const Loading = () => {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-white dark:bg-zinc-950">
-      <div className="w-48 sm:w-56">
-        <DotLottieReact
-          src="https://lottie.host/9a1af7d4-17b9-4adc-9ba6-9db3891a8415/nAGVhLu83f.lottie"
-          loop
-          autoplay
-        />
+    <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background px-4 transition-colors duration-300">
+      <div className="relative flex items-center justify-center">
+        {/* Outer glowing spinning ring */}
+        <div className="h-20 w-20 rounded-full border-4 border-brand-500/20 border-t-active animate-spin" />
+        {/* Inner pulsing icon / brand badge */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="h-10 w-10 rounded-full bg-brand-500/10 flex items-center justify-center animate-pulse">
+            <svg
+              className="h-5 w-5 text-active"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2.5}
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
+            </svg>
+          </div>
+        </div>
       </div>
-      <p className="animate-pulse text-sm font-medium text-zinc-400 dark:text-zinc-500">
-        Loading…
-      </p>
+      <div className="flex flex-col items-center gap-1.5 text-center">
+        <p className="font-['Outfit'] text-lg font-bold tracking-tight text-foreground">
+          Flex<span className="text-active">Pulse</span>
+        </p>
+        <p className="animate-pulse text-xs font-medium text-[#535C91] dark:text-[#9290C3]">
+          Loading…
+        </p>
+      </div>
     </div>
   );
 };
 
-export default loading;
+export default Loading;
