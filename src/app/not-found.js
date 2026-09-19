@@ -29,7 +29,7 @@ const NotFound = () => {
         {/* Lottie */}
         <div className="w-full max-w-lg lg:max-w-xl">
           <DotLottieReact
-            src="https://lottie.host/e54ff801-75d7-427f-b50d-67901db86877/SsWcllQCND.lottie"
+            src="/not-found.lottie"
             loop
             autoplay
           />
