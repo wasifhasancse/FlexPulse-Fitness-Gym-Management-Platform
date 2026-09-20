@@ -11,6 +11,8 @@ const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
+import { Toaster } from "react-hot-toast";
+
 export const metadata = {
   title: {
     default: "FlexPulse - Premium Fitness & Gym Platform",
@@ -37,6 +39,7 @@ export default function RootLayout({ children }) {
           <Footer/>
         </HeroUiThemeProvider>
         <Toast.Provider />
+        <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
       </body>
     </html>
   );
