@@ -89,3 +89,32 @@ export const rejectClassByAdmin = (classId, token) => {
 export const deleteClassByAdmin = (classId, token) => {
   return serverMutation(`/api/admin/classes/${classId}`, {}, token, "DELETE");
 };
+
+export const getPublicTrainers = async () => {
+  try {
+    const res = await fetch(`${baseUrl}/api/trainers`);
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (e) {
+    console.error("Failed to load trainers:", e);
+    return [];
+  }
+};
+
+export const submitContact = async (data) => {
+  const res = await fetch(`${baseUrl}/api/contact`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+};
+
+export const submitTrialPass = async (data) => {
+  const res = await fetch(`${baseUrl}/api/trial-pass`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+};
