@@ -132,7 +132,11 @@ export default function Navbar() {
           <div className="flex justify-between items-center h-18">
             
             {/* Left: Professional Athletic Logo */}
-            <Link href="/" className="shrink-0 flex items-center gap-3 group">
+            <Link
+              href="/"
+              onMouseEnter={() => setIsProgramsOpen(false)}
+              className="shrink-0 flex items-center gap-3 group"
+            >
               <div className="relative w-11 h-11 rounded-2xl bg-linear-to-br from-[#1B1A55] to-[#070F2B] p-0.5 shadow-lg group-hover:scale-105 transition-transform duration-300 border border-active/40 flex items-center justify-center overflow-hidden">
                 {/* Glow ring */}
                 <div className="absolute inset-0 bg-linear-to-tr from-active/30 via-transparent to-active/10 opacity-70" />
@@ -182,6 +186,7 @@ export default function Navbar() {
             <div className="hidden lg:flex items-center space-x-1 xl:space-x-2 font-['Inter']">
               <Link
                 href="/"
+                onMouseEnter={() => setIsProgramsOpen(false)}
                 className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
                   isActive("/")
                     ? "text-active bg-active/10"
@@ -194,6 +199,7 @@ export default function Navbar() {
               {/* All Classes separate */}
               <Link
                 href="/all-classes"
+                onMouseEnter={() => setIsProgramsOpen(false)}
                 className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
                   isActive("/all-classes")
                     ? "text-active bg-active/10"
@@ -206,6 +212,7 @@ export default function Navbar() {
               {/* Coaches separate */}
               <Link
                 href="/trainers"
+                onMouseEnter={() => setIsProgramsOpen(false)}
                 className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
                   isActive("/trainers")
                     ? "text-active bg-active/10"
@@ -216,10 +223,14 @@ export default function Navbar() {
               </Link>
 
               {/* Programs Dropdown (Schedule, Facilities, Calculator, Memberships, Community) */}
-              <div className="relative" ref={programsRef}>
+              <div
+                className="relative"
+                ref={programsRef}
+                onMouseEnter={() => setIsProgramsOpen(true)}
+                onMouseLeave={() => setIsProgramsOpen(false)}
+              >
                 <button
-                  onClick={() => setIsProgramsOpen(!isProgramsOpen)}
-                  onMouseEnter={() => setIsProgramsOpen(true)}
+                  onClick={() => setIsProgramsOpen((prev) => !prev)}
                   className={`px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-1.5 transition-all duration-200 cursor-pointer whitespace-nowrap ${
                     isProgramsActive || isProgramsOpen
                       ? "text-active bg-active/10"
@@ -234,43 +245,42 @@ export default function Navbar() {
                   />
                 </button>
 
-                {/* Dropdown Menu */}
+                {/* Dropdown Menu with hit-test bridge */}
                 {isProgramsOpen && (
-                  <div
-                    onMouseLeave={() => setIsProgramsOpen(false)}
-                    className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-[#070F2B] border border-brand-500/25 dark:border-brand-500/35 rounded-3xl shadow-2xl z-50 p-2.5 space-y-1 animate-fadeIn"
-                  >
-                    <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[#535C91] dark:text-[#9290C3]/70 border-b border-brand-500/10">
-                      Explore Programs & Club Hub
+                  <div className="absolute top-full left-0 pt-2 w-80 z-50 animate-fadeIn">
+                    <div className="bg-white dark:bg-[#070F2B] border border-brand-500/25 dark:border-brand-500/35 rounded-3xl shadow-2xl p-2.5 space-y-1">
+                      <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[#535C91] dark:text-[#9290C3]/70 border-b border-brand-500/10">
+                        Explore Programs & Club Hub
+                      </div>
+                      {programDropdownItems.map((item) => {
+                        const Icon = item.icon;
+                        const active = pathname === item.path;
+                        return (
+                          <Link
+                            key={item.path}
+                            href={item.path}
+                            onClick={() => setIsProgramsOpen(false)}
+                            className={`flex items-start gap-3 p-2.5 rounded-2xl transition-all ${
+                              active
+                                ? "bg-active/15 text-active"
+                                : "hover:bg-[#535C91]/10 dark:hover:bg-[#1B1A55]/50 text-foreground"
+                            }`}
+                          >
+                            <div className={`p-2 rounded-xl shrink-0 mt-0.5 ${active ? "bg-active text-white" : "bg-[#535C91]/10 dark:bg-[#1B1A55] text-active"}`}>
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <p className="font-['Outfit'] text-xs font-bold leading-tight">
+                                {item.name}
+                              </p>
+                              <p className="text-[11px] text-[#535C91] dark:text-[#9290C3] mt-0.5 leading-snug">
+                                {item.desc}
+                              </p>
+                            </div>
+                          </Link>
+                        );
+                      })}
                     </div>
-                    {programDropdownItems.map((item) => {
-                      const Icon = item.icon;
-                      const active = pathname === item.path;
-                      return (
-                        <Link
-                          key={item.path}
-                          href={item.path}
-                          onClick={() => setIsProgramsOpen(false)}
-                          className={`flex items-start gap-3 p-2.5 rounded-2xl transition-all ${
-                            active
-                              ? "bg-active/15 text-active"
-                              : "hover:bg-[#535C91]/10 dark:hover:bg-[#1B1A55]/50 text-foreground"
-                          }`}
-                        >
-                          <div className={`p-2 rounded-xl shrink-0 mt-0.5 ${active ? "bg-active text-white" : "bg-[#535C91]/10 dark:bg-[#1B1A55] text-active"}`}>
-                            <Icon className="w-4 h-4" />
-                          </div>
-                          <div>
-                            <p className="font-['Outfit'] text-xs font-bold leading-tight">
-                              {item.name}
-                            </p>
-                            <p className="text-[11px] text-[#535C91] dark:text-[#9290C3] mt-0.5 leading-snug">
-                              {item.desc}
-                            </p>
-                          </div>
-                        </Link>
-                      );
-                    })}
                   </div>
                 )}
               </div>
@@ -278,6 +288,7 @@ export default function Navbar() {
               {/* Contact */}
               <Link
                 href="/contact"
+                onMouseEnter={() => setIsProgramsOpen(false)}
                 className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
                   isActive("/contact")
                     ? "text-active bg-active/10"
@@ -291,6 +302,7 @@ export default function Navbar() {
               {user && (
                 <Link
                   href={`/dashboard/${user?.role}`}
+                  onMouseEnter={() => setIsProgramsOpen(false)}
                   className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
                     isActive(`/dashboard/${user?.role}`)
                       ? "text-active bg-active/10"
@@ -303,7 +315,10 @@ export default function Navbar() {
             </div>
 
             {/* Right Action Bar: Search + Theme + Auth */}
-            <div className="hidden lg:flex items-center space-x-2.5 xl:space-x-3 shrink-0">
+            <div
+              className="hidden lg:flex items-center space-x-2.5 xl:space-x-3 shrink-0"
+              onMouseEnter={() => setIsProgramsOpen(false)}
+            >
               {/* Interactive Search Bar Trigger */}
               <button
                 onClick={() => setIsSearchOpen(true)}
