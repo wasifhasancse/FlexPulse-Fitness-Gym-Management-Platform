@@ -1,4 +1,4 @@
-// feat: kinetic headline slot
+// style: tuned typography watermark
 "use client";
 
 import { useState, useEffect } from "react";
