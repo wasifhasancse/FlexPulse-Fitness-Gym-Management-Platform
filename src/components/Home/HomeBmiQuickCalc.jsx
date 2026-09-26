@@ -1,4 +1,4 @@
-// feat: who gauge
+// feat: tactile steppers
 "use client";
 
 import { useState, useMemo } from "react";
