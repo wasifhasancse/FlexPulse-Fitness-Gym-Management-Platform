@@ -1,4 +1,3 @@
-// feat: bento layout
 "use client";
 
 import { motion } from "framer-motion";
