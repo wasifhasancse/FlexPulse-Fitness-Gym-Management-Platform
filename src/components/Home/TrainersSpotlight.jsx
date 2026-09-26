@@ -1,4 +1,3 @@
-// feat: trainer filters
 "use client";
 
 import { useState, useMemo } from "react";
