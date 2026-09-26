@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   FiActivity,
   FiArrowRight,
@@ -22,6 +23,7 @@ import { submitTrialPass } from "@/lib/api/getClasses";
 import toast from "react-hot-toast";
 
 export default function FitnessCalculatorClient() {
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("bmi"); // 'bmi' | 'macros'
   const [unitSystem, setUnitSystem] = useState("metric"); // 'metric' | 'imperial'
 
@@ -76,6 +78,38 @@ export default function FitnessCalculatorClient() {
   // Macro / Calorie State
   const [activityLevel, setActivityLevel] = useState(1.55); // Moderately Active
   const [goal, setGoal] = useState("maintenance"); // 'loss' | 'maintenance' | 'gain'
+
+  // Pre-load from URL search params (e.g. from homepage quick calculator)
+  useEffect(() => {
+    if (!searchParams) return;
+    const tabParam = searchParams.get("tab");
+    if (tabParam === "macros" || tabParam === "bmi") {
+      setActiveTab(tabParam);
+    }
+    const unitParam = searchParams.get("unit");
+    if (unitParam === "imperial" || unitParam === "metric") {
+      setUnitSystem(unitParam);
+    }
+    const heightParam = searchParams.get("height");
+    if (heightParam) {
+      const numH = Number(heightParam);
+      if (unitParam === "imperial") {
+        setHeightFt(Math.floor(numH / 12));
+        setHeightIn(numH % 12);
+      } else {
+        setHeightCm(numH);
+      }
+    }
+    const weightParam = searchParams.get("weight");
+    if (weightParam) {
+      const numW = Number(weightParam);
+      if (unitParam === "imperial") {
+        setWeightLbs(numW);
+      } else {
+        setWeightKg(numW);
+      }
+    }
+  }, [searchParams]);
 
   // BMI Calculation
   const bmiData = useMemo(() => {
@@ -243,19 +277,21 @@ export default function FitnessCalculatorClient() {
               <div className="flex items-center justify-between border-b border-brand-500/15 pb-4">
                 <h3 className="font-['Outfit'] text-xl font-bold text-foreground">Personal Metrics</h3>
                 {/* Unit toggle */}
-                <div className="flex items-center gap-1 bg-background/80 border border-brand-500/20 rounded-xl p-1">
+                <div className="inline-flex items-center gap-1 bg-background/80 border border-brand-500/20 rounded-xl p-1 shrink-0 whitespace-nowrap select-none">
                   <button
+                    type="button"
                     onClick={() => setUnitSystem("metric")}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      unitSystem === "metric" ? "bg-active text-btn-text" : "text-secondary hover:text-foreground"
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                      unitSystem === "metric" ? "bg-active text-btn-text shadow-xs" : "text-secondary hover:text-foreground"
                     }`}
                   >
                     Metric (cm/kg)
                   </button>
                   <button
+                    type="button"
                     onClick={() => setUnitSystem("imperial")}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      unitSystem === "imperial" ? "bg-active text-btn-text" : "text-secondary hover:text-foreground"
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                      unitSystem === "imperial" ? "bg-active text-btn-text shadow-xs" : "text-secondary hover:text-foreground"
                     }`}
                   >
                     Imperial (ft/lbs)

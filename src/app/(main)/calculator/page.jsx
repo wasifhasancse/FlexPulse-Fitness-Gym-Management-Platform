@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import FitnessCalculatorClient from "@/components/Calculator/FitnessCalculatorClient";
 
 export const metadata = {
@@ -7,5 +8,9 @@ export const metadata = {
 };
 
 export default function CalculatorPage() {
-  return <FitnessCalculatorClient />;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+      <FitnessCalculatorClient />
+    </Suspense>
+  );
 }
