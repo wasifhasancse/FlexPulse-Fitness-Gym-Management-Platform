@@ -1,4 +1,3 @@
-// feat: pricing cards
 "use client";
 
 import { useState } from "react";
