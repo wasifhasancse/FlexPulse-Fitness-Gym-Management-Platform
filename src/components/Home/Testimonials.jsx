@@ -1,4 +1,3 @@
-// feat: carousel layout
 "use client";
 
 import { useState, useEffect } from "react";
