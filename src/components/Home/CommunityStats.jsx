@@ -1,4 +1,3 @@
-// feat: activity ticker
 "use client";
 
 import { useState, useEffect } from "react";
