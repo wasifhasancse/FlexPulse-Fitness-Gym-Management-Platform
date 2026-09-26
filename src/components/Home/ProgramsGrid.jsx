@@ -1,4 +1,3 @@
-// feat: disciplines data
 "use client";
 
 import { useState, useMemo } from "react";
