@@ -1,6 +1,8 @@
 import HeroSection from "@/components/Home/HeroSection";
 import ProgramsGrid from "@/components/Home/ProgramsGrid";
 import FeaturedClasses from "@/components/Home/FeaturedClasses";
+import DailySchedulePreview from "@/components/Home/DailySchedulePreview";
+import FacilitiesShowcase from "@/components/Home/FacilitiesShowcase";
 import HomeBmiQuickCalc from "@/components/Home/HomeBmiQuickCalc";
 import WhyChooseUs from "@/components/Home/WhyChooseUs";
 import TrainersSpotlight from "@/components/Home/TrainersSpotlight";
@@ -9,6 +11,7 @@ import TrialPassBanner from "@/components/Home/TrialPassBanner";
 import LatestForumPosts from "@/components/Home/LatestForumPosts";
 import Testimonials from "@/components/Home/Testimonials";
 import CommunityStats from "@/components/Home/CommunityStats";
+import HomeFaqSection from "@/components/Home/HomeFaqSection";
 import { getFeaturedClass } from "@/lib/api/getClasses";
 
 export const metadata = {
@@ -46,6 +49,8 @@ export default async function Home() {
       <HeroSection />
       <ProgramsGrid />
       <FeaturedClasses classes={featuredClasses} />
+      <DailySchedulePreview />
+      <FacilitiesShowcase />
       <HomeBmiQuickCalc />
       <WhyChooseUs />
       <TrainersSpotlight />
@@ -54,6 +59,7 @@ export default async function Home() {
       <LatestForumPosts posts={latestPosts} />
       <Testimonials />
       <CommunityStats />
+      <HomeFaqSection />
     </div>
   );
 }
