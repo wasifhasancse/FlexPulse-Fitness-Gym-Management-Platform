@@ -41,10 +41,12 @@ export default function Navbar() {
   const dropdownRef = useRef(null);
   const programsRef = useRef(null);
 
-  // Global Ctrl+K / Cmd+K search listener
+  // Global Ctrl+K / Cmd+K / Ctrl+/ search listener
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+      const isK = e.key === "k" || e.key === "K" || e.code === "KeyK";
+      const isSlash = e.key === "/" || e.code === "Slash";
+      if ((e.ctrlKey || e.metaKey) && (isK || isSlash)) {
         e.preventDefault();
         setIsSearchOpen((prev) => !prev);
       }
@@ -323,12 +325,13 @@ export default function Navbar() {
               <button
                 onClick={() => setIsSearchOpen(true)}
                 className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/60 hover:bg-[#535C91]/20 dark:hover:bg-[#1B1A55] border border-brand-500/20 text-xs font-semibold text-[#535C91] dark:text-[#9290C3] transition-all cursor-pointer shadow-xs hover:border-active/40"
-                title="Search classes, trainers, tools (Ctrl+K)"
+                title="Search classes, trainers, tools"
               >
                 <FiSearch className="w-4 h-4 text-active" />
                 <span className="hidden xl:inline">Search...</span>
-                <kbd className="px-1.5 py-0.5 rounded-md bg-background border border-brand-500/20 text-[10px] font-mono font-bold text-foreground/70">
-                  ⌘K
+                <kbd className="inline-flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-md bg-background border border-brand-500/20 text-[10px] font-mono font-bold text-foreground/70 select-none shadow-2xs">
+                  <span className="text-[11px] leading-none">⌘</span>
+                  <span className="leading-none">K</span>
                 </kbd>
               </button>
 
@@ -476,7 +479,10 @@ export default function Navbar() {
               <span className="flex items-center gap-2">
                 <FiSearch className="w-4 h-4 text-active" /> Search classes, coaches, tools...
               </span>
-              <kbd className="px-1.5 py-0.5 rounded bg-background text-[10px] font-mono">⌘K</kbd>
+              <kbd className="inline-flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-md bg-background border border-brand-500/20 text-[10px] font-mono font-bold text-foreground/70 select-none">
+                <span className="text-[11px] leading-none">⌘</span>
+                <span className="leading-none">K</span>
+              </kbd>
             </button>
 
             <Link
