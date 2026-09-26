@@ -1,4 +1,3 @@
-// feat: category filters
 "use client";
 
 import { useState, useMemo } from "react";
