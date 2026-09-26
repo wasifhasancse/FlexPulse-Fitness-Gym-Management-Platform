@@ -12,12 +12,55 @@ import {
   FiRefreshCw,
   FiTarget,
   FiZap,
+  FiCopy,
+  FiCheck,
+  FiShield,
+  FiGift,
 } from "react-icons/fi";
 import { FaDumbbell, FaFireAlt, FaHeartbeat } from "react-icons/fa";
+import { submitTrialPass } from "@/lib/api/getClasses";
+import toast from "react-hot-toast";
 
 export default function FitnessCalculatorClient() {
   const [activeTab, setActiveTab] = useState("bmi"); // 'bmi' | 'macros'
   const [unitSystem, setUnitSystem] = useState("metric"); // 'metric' | 'imperial'
+
+  // VIP Pass State
+  const [passData, setPassData] = useState({ name: "", email: "", phone: "" });
+  const [passLoading, setPassLoading] = useState(false);
+  const [passGeneratedCode, setPassGeneratedCode] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleClaimPass = async (e) => {
+    e.preventDefault();
+    if (!passData.name || !passData.email) {
+      toast.error("Please enter your full name and email.");
+      return;
+    }
+    try {
+      setPassLoading(true);
+      const res = await submitTrialPass(passData);
+      if (res && res.passCode) {
+        setPassGeneratedCode(res.passCode);
+        toast.success("Congratulations! VIP 1-Day Trial Pass Activated.");
+      } else {
+        toast.error(res?.message || "Could not generate pass. Please try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error creating trial pass.");
+    } finally {
+      setPassLoading(false);
+    }
+  };
+
+  const handleCopyCode = () => {
+    if (!passGeneratedCode) return;
+    navigator.clipboard.writeText(passGeneratedCode);
+    setCopied(true);
+    toast.success("Pass code copied to clipboard!");
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   // BMI State
   const [gender, setGender] = useState("male");
@@ -594,6 +637,183 @@ export default function FitnessCalculatorClient() {
             </div>
           </div>
         )}
+
+        {/* Decorative VIP 1-Day Trial Pass Voucher Showcase */}
+        <section id="trial-pass" className="mt-20 pt-16 border-t border-brand-500/20">
+          <div className="relative rounded-3xl bg-linear-to-br from-active/15 via-[#1B1A55]/30 to-[#070F2B] border border-active/35 p-6 sm:p-10 shadow-2xl overflow-hidden">
+            {/* Background ambient lighting */}
+            <div className="absolute top-0 right-1/4 w-80 h-80 bg-active/10 rounded-full blur-[120px] pointer-events-none" />
+
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              
+              {/* Left Ticket Info & Perks (7 cols) */}
+              <div className="lg:col-span-7 space-y-5">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-active text-white text-xs font-bold uppercase tracking-wider shadow-sm">
+                  <FiGift className="w-3.5 h-3.5" />
+                  <span>Complimentary VIP Invitation</span>
+                </div>
+
+                <h3 className="font-['Outfit'] text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight leading-tight">
+                  Test Your New Plan With a <br />
+                  <span className="text-active">Free 1-Day VIP Pass</span>
+                </h3>
+
+                <p className="font-['Inter'] text-sm sm:text-base text-[#535C91] dark:text-[#9290C3] leading-relaxed max-w-xl">
+                  Now that you know your body composition baseline and target calories, test drive your routine at FlexPulse. Enjoy full access to our Olympic weight room, functional turf, any studio group class, and recovery hydro-spa.
+                </p>
+
+                {/* Perforated Ticket Feature Chips */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 font-['Inter'] text-xs">
+                  <div className="p-3 rounded-2xl bg-background/60 border border-brand-500/15 flex items-center gap-2.5">
+                    <FiCheckCircle className="text-active w-4 h-4 shrink-0" />
+                    <span className="font-semibold text-foreground">Olympic Weights</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-background/60 border border-brand-500/15 flex items-center gap-2.5">
+                    <FiCheckCircle className="text-active w-4 h-4 shrink-0" />
+                    <span className="font-semibold text-foreground">1 Group Class</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-background/60 border border-brand-500/15 flex items-center gap-2.5">
+                    <FiCheckCircle className="text-active w-4 h-4 shrink-0" />
+                    <span className="font-semibold text-foreground">InBody 570 Scan</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-background/60 border border-brand-500/15 flex items-center gap-2.5">
+                    <FiCheckCircle className="text-active w-4 h-4 shrink-0" />
+                    <span className="font-semibold text-foreground">Sauna & Recovery</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-background/60 border border-brand-500/15 flex items-center gap-2.5">
+                    <FiCheckCircle className="text-active w-4 h-4 shrink-0" />
+                    <span className="font-semibold text-foreground">Locker & Towel</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-background/60 border border-brand-500/15 flex items-center gap-2.5">
+                    <FiShield className="text-active w-4 h-4 shrink-0" />
+                    <span className="font-semibold text-foreground">No Credit Card</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Ticket Stub / Generator Card (5 cols) */}
+              <div className="lg:col-span-5">
+                <div className="relative rounded-3xl bg-[#070F2B] border-2 border-active/40 p-6 sm:p-8 shadow-2xl space-y-5">
+                  {/* Decorative Ticket Perforation Badge */}
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-0.5 rounded-full bg-active text-white text-[10px] font-mono font-bold uppercase tracking-widest shadow-md">
+                    ALL-ACCESS TICKET
+                  </div>
+
+                  {passGeneratedCode ? (
+                    <div className="text-center space-y-4 py-3">
+                      <div className="w-14 h-14 rounded-full bg-active/20 text-active flex items-center justify-center mx-auto">
+                        <FiCheckCircle className="w-8 h-8" />
+                      </div>
+                      <h4 className="font-['Outfit'] text-2xl font-bold text-white">
+                        Your Pass Is Ready!
+                      </h4>
+                      <p className="text-xs text-gray-300 font-['Inter']">
+                        Show this digital pass code to our reception desk on arrival:
+                      </p>
+
+                      {/* Barcode & Code Box */}
+                      <div className="p-4 rounded-2xl bg-black/70 border border-active/50 space-y-2 select-all">
+                        <div className="font-mono text-3xl font-black text-active tracking-widest">
+                          {passGeneratedCode}
+                        </div>
+                        <div className="text-[10px] text-gray-400 font-mono tracking-widest uppercase">
+                          ||| | | |||| || | || |||| | |||
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleCopyCode}
+                          className="flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+                        >
+                          {copied ? <FiCheck className="w-4 h-4 text-emerald-400" /> : <FiCopy className="w-4 h-4" />}
+                          <span>{copied ? "Copied Code!" : "Copy Pass Code"}</span>
+                        </button>
+                        <Link
+                          href="/schedule"
+                          className="py-3 px-4 rounded-xl bg-active text-white font-bold text-xs flex items-center justify-center transition-all"
+                        >
+                          View Schedule
+                        </Link>
+                      </div>
+
+                      <p className="text-[11px] text-gray-400 font-['Inter']">
+                        Valid for 7 days from today. No hidden commitments.
+                      </p>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleClaimPass} className="space-y-4 font-['Inter']">
+                      <div className="text-center space-y-1">
+                        <h4 className="font-['Outfit'] text-xl sm:text-2xl font-bold text-white">
+                          Claim Digital Pass
+                        </h4>
+                        <p className="text-xs text-gray-400">
+                          Instant confirmation • Generated in 2 seconds
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-300 mb-1.5">
+                          Full Name
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={passData.name}
+                          onChange={(e) => setPassData({ ...passData, name: e.target.value })}
+                          placeholder="e.g. Jordan Miller"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white text-xs sm:text-sm focus:border-active outline-none placeholder-gray-500 transition-all"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-300 mb-1.5">
+                          Email Address
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          value={passData.email}
+                          onChange={(e) => setPassData({ ...passData, email: e.target.value })}
+                          placeholder="jordan@example.com"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white text-xs sm:text-sm focus:border-active outline-none placeholder-gray-500 transition-all"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-300 mb-1.5">
+                          Phone Number (Optional)
+                        </label>
+                        <input
+                          type="tel"
+                          value={passData.phone}
+                          onChange={(e) => setPassData({ ...passData, phone: e.target.value })}
+                          placeholder="+880 1700-000000"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white text-xs sm:text-sm focus:border-active outline-none placeholder-gray-500 transition-all"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={passLoading}
+                        className="w-full py-3.5 rounded-xl bg-active text-white font-bold text-sm shadow-lg hover:opacity-90 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                      >
+                        {passLoading ? (
+                          <span>Activating Pass...</span>
+                        ) : (
+                          <>
+                            <FiZap className="w-4 h-4" />
+                            <span>Activate My VIP Pass</span>
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );

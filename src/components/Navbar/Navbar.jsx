@@ -302,7 +302,7 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Right Action Bar: Search + Theme + Free Day Pass + Auth */}
+            {/* Right Action Bar: Search + Theme + Auth */}
             <div className="hidden lg:flex items-center space-x-2.5 xl:space-x-3 shrink-0">
               {/* Interactive Search Bar Trigger */}
               <button
@@ -318,15 +318,6 @@ export default function Navbar() {
               </button>
 
               <DarkModeSwitch />
-
-              {/* VIP Day Pass Quick CTA */}
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-active/10 hover:bg-active text-active hover:text-white border border-active/30 font-['Inter'] text-xs font-bold transition-all duration-200 whitespace-nowrap shadow-xs"
-              >
-                <FiZap className="w-3.5 h-3.5" />
-                <span>Free Day Pass</span>
-              </Link>
 
               {/* User Auth or Sign In Button */}
               {user ? (
