@@ -15,13 +15,13 @@ import {
 import {
   FiGrid,
   FiLogOut,
-  FiSettings,
   FiSearch,
   FiCalendar,
   FiActivity,
   FiLayers,
-  FiCompass,
   FiZap,
+  FiDollarSign,
+  FiMessageSquare,
 } from "react-icons/fi";
 import DarkModeSwitch from "./DarkModeSwitch";
 import NavSearchModal from "./NavSearchModal";
@@ -74,15 +74,15 @@ export default function Navbar() {
   }
 
   const isActive = (path) => pathname === path;
-  const isProgramsActive = ["/all-classes", "/schedule", "/facilities", "/calculator"].includes(pathname);
+  const isProgramsActive = [
+    "/schedule",
+    "/facilities",
+    "/calculator",
+    "/pricing",
+    "/forum",
+  ].includes(pathname);
 
   const programDropdownItems = [
-    {
-      name: "All Fitness Classes",
-      desc: "50+ strength, HIIT, combat & mobility classes",
-      path: "/all-classes",
-      icon: FiCompass,
-    },
     {
       name: "Weekly Schedule",
       desc: "Live daily class timetable & booking slots",
@@ -101,6 +101,18 @@ export default function Navbar() {
       path: "/calculator",
       icon: FiActivity,
     },
+    {
+      name: "Memberships & Pricing",
+      desc: "Flexible tiers with 20% annual savings",
+      path: "/pricing",
+      icon: FiDollarSign,
+    },
+    {
+      name: "Community Forum",
+      desc: "Ask fitness questions & connect with members",
+      path: "/forum",
+      icon: FiMessageSquare,
+    },
   ];
 
   const onLogout = async () => {
@@ -116,7 +128,7 @@ export default function Navbar() {
   return (
     <>
       <nav className="bg-background/90 backdrop-blur-xl border-b border-brand-500/20 shadow-xs sticky top-0 z-50 transition-colors duration-300">
-        <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="w-11/12 mx-auto">
           <div className="flex justify-between items-center h-18">
             
             {/* Left: Professional Athletic Logo */}
@@ -166,11 +178,11 @@ export default function Navbar() {
               </div>
             </Link>
 
-            {/* Center Desktop Navigation */}
+            {/* Center Desktop Navigation: Home, All Classes, Coaches, Programs ▾, Contact, Dashboard */}
             <div className="hidden lg:flex items-center space-x-1 xl:space-x-2 font-['Inter']">
               <Link
                 href="/"
-                className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
                   isActive("/")
                     ? "text-active bg-active/10"
                     : "text-foreground/85 hover:text-active hover:bg-brand-500/10"
@@ -179,12 +191,36 @@ export default function Navbar() {
                 Home
               </Link>
 
-              {/* Programs Dropdown */}
+              {/* All Classes separate */}
+              <Link
+                href="/all-classes"
+                className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
+                  isActive("/all-classes")
+                    ? "text-active bg-active/10"
+                    : "text-foreground/85 hover:text-active hover:bg-brand-500/10"
+                }`}
+              >
+                All Classes
+              </Link>
+
+              {/* Coaches separate */}
+              <Link
+                href="/trainers"
+                className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
+                  isActive("/trainers")
+                    ? "text-active bg-active/10"
+                    : "text-foreground/85 hover:text-active hover:bg-brand-500/10"
+                }`}
+              >
+                Coaches
+              </Link>
+
+              {/* Programs Dropdown (Schedule, Facilities, Calculator, Memberships, Community) */}
               <div className="relative" ref={programsRef}>
                 <button
                   onClick={() => setIsProgramsOpen(!isProgramsOpen)}
                   onMouseEnter={() => setIsProgramsOpen(true)}
-                  className={`px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-1.5 transition-all duration-200 cursor-pointer ${
+                  className={`px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-1.5 transition-all duration-200 cursor-pointer whitespace-nowrap ${
                     isProgramsActive || isProgramsOpen
                       ? "text-active bg-active/10"
                       : "text-foreground/85 hover:text-active hover:bg-brand-500/10"
@@ -202,10 +238,10 @@ export default function Navbar() {
                 {isProgramsOpen && (
                   <div
                     onMouseLeave={() => setIsProgramsOpen(false)}
-                    className="absolute top-full left-0 mt-2 w-76 bg-white dark:bg-[#070F2B] border border-brand-500/25 dark:border-brand-500/35 rounded-3xl shadow-2xl z-50 p-2 space-y-1 animate-fadeIn"
+                    className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-[#070F2B] border border-brand-500/25 dark:border-brand-500/35 rounded-3xl shadow-2xl z-50 p-2.5 space-y-1 animate-fadeIn"
                   >
                     <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[#535C91] dark:text-[#9290C3]/70 border-b border-brand-500/10">
-                      Explore Training & Tools
+                      Explore Programs & Club Hub
                     </div>
                     {programDropdownItems.map((item) => {
                       const Icon = item.icon;
@@ -239,42 +275,10 @@ export default function Navbar() {
                 )}
               </div>
 
-              <Link
-                href="/trainers"
-                className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                  isActive("/trainers")
-                    ? "text-active bg-active/10"
-                    : "text-foreground/85 hover:text-active hover:bg-brand-500/10"
-                }`}
-              >
-                Coaches
-              </Link>
-
-              <Link
-                href="/pricing"
-                className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                  isActive("/pricing")
-                    ? "text-active bg-active/10"
-                    : "text-foreground/85 hover:text-active hover:bg-brand-500/10"
-                }`}
-              >
-                Memberships
-              </Link>
-
-              <Link
-                href="/forum"
-                className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                  isActive("/forum")
-                    ? "text-active bg-active/10"
-                    : "text-foreground/85 hover:text-active hover:bg-brand-500/10"
-                }`}
-              >
-                Community
-              </Link>
-
+              {/* Contact */}
               <Link
                 href="/contact"
-                className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
                   isActive("/contact")
                     ? "text-active bg-active/10"
                     : "text-foreground/85 hover:text-active hover:bg-brand-500/10"
@@ -283,10 +287,11 @@ export default function Navbar() {
                 Contact
               </Link>
 
+              {/* Dashboard if logged in */}
               {user && (
                 <Link
                   href={`/dashboard/${user?.role}`}
-                  className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                  className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
                     isActive(`/dashboard/${user?.role}`)
                       ? "text-active bg-active/10"
                       : "text-foreground/85 hover:text-active hover:bg-brand-500/10"
@@ -297,8 +302,8 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Right Action Bar: Search + Theme + VIP Pass / Auth */}
-            <div className="hidden lg:flex items-center space-x-3">
+            {/* Right Action Bar: Search + Theme + Free Day Pass + Auth */}
+            <div className="hidden lg:flex items-center space-x-2.5 xl:space-x-3 shrink-0">
               {/* Interactive Search Bar Trigger */}
               <button
                 onClick={() => setIsSearchOpen(true)}
@@ -317,7 +322,7 @@ export default function Navbar() {
               {/* VIP Day Pass Quick CTA */}
               <Link
                 href="/contact"
-                className="hidden xl:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-brand-800/30 border border-active/30 text-active hover:bg-active hover:text-white font-['Inter'] text-xs font-bold transition-all duration-200"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-active/10 hover:bg-active text-active hover:text-white border border-active/30 font-['Inter'] text-xs font-bold transition-all duration-200 whitespace-nowrap shadow-xs"
               >
                 <FiZap className="w-3.5 h-3.5" />
                 <span>Free Day Pass</span>
@@ -329,12 +334,12 @@ export default function Navbar() {
                   {/* Profile Pill Trigger */}
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full bg-[#535C91]/15 dark:bg-[#1B1A55]/80 text-foreground font-semibold text-xs transition-all hover:bg-[#535C91]/25 dark:hover:bg-[#1B1A55] cursor-pointer border border-[#535C91]/20 dark:border-brand-500/20"
+                    className="flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full bg-[#535C91]/15 dark:bg-[#1B1A55]/80 text-foreground font-semibold text-xs transition-all hover:bg-[#535C91]/25 dark:hover:bg-[#1B1A55] cursor-pointer border border-[#535C91]/20 dark:border-brand-500/20 shrink-0"
                   >
                     {user.image ? (
                       <Image
                         src={user.image}
-                        alt={user.name}
+                        alt={user.name || "User"}
                         width={28}
                         height={28}
                         className="rounded-full object-cover border border-active/30"
@@ -342,13 +347,13 @@ export default function Navbar() {
                     ) : (
                       <FaUserCircle className="w-7 h-7 text-active" />
                     )}
-                    <span className="font-['Inter'] max-w-24 truncate">
+                    <span className="font-['Inter'] whitespace-nowrap">
                       {user.name ? user.name.split(" ")[0] : "Account"}
                     </span>
                     {isProfileOpen ? (
-                      <FaChevronUp className="w-3 h-3 text-active" />
+                      <FaChevronUp className="w-3 h-3 text-active shrink-0" />
                     ) : (
-                      <FaChevronDown className="w-3 h-3 text-active" />
+                      <FaChevronDown className="w-3 h-3 text-active shrink-0" />
                     )}
                   </button>
 
@@ -359,7 +364,7 @@ export default function Navbar() {
                         {user.image ? (
                           <Image
                             src={user.image}
-                            alt={user.name}
+                            alt={user.name || "User"}
                             width={46}
                             height={46}
                             className="rounded-full object-cover border border-active/30"
@@ -453,7 +458,7 @@ export default function Navbar() {
             isOpen ? "max-h-[85vh] opacity-100" : "max-h-0 opacity-0"
           } bg-background border-t border-brand-500/20 overflow-y-auto`}
         >
-          <div className="px-5 pt-3 pb-6 space-y-2 font-['Inter']">
+          <div className="w-11/12 mx-auto pt-3 pb-6 space-y-2 font-['Inter']">
             {/* Mobile Quick Search Input Trigger */}
             <button
               onClick={() => {
@@ -476,6 +481,26 @@ export default function Navbar() {
               }`}
             >
               Home
+            </Link>
+
+            <Link
+              href="/all-classes"
+              onClick={() => setIsOpen(false)}
+              className={`block text-sm font-semibold py-2.5 px-3.5 rounded-xl transition-colors ${
+                isActive("/all-classes") ? "bg-active text-white" : "text-foreground hover:bg-brand-500/10"
+              }`}
+            >
+              All Classes
+            </Link>
+
+            <Link
+              href="/trainers"
+              onClick={() => setIsOpen(false)}
+              className={`block text-sm font-semibold py-2.5 px-3.5 rounded-xl transition-colors ${
+                isActive("/trainers") ? "bg-active text-white" : "text-foreground hover:bg-brand-500/10"
+              }`}
+            >
+              Master Coaches
             </Link>
 
             {/* Mobile Programs Accordion */}
@@ -510,36 +535,6 @@ export default function Navbar() {
             </div>
 
             <Link
-              href="/trainers"
-              onClick={() => setIsOpen(false)}
-              className={`block text-sm font-semibold py-2.5 px-3.5 rounded-xl transition-colors ${
-                isActive("/trainers") ? "bg-active text-white" : "text-foreground hover:bg-brand-500/10"
-              }`}
-            >
-              Master Coaches
-            </Link>
-
-            <Link
-              href="/pricing"
-              onClick={() => setIsOpen(false)}
-              className={`block text-sm font-semibold py-2.5 px-3.5 rounded-xl transition-colors ${
-                isActive("/pricing") ? "bg-active text-white" : "text-foreground hover:bg-brand-500/10"
-              }`}
-            >
-              Memberships & Pricing
-            </Link>
-
-            <Link
-              href="/forum"
-              onClick={() => setIsOpen(false)}
-              className={`block text-sm font-semibold py-2.5 px-3.5 rounded-xl transition-colors ${
-                isActive("/forum") ? "bg-active text-white" : "text-foreground hover:bg-brand-500/10"
-              }`}
-            >
-              Community Forum
-            </Link>
-
-            <Link
               href="/contact"
               onClick={() => setIsOpen(false)}
               className={`block text-sm font-semibold py-2.5 px-3.5 rounded-xl transition-colors ${
@@ -549,6 +544,18 @@ export default function Navbar() {
               Contact & VIP Pass
             </Link>
 
+            {user && (
+              <Link
+                href={`/dashboard/${user?.role}`}
+                onClick={() => setIsOpen(false)}
+                className={`block text-sm font-semibold py-2.5 px-3.5 rounded-xl transition-colors ${
+                  isActive(`/dashboard/${user?.role}`) ? "bg-active text-white" : "text-foreground hover:bg-brand-500/10"
+                }`}
+              >
+                Member Dashboard
+              </Link>
+            )}
+
             {/* Mobile User Profile & CTAs */}
             <div className="border-t border-brand-500/20 pt-4 mt-3">
               {user ? (
@@ -557,7 +564,7 @@ export default function Navbar() {
                     {user.image ? (
                       <Image
                         src={user.image}
-                        alt={user.name}
+                        alt={user.name || "User"}
                         width={36}
                         height={36}
                         className="rounded-full object-cover border border-active/40"
