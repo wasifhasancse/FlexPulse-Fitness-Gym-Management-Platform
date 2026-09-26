@@ -1,9 +1,10 @@
 "use client";
-import { authClient } from "@/lib/auth-client";
+
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { authClient } from "@/lib/auth-client";
 import {
   FaBars,
   FaChevronDown,
@@ -12,27 +13,54 @@ import {
   FaUserCircle,
 } from "react-icons/fa";
 import {
-  FiEdit3,
   FiGrid,
   FiLogOut,
-  FiSettings
+  FiSettings,
+  FiSearch,
+  FiCalendar,
+  FiActivity,
+  FiLayers,
+  FiCompass,
+  FiZap,
 } from "react-icons/fi";
 import DarkModeSwitch from "./DarkModeSwitch";
+import NavSearchModal from "./NavSearchModal";
 
 export default function Navbar() {
   const { data: session } = authClient.useSession();
   const user = session?.user;
   const router = useRouter();
+  const pathname = usePathname();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const pathname = usePathname();
-  const dropdownRef = useRef(null);
+  const [isProgramsOpen, setIsProgramsOpen] = useState(false);
+  const [isMobileProgramsOpen, setIsMobileProgramsOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  // Click outside listener for profile dropdown
+  const dropdownRef = useRef(null);
+  const programsRef = useRef(null);
+
+  // Global Ctrl+K / Cmd+K search listener
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setIsSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // Click outside listener for profile and programs dropdown
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsProfileOpen(false);
+      }
+      if (programsRef.current && !programsRef.current.contains(event.target)) {
+        setIsProgramsOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -46,22 +74,34 @@ export default function Navbar() {
   }
 
   const isActive = (path) => pathname === path;
+  const isProgramsActive = ["/all-classes", "/schedule", "/facilities", "/calculator"].includes(pathname);
 
-  const navItems = [
-    { name: "Home", path: "/" },
-    { name: "Classes", path: "/all-classes" },
-    { name: "Schedule", path: "/schedule" },
-    { name: "Trainers", path: "/trainers" },
-    { name: "Pricing", path: "/pricing" },
-    { name: "Facilities", path: "/facilities" },
-    { name: "Calculator", path: "/calculator" },
-    { name: "Contact", path: "/contact" },
-    { name: "Community", path: "/forum" },
+  const programDropdownItems = [
+    {
+      name: "All Fitness Classes",
+      desc: "50+ strength, HIIT, combat & mobility classes",
+      path: "/all-classes",
+      icon: FiCompass,
+    },
+    {
+      name: "Weekly Schedule",
+      desc: "Live daily class timetable & booking slots",
+      path: "/schedule",
+      icon: FiCalendar,
+    },
+    {
+      name: "Club Facilities",
+      desc: "Olympic free weights, turf & recovery spa",
+      path: "/facilities",
+      icon: FiLayers,
+    },
+    {
+      name: "BMI & Macro Calculator",
+      desc: "Body composition gauge & target nutrition",
+      path: "/calculator",
+      icon: FiActivity,
+    },
   ];
-
-  if (user) {
-    navItems.push({ name: "Dashboard", path: `/dashboard/${user?.role}` });
-  }
 
   const onLogout = async () => {
     await authClient.signOut({
@@ -74,258 +114,511 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-background/85 backdrop-blur-md border-b border-brand-500/25 shadow-sm sticky top-0 z-50 transition-colors duration-300">
-      <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo & Website Name */}
-          <Link href="/" className="shrink-0 flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-[#9290C3] to-[#535C91] dark:from-[#1B1A55] dark:to-[#070F2B] flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300 border border-brand-500/20">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="h-5 w-5 text-active"
-              >
-                <path d="M6 5H4v14h2V5zm14 0h-2v14h2V5zm-4 6H8v2h8v-2zm-1-4h-2v10h2V7zm-8 0H5v10h2V7z" />
-              </svg>
-            </div>
-            <span className="font-['Outfit'] text-xl sm:text-2xl font-bold tracking-tight text-foreground group-hover:opacity-90 transition-opacity">
-              Flex<span className="text-active">Pulse</span>
-            </span>
-          </Link>
+    <>
+      <nav className="bg-background/90 backdrop-blur-xl border-b border-brand-500/20 shadow-xs sticky top-0 z-50 transition-colors duration-300">
+        <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <div className="flex justify-between items-center h-18">
+            
+            {/* Left: Professional Athletic Logo */}
+            <Link href="/" className="shrink-0 flex items-center gap-3 group">
+              <div className="relative w-11 h-11 rounded-2xl bg-linear-to-br from-[#1B1A55] to-[#070F2B] p-0.5 shadow-lg group-hover:scale-105 transition-transform duration-300 border border-active/40 flex items-center justify-center overflow-hidden">
+                {/* Glow ring */}
+                <div className="absolute inset-0 bg-linear-to-tr from-active/30 via-transparent to-active/10 opacity-70" />
+                
+                {/* Kinetic Pulse Emblem SVG */}
+                <svg
+                  viewBox="0 0 32 32"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-7 h-7 relative z-10"
+                >
+                  <defs>
+                    <linearGradient id="fpLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#ff2a55" />
+                      <stop offset="100%" stopColor="#ff0336" />
+                    </linearGradient>
+                  </defs>
+                  {/* Outer Barbell Plates */}
+                  <rect x="3" y="10" width="3" height="12" rx="1.5" fill="url(#fpLogoGrad)" />
+                  <rect x="7" y="12" width="2.5" height="8" rx="1.2" fill="url(#fpLogoGrad)" opacity="0.85" />
+                  <rect x="26" y="10" width="3" height="12" rx="1.5" fill="url(#fpLogoGrad)" />
+                  <rect x="22.5" y="12" width="2.5" height="8" rx="1.2" fill="url(#fpLogoGrad)" opacity="0.85" />
+                  {/* Central Bar & Kinetic Energy Pulse Line */}
+                  <path
+                    d="M9.5 16H12.5L14.5 10.5L17.5 21.5L19.5 16H22.5"
+                    stroke="url(#fpLogoGrad)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  {/* Center Energy Core */}
+                  <circle cx="16" cy="16" r="1.5" fill="#ffffff" />
+                </svg>
+              </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-3.5 xl:space-x-5">
-            {navItems.map((item) => (
+              <div>
+                <span className="font-['Outfit'] text-2xl font-black tracking-tight text-foreground flex items-center leading-none">
+                  FLEX<span className="text-active tracking-normal">PULSE</span>
+                </span>
+                <span className="font-['Inter'] text-[9px] tracking-[0.22em] uppercase font-bold text-[#535C91] dark:text-[#9290C3]/75 block mt-1">
+                  Athletic Club
+                </span>
+              </div>
+            </Link>
+
+            {/* Center Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-1 xl:space-x-2 font-['Inter']">
               <Link
-                key={item.path}
-                href={item.path}
-                className={`font-['Inter'] text-xs xl:text-sm font-semibold transition-colors duration-200 whitespace-nowrap ${
-                  isActive(item.path)
-                    ? "text-active border-b-2 border-active pb-1"
-                    : "text-foreground/80 hover:text-active"
+                href="/"
+                className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                  isActive("/")
+                    ? "text-active bg-active/10"
+                    : "text-foreground/85 hover:text-active hover:bg-brand-500/10"
                 }`}
               >
-                {item.name}
+                Home
               </Link>
-            ))}
-          </div>
 
-          {/* Right side: Theme Toggle + Auth */}
-          <div className="hidden lg:flex items-center space-x-4">
-            <DarkModeSwitch />
-
-            {user ? (
-              <div className="relative" ref={dropdownRef}>
-                {/* Profile Pill Trigger */}
+              {/* Programs Dropdown */}
+              <div className="relative" ref={programsRef}>
                 <button
-                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                   className="flex items-center gap-2.5 pl-1.5 pr-3.5 py-1.5 rounded-full bg-[#535C91]/15 dark:bg-[#1B1A55]/80 text-active dark:text-[#9290C3] font-medium text-sm transition-all hover:bg-[#535C91]/25 dark:hover:bg-[#1B1A55] cursor-pointer border border-[#535C91]/20 dark:border-brand-500/20"
+                  onClick={() => setIsProgramsOpen(!isProgramsOpen)}
+                  onMouseEnter={() => setIsProgramsOpen(true)}
+                  className={`px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-1.5 transition-all duration-200 cursor-pointer ${
+                    isProgramsActive || isProgramsOpen
+                      ? "text-active bg-active/10"
+                      : "text-foreground/85 hover:text-active hover:bg-brand-500/10"
+                  }`}
                 >
-                  {user.image ? (
-                    <Image
-                      src={user.image}
-                      alt={user.name}
-                      width={30}
-                      height={30}
-                      className="rounded-full object-cover border border-active/30"
-                    />
-                  ) : (
-                    <FaUserCircle className="w-7.5 h-7.5 text-active dark:text-[#9290C3]" />
-                  )}
-                  <span className="font-['Inter'] font-semibold">
-                    {user.name ? user.name.split(" ")[0] : "User"}
-                  </span>
-                  {isProfileOpen ? (
-                    <FaChevronUp className="w-3.5 h-3.5 text-active dark:text-[#9290C3]" />
-                  ) : (
-                    <FaChevronDown className="w-3.5 h-3.5 text-active dark:text-[#9290C3]" />
-                  )}
+                  <span>Programs</span>
+                  <FaChevronDown
+                    className={`w-3 h-3 transition-transform duration-200 ${
+                      isProgramsOpen ? "rotate-180 text-active" : ""
+                    }`}
+                  />
                 </button>
 
-                {/* Profile Dropdown Menu */}
-                {isProfileOpen && (
-                  <div className="absolute right-0 mt-2.5 w-80 bg-white dark:bg-[#070F2B] border border-brand-500/20 dark:border-brand-500/30 rounded-[20px] shadow-xl z-50 overflow-hidden py-1 transition-all">
-                    {/* User Info Container */}
-                    <div className="bg-[#535C91]/5 dark:bg-[#1B1A55]/40 m-3 p-4 rounded-2xl flex items-center gap-3">
-                      {user.image ? (
-                        <Image
-                          src={user.image}
-                          alt={user.name}
-                          width={52}
-                          height={52}
-                          className="rounded-full object-cover border border-active/20"
-                        />
-                      ) : (
-                        <FaUserCircle className="w-13 h-13 text-active dark:text-[#9290C3]" />
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <p className="font-['Inter'] font-bold text-gray-900 dark:text-white text-base truncate">
-                          {user.name}
-                        </p>
-                        <p className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3] truncate">
-                          {user.email}
-                        </p>
-                      </div>
+                {/* Dropdown Menu */}
+                {isProgramsOpen && (
+                  <div
+                    onMouseLeave={() => setIsProgramsOpen(false)}
+                    className="absolute top-full left-0 mt-2 w-76 bg-white dark:bg-[#070F2B] border border-brand-500/25 dark:border-brand-500/35 rounded-3xl shadow-2xl z-50 p-2 space-y-1 animate-fadeIn"
+                  >
+                    <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[#535C91] dark:text-[#9290C3]/70 border-b border-brand-500/10">
+                      Explore Training & Tools
                     </div>
-
-                    {/* Menu Options */}
-                    <div className="px-2 pb-2 space-y-1">
-                      <Link
-                        href={`/dashboard/${user?.role}`}
-                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm rounded-xl font-medium text-gray-700 dark:text-gray-200 hover:bg-[#535C91]/10 hover:text-active dark:hover:bg-[#1B1A55]/50 dark:hover:text-[#9290C3] transition-colors"
-                      >
-                        <FiGrid className="w-4 h-4" />
-                        <span>Dashboard</span>
-                      </Link>
-
-                      {/* <Link
-                        href={`/dashboard/${user?.role}`}
-                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm rounded-xl font-medium text-gray-700 dark:text-gray-200 hover:bg-[#535C91]/10 hover:text-active dark:hover:bg-[#1B1A55]/50 dark:hover:text-[#9290C3] transition-colors"
-                      >
-                        <FiEdit3 className="w-4 h-4" />
-                        <span>Profile Management</span>
-                      </Link> */}
-
-                      <Link
-                        href="#"
-                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm rounded-xl font-medium text-gray-700 dark:text-gray-200 hover:bg-[#535C91]/10 hover:text-active dark:hover:bg-[#1B1A55]/50 dark:hover:text-[#9290C3] transition-colors"
-                      >
-                        <FiSettings className="w-4 h-4" />
-                        <span>Settings</span>
-                      </Link>
-
-                      <div className="border-t border-brand-500/10 dark:border-brand-800/40 my-2"></div>
-
-                      <button
-                        onClick={onLogout}
-                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm rounded-xl font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors cursor-pointer"
-                      >
-                        <FiLogOut className="w-4 h-4" />
-                        <span>Sign Out</span>
-                      </button>
-                    </div>
+                    {programDropdownItems.map((item) => {
+                      const Icon = item.icon;
+                      const active = pathname === item.path;
+                      return (
+                        <Link
+                          key={item.path}
+                          href={item.path}
+                          onClick={() => setIsProgramsOpen(false)}
+                          className={`flex items-start gap-3 p-2.5 rounded-2xl transition-all ${
+                            active
+                              ? "bg-active/15 text-active"
+                              : "hover:bg-[#535C91]/10 dark:hover:bg-[#1B1A55]/50 text-foreground"
+                          }`}
+                        >
+                          <div className={`p-2 rounded-xl shrink-0 mt-0.5 ${active ? "bg-active text-white" : "bg-[#535C91]/10 dark:bg-[#1B1A55] text-active"}`}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <p className="font-['Outfit'] text-xs font-bold leading-tight">
+                              {item.name}
+                            </p>
+                            <p className="text-[11px] text-[#535C91] dark:text-[#9290C3] mt-0.5 leading-snug">
+                              {item.desc}
+                            </p>
+                          </div>
+                        </Link>
+                      );
+                    })}
                   </div>
                 )}
               </div>
-            ) : (
-              <>
-                <Link
-                  href="/signin"
-                  className="font-['Inter'] text-sm font-medium text-foreground hover:text-brand-300 transition-colors"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/signup"
-                  className="font-['Inter'] text-sm font-bold bg-btn-bg text-btn-text px-6 py-2 rounded-full border border-brand-500/20 hover:opacity-90 transition-all duration-300"
-                >
-                  Sign Up
-                </Link>
-              </>
-            )}
-          </div>
 
-          {/* Mobile menu button */}
-          <div className="lg:hidden flex items-center space-x-2">
-            <DarkModeSwitch />
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-foreground hover:text-brand-300 focus:outline-none"
-            >
-              {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-            </button>
+              <Link
+                href="/trainers"
+                className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                  isActive("/trainers")
+                    ? "text-active bg-active/10"
+                    : "text-foreground/85 hover:text-active hover:bg-brand-500/10"
+                }`}
+              >
+                Coaches
+              </Link>
+
+              <Link
+                href="/pricing"
+                className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                  isActive("/pricing")
+                    ? "text-active bg-active/10"
+                    : "text-foreground/85 hover:text-active hover:bg-brand-500/10"
+                }`}
+              >
+                Memberships
+              </Link>
+
+              <Link
+                href="/forum"
+                className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                  isActive("/forum")
+                    ? "text-active bg-active/10"
+                    : "text-foreground/85 hover:text-active hover:bg-brand-500/10"
+                }`}
+              >
+                Community
+              </Link>
+
+              <Link
+                href="/contact"
+                className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                  isActive("/contact")
+                    ? "text-active bg-active/10"
+                    : "text-foreground/85 hover:text-active hover:bg-brand-500/10"
+                }`}
+              >
+                Contact
+              </Link>
+
+              {user && (
+                <Link
+                  href={`/dashboard/${user?.role}`}
+                  className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                    isActive(`/dashboard/${user?.role}`)
+                      ? "text-active bg-active/10"
+                      : "text-foreground/85 hover:text-active hover:bg-brand-500/10"
+                  }`}
+                >
+                  Dashboard
+                </Link>
+              )}
+            </div>
+
+            {/* Right Action Bar: Search + Theme + VIP Pass / Auth */}
+            <div className="hidden lg:flex items-center space-x-3">
+              {/* Interactive Search Bar Trigger */}
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/60 hover:bg-[#535C91]/20 dark:hover:bg-[#1B1A55] border border-brand-500/20 text-xs font-semibold text-[#535C91] dark:text-[#9290C3] transition-all cursor-pointer shadow-xs hover:border-active/40"
+                title="Search classes, trainers, tools (Ctrl+K)"
+              >
+                <FiSearch className="w-4 h-4 text-active" />
+                <span className="hidden xl:inline">Search...</span>
+                <kbd className="px-1.5 py-0.5 rounded-md bg-background border border-brand-500/20 text-[10px] font-mono font-bold text-foreground/70">
+                  ⌘K
+                </kbd>
+              </button>
+
+              <DarkModeSwitch />
+
+              {/* VIP Day Pass Quick CTA */}
+              <Link
+                href="/contact"
+                className="hidden xl:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-brand-800/30 border border-active/30 text-active hover:bg-active hover:text-white font-['Inter'] text-xs font-bold transition-all duration-200"
+              >
+                <FiZap className="w-3.5 h-3.5" />
+                <span>Free Day Pass</span>
+              </Link>
+
+              {/* User Auth or Sign In Button */}
+              {user ? (
+                <div className="relative" ref={dropdownRef}>
+                  {/* Profile Pill Trigger */}
+                  <button
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className="flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full bg-[#535C91]/15 dark:bg-[#1B1A55]/80 text-foreground font-semibold text-xs transition-all hover:bg-[#535C91]/25 dark:hover:bg-[#1B1A55] cursor-pointer border border-[#535C91]/20 dark:border-brand-500/20"
+                  >
+                    {user.image ? (
+                      <Image
+                        src={user.image}
+                        alt={user.name}
+                        width={28}
+                        height={28}
+                        className="rounded-full object-cover border border-active/30"
+                      />
+                    ) : (
+                      <FaUserCircle className="w-7 h-7 text-active" />
+                    )}
+                    <span className="font-['Inter'] max-w-24 truncate">
+                      {user.name ? user.name.split(" ")[0] : "Account"}
+                    </span>
+                    {isProfileOpen ? (
+                      <FaChevronUp className="w-3 h-3 text-active" />
+                    ) : (
+                      <FaChevronDown className="w-3 h-3 text-active" />
+                    )}
+                  </button>
+
+                  {/* Profile Dropdown Menu */}
+                  {isProfileOpen && (
+                    <div className="absolute right-0 mt-2.5 w-76 bg-white dark:bg-[#070F2B] border border-brand-500/20 dark:border-brand-500/30 rounded-3xl shadow-2xl z-50 overflow-hidden py-1 transition-all">
+                      <div className="bg-[#535C91]/5 dark:bg-[#1B1A55]/40 m-2.5 p-3.5 rounded-2xl flex items-center gap-3">
+                        {user.image ? (
+                          <Image
+                            src={user.image}
+                            alt={user.name}
+                            width={46}
+                            height={46}
+                            className="rounded-full object-cover border border-active/30"
+                          />
+                        ) : (
+                          <FaUserCircle className="w-11 h-11 text-active" />
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="font-['Inter'] font-bold text-foreground text-sm truncate">
+                            {user.name}
+                          </p>
+                          <p className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3] truncate">
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="px-2 pb-2 space-y-1 font-['Inter'] text-sm">
+                        <Link
+                          href={`/dashboard/${user?.role}`}
+                          onClick={() => setIsProfileOpen(false)}
+                          className="flex items-center gap-3 w-full px-3.5 py-2 text-xs rounded-xl font-medium text-foreground hover:bg-brand-500/15 hover:text-active transition-colors"
+                        >
+                          <FiGrid className="w-4 h-4 text-active" />
+                          <span>Member Dashboard</span>
+                        </Link>
+
+                        <Link
+                          href="/calculator"
+                          onClick={() => setIsProfileOpen(false)}
+                          className="flex items-center gap-3 w-full px-3.5 py-2 text-xs rounded-xl font-medium text-foreground hover:bg-brand-500/15 hover:text-active transition-colors"
+                        >
+                          <FiActivity className="w-4 h-4 text-active" />
+                          <span>My Fitness Baseline</span>
+                        </Link>
+
+                        <div className="border-t border-brand-500/10 my-1.5" />
+
+                        <button
+                          onClick={onLogout}
+                          className="flex items-center gap-3 w-full px-3.5 py-2 text-xs rounded-xl font-semibold text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                        >
+                          <FiLogOut className="w-4 h-4" />
+                          <span>Sign Out</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2 font-['Inter']">
+                  <Link
+                    href="/signin"
+                    className="text-xs font-semibold text-foreground/85 hover:text-active px-3 py-2 rounded-xl hover:bg-brand-500/10 transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="text-xs font-bold bg-btn-bg text-btn-text px-5 py-2.5 rounded-full border border-brand-500/20 shadow-md hover:scale-105 active:scale-95 transition-all duration-300"
+                  >
+                    Join Club
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Header Icons: Search + Theme + Hamburger */}
+            <div className="lg:hidden flex items-center space-x-2">
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                className="p-2 rounded-xl bg-[#535C91]/10 dark:bg-[#1B1A55]/60 text-active"
+                aria-label="Search site"
+              >
+                <FiSearch size={18} />
+              </button>
+              <DarkModeSwitch />
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="p-2 rounded-xl text-foreground hover:text-active hover:bg-brand-500/10 focus:outline-none"
+              >
+                {isOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Navigation Drawer */}
-      <div
-        className={`lg:hidden transition-all duration-300 overflow-hidden ${
-          isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
-        } bg-background border-t border-brand-500/30`}
-      >
-        <div className="px-4 pt-2 pb-4 space-y-2">
-          {navItems.map((item) => (
+        {/* Mobile Navigation Drawer */}
+        <div
+          className={`lg:hidden transition-all duration-300 overflow-hidden ${
+            isOpen ? "max-h-[85vh] opacity-100" : "max-h-0 opacity-0"
+          } bg-background border-t border-brand-500/20 overflow-y-auto`}
+        >
+          <div className="px-5 pt-3 pb-6 space-y-2 font-['Inter']">
+            {/* Mobile Quick Search Input Trigger */}
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                setIsSearchOpen(true);
+              }}
+              className="w-full flex items-center justify-between p-3 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/50 border border-brand-500/20 text-xs text-[#535C91] dark:text-[#9290C3] mb-3"
+            >
+              <span className="flex items-center gap-2">
+                <FiSearch className="w-4 h-4 text-active" /> Search classes, coaches, tools...
+              </span>
+              <kbd className="px-1.5 py-0.5 rounded bg-background text-[10px] font-mono">⌘K</kbd>
+            </button>
+
             <Link
-              key={item.path}
-              href={item.path}
-              className={`block font-['Inter'] text-sm font-medium py-2 px-3 rounded-lg transition-colors ${
-                isActive(item.path)
-                  ? "bg-brand-800 text-active"
-                  : "text-foreground hover:bg-brand-500/20"
+              href="/"
+              onClick={() => setIsOpen(false)}
+              className={`block text-sm font-semibold py-2.5 px-3.5 rounded-xl transition-colors ${
+                isActive("/") ? "bg-active text-white" : "text-foreground hover:bg-brand-500/10"
               }`}
             >
-              {item.name}
+              Home
             </Link>
-          ))}
-          <div className="border-t border-brand-500/30 pt-2 mt-2">
-            {user ? (
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3 px-3 py-2 bg-brand-800/40 rounded-xl">
-                  {user.image ? (
-                    <Image
-                      src={user.image}
-                      alt={user.name}
-                      width={40}
-                      height={40}
-                      className="rounded-full object-cover border-2 border-brand-300"
-                    />
-                  ) : (
-                    <FaUserCircle className="w-10 h-10 text-brand-300" />
-                  )}
-                  <div>
-                    <p className="font-['Inter'] text-sm font-bold text-foreground">
-                      {user.name}
-                    </p>
-                    <p className="font-['Inter'] text-xs text-brand-300 truncate max-w-50">
-                      {user.email}
-                    </p>
+
+            {/* Mobile Programs Accordion */}
+            <div className="rounded-xl border border-brand-500/15 overflow-hidden">
+              <button
+                onClick={() => setIsMobileProgramsOpen(!isMobileProgramsOpen)}
+                className="w-full flex items-center justify-between py-2.5 px-3.5 text-sm font-semibold text-foreground hover:text-active"
+              >
+                <span>Programs & Tools</span>
+                <FaChevronDown
+                  className={`w-3 h-3 transition-transform ${isMobileProgramsOpen ? "rotate-180 text-active" : ""}`}
+                />
+              </button>
+              {isMobileProgramsOpen && (
+                <div className="p-2 space-y-1 bg-[#535C91]/5 dark:bg-[#1B1A55]/30 border-t border-brand-500/10">
+                  {programDropdownItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.path}
+                        href={item.path}
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center gap-2.5 p-2 rounded-lg text-xs font-medium text-foreground/90 hover:text-active hover:bg-brand-500/10"
+                      >
+                        <Icon className="w-3.5 h-3.5 text-active" />
+                        <span>{item.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <Link
+              href="/trainers"
+              onClick={() => setIsOpen(false)}
+              className={`block text-sm font-semibold py-2.5 px-3.5 rounded-xl transition-colors ${
+                isActive("/trainers") ? "bg-active text-white" : "text-foreground hover:bg-brand-500/10"
+              }`}
+            >
+              Master Coaches
+            </Link>
+
+            <Link
+              href="/pricing"
+              onClick={() => setIsOpen(false)}
+              className={`block text-sm font-semibold py-2.5 px-3.5 rounded-xl transition-colors ${
+                isActive("/pricing") ? "bg-active text-white" : "text-foreground hover:bg-brand-500/10"
+              }`}
+            >
+              Memberships & Pricing
+            </Link>
+
+            <Link
+              href="/forum"
+              onClick={() => setIsOpen(false)}
+              className={`block text-sm font-semibold py-2.5 px-3.5 rounded-xl transition-colors ${
+                isActive("/forum") ? "bg-active text-white" : "text-foreground hover:bg-brand-500/10"
+              }`}
+            >
+              Community Forum
+            </Link>
+
+            <Link
+              href="/contact"
+              onClick={() => setIsOpen(false)}
+              className={`block text-sm font-semibold py-2.5 px-3.5 rounded-xl transition-colors ${
+                isActive("/contact") ? "bg-active text-white" : "text-foreground hover:bg-brand-500/10"
+              }`}
+            >
+              Contact & VIP Pass
+            </Link>
+
+            {/* Mobile User Profile & CTAs */}
+            <div className="border-t border-brand-500/20 pt-4 mt-3">
+              {user ? (
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3 px-3.5 py-2.5 bg-brand-800/40 rounded-2xl">
+                    {user.image ? (
+                      <Image
+                        src={user.image}
+                        alt={user.name}
+                        width={36}
+                        height={36}
+                        className="rounded-full object-cover border border-active/40"
+                      />
+                    ) : (
+                      <FaUserCircle className="w-9 h-9 text-active" />
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-foreground truncate">
+                        {user.name}
+                      </p>
+                      <p className="text-[11px] text-[#535C91] dark:text-[#9290C3] truncate">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link
+                      href={`/dashboard/${user?.role}`}
+                      onClick={() => setIsOpen(false)}
+                      className="py-2.5 px-3 rounded-xl bg-[#535C91]/10 text-center text-xs font-bold text-foreground hover:text-active"
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={onLogout}
+                      className="py-2.5 px-3 rounded-xl bg-rose-500/10 text-center text-xs font-bold text-rose-500"
+                    >
+                      Sign Out
+                    </button>
                   </div>
                 </div>
-                <div className="space-y-1 pl-2">
+              ) : (
+                <div className="flex flex-col gap-2 pt-1">
                   <Link
-                    href={`/dashboard/${user?.role}`}
-                    className="flex items-center space-x-2 py-2 px-3 rounded-lg text-foreground hover:bg-brand-500/20 text-sm font-medium"
+                    href="/signin"
+                    onClick={() => setIsOpen(false)}
+                    className="block text-sm font-semibold py-2.5 px-3 rounded-xl text-center text-foreground hover:bg-brand-500/10 border border-brand-500/20"
                   >
-                    <FiGrid className="w-4 h-4 text-brand-300" />
-                    <span>Dashboard</span>
+                    Sign In
                   </Link>
                   <Link
-                    href={`/dashboard/${user?.role}`}
-                    className="flex items-center space-x-2 py-2 px-3 rounded-lg text-foreground hover:bg-brand-500/20 text-sm font-medium"
+                    href="/signup"
+                    onClick={() => setIsOpen(false)}
+                    className="block text-sm font-bold py-3 px-4 rounded-full bg-btn-bg text-btn-text text-center shadow-md"
                   >
-                    <FiEdit3 className="w-4 h-4 text-brand-300" />
-                    <span>Profile Management</span>
+                    Join FlexPulse Club
                   </Link>
-                  <button
-                    onClick={onLogout}
-                    className="flex items-center space-x-2 py-2 px-3 rounded-lg text-red-500 hover:bg-red-500/10 text-sm font-medium w-full text-left"
-                  >
-                    <FiLogOut className="w-4 h-4" />
-                    <span>Sign Out</span>
-                  </button>
                 </div>
-              </div>
-            ) : (
-              <div className="flex flex-col space-y-2">
-                <Link
-                  href="/signin"
-                  className="block font-['Inter'] text-sm font-medium py-2 px-3 rounded-lg text-foreground hover:bg-brand-500/20"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/signup"
-                  className="block font-['Inter'] text-sm font-bold py-2 px-3 rounded-full bg-btn-bg text-btn-text text-center border border-brand-500/20"
-                >
-                  Sign Up
-                </Link>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+
+      {/* Spotlight Search Modal */}
+      <NavSearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+      />
+    </>
   );
 }

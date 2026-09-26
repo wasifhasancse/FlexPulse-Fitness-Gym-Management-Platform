@@ -22,20 +22,43 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
           {/* Brand Column */}
           <div className="flex flex-col space-y-6">
-            <Link href="/" className="flex items-center gap-2.5 group w-fit">
-              <div className="w-10 h-10 rounded-xl bg-linear-to-br from-[#9290C3] to-[#535C91] dark:from-[#1B1A55] dark:to-[#070F2B] flex items-center justify-center shadow-md border border-brand-500/20 group-hover:scale-105 transition-transform duration-300">
+            <Link href="/" className="flex items-center gap-3 group w-fit">
+              <div className="relative w-11 h-11 rounded-2xl bg-linear-to-br from-[#1B1A55] to-[#070F2B] p-0.5 shadow-md border border-active/40 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 overflow-hidden">
+                <div className="absolute inset-0 bg-linear-to-tr from-active/30 via-transparent to-active/10 opacity-70" />
                 <svg
+                  viewBox="0 0 32 32"
+                  fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="h-6 w-6 text-active"
+                  className="w-7 h-7 relative z-10"
                 >
-                  <path d="M6 5H4v14h2V5zm14 0h-2v14h2V5zm-4 6H8v2h8v-2zm-1-4h-2v10h2V7zm-8 0H5v10h2V7z" />
+                  <defs>
+                    <linearGradient id="fpFooterLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#ff2a55" />
+                      <stop offset="100%" stopColor="#ff0336" />
+                    </linearGradient>
+                  </defs>
+                  <rect x="3" y="10" width="3" height="12" rx="1.5" fill="url(#fpFooterLogoGrad)" />
+                  <rect x="7" y="12" width="2.5" height="8" rx="1.2" fill="url(#fpFooterLogoGrad)" opacity="0.85" />
+                  <rect x="26" y="10" width="3" height="12" rx="1.5" fill="url(#fpFooterLogoGrad)" />
+                  <rect x="22.5" y="12" width="2.5" height="8" rx="1.2" fill="url(#fpFooterLogoGrad)" opacity="0.85" />
+                  <path
+                    d="M9.5 16H12.5L14.5 10.5L17.5 21.5L19.5 16H22.5"
+                    stroke="url(#fpFooterLogoGrad)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <circle cx="16" cy="16" r="1.5" fill="#ffffff" />
                 </svg>
               </div>
-              <span className="font-['Outfit'] text-2xl font-bold tracking-tight text-foreground">
-                Flex<span className="text-active">Pulse</span>
-              </span>
+              <div>
+                <span className="font-['Outfit'] text-2xl font-black tracking-tight text-foreground flex items-center leading-none">
+                  FLEX<span className="text-active tracking-normal">PULSE</span>
+                </span>
+                <span className="font-['Inter'] text-[9px] tracking-[0.22em] uppercase font-bold text-[#535C91] dark:text-[#9290C3]/75 block mt-1">
+                  Athletic Club
+                </span>
+              </div>
             </Link>
             <p className="font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3]/80 leading-relaxed">
               Elevate your body, mind, and spirit with certified elite trainers,
