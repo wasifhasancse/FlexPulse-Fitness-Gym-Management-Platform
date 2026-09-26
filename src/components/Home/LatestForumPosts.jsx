@@ -1,4 +1,3 @@
-// feat: telemetry widget
 "use client";
 
 import { useState, useMemo } from "react";
