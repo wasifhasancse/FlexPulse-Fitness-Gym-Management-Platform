@@ -49,8 +49,14 @@ export default function Navbar() {
 
   const navItems = [
     { name: "Home", path: "/" },
-    { name: "All Classes", path: "/all-classes" },
-    { name: "Community Forum", path: "/forum" },
+    { name: "Classes", path: "/all-classes" },
+    { name: "Schedule", path: "/schedule" },
+    { name: "Trainers", path: "/trainers" },
+    { name: "Pricing", path: "/pricing" },
+    { name: "Facilities", path: "/facilities" },
+    { name: "Calculator", path: "/calculator" },
+    { name: "Contact", path: "/contact" },
+    { name: "Community", path: "/forum" },
   ];
 
   if (user) {
@@ -68,36 +74,36 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-background/80 backdrop-blur-md border-b border-brand-500/30 shadow-sm sticky top-0 z-50 transition-colors duration-300">
-      <div className="px-6 mx-auto sm:px-6 lg:px-8">
+    <nav className="bg-background/85 backdrop-blur-md border-b border-brand-500/25 shadow-sm sticky top-0 z-50 transition-colors duration-300">
+      <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex justify-between items-center h-16">
           {/* Logo & Website Name */}
           <Link href="/" className="shrink-0 flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-[#9290C3] to-[#535C91] dark:from-[#1B1A55] dark:to-[#070F2B] flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300 border border-brand-500/20">
+            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-[#9290C3] to-[#535C91] dark:from-[#1B1A55] dark:to-[#070F2B] flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300 border border-brand-500/20">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                className="h-6 w-6 text-active"
+                className="h-5 w-5 text-active"
               >
                 <path d="M6 5H4v14h2V5zm14 0h-2v14h2V5zm-4 6H8v2h8v-2zm-1-4h-2v10h2V7zm-8 0H5v10h2V7z" />
               </svg>
             </div>
-            <span className="font-['Outfit'] text-2xl font-bold tracking-tight text-foreground group-hover:opacity-90 transition-opacity">
+            <span className="font-['Outfit'] text-xl sm:text-2xl font-bold tracking-tight text-foreground group-hover:opacity-90 transition-opacity">
               Flex<span className="text-active">Pulse</span>
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-3.5 xl:space-x-5">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 href={item.path}
-                className={`font-['Inter'] text-sm font-medium transition-colors duration-200 ${
+                className={`font-['Inter'] text-xs xl:text-sm font-semibold transition-colors duration-200 whitespace-nowrap ${
                   isActive(item.path)
                     ? "text-active border-b-2 border-active pb-1"
-                    : "text-foreground hover:text-brand-300"
+                    : "text-foreground/80 hover:text-active"
                 }`}
               >
                 {item.name}
@@ -106,7 +112,7 @@ export default function Navbar() {
           </div>
 
           {/* Right side: Theme Toggle + Auth */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-4">
             <DarkModeSwitch />
 
             {user ? (
@@ -221,7 +227,7 @@ export default function Navbar() {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-2">
+          <div className="lg:hidden flex items-center space-x-2">
             <DarkModeSwitch />
             <button
               onClick={() => setIsOpen(!isOpen)}
@@ -235,7 +241,7 @@ export default function Navbar() {
 
       {/* Mobile Navigation Drawer */}
       <div
-        className={`md:hidden transition-all duration-300 overflow-hidden ${
+        className={`lg:hidden transition-all duration-300 overflow-hidden ${
           isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
         } bg-background border-t border-brand-500/30`}
       >
