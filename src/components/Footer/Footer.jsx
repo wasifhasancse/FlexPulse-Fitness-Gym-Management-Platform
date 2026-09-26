@@ -101,40 +101,56 @@ export default function Footer() {
             <h3 className="font-['Outfit'] text-base font-bold tracking-wide text-foreground">
               Explore Links
             </h3>
-            <ul className="space-y-3 font-['Inter'] text-sm">
-              <li>
-                <Link
-                  href="/"
-                  className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200"
-                >
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/all-classes"
-                  className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200"
-                >
-                  All Fitness Classes
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/forum"
-                  className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200"
-                >
-                  Community Forum
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/signin"
-                  className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200"
-                >
-                  Member Portal Login
-                </Link>
-              </li>
-            </ul>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 font-['Inter'] text-sm">
+              <Link
+                href="/all-classes"
+                className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200"
+              >
+                All Classes
+              </Link>
+              <Link
+                href="/schedule"
+                className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200"
+              >
+                Class Schedule
+              </Link>
+              <Link
+                href="/trainers"
+                className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200"
+              >
+                Elite Coaches
+              </Link>
+              <Link
+                href="/pricing"
+                className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200"
+              >
+                Membership Plans
+              </Link>
+              <Link
+                href="/facilities"
+                className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200"
+              >
+                Gym Facilities
+              </Link>
+              <Link
+                href="/calculator"
+                className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200"
+              >
+                BMI & Macros
+              </Link>
+              <Link
+                href="/contact"
+                className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200"
+              >
+                Contact & VIP Pass
+              </Link>
+              <Link
+                href="/forum"
+                className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200"
+              >
+                Community Forum
+              </Link>
+            </div>
           </div>
 
           {/* Contact & Hours Column */}
