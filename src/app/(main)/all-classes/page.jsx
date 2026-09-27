@@ -57,8 +57,9 @@ export default async function AllClassesPage({ searchParams }) {
     if (difficulty && difficulty !== "All" && difficulty !== "All Levels")
       query.set("difficulty", difficulty);
     if (sort && sort !== "newest") query.set("sort", sort);
-    query.set("page", String(targetPage));
-    return `/all-classes?${query.toString()}`;
+    if (Number(targetPage) > 1) query.set("page", String(targetPage));
+    const qs = query.toString();
+    return qs ? `/all-classes?${qs}#classes-catalog` : "/all-classes#classes-catalog";
   };
 
   const hasFilters = Boolean(
@@ -140,7 +141,7 @@ export default async function AllClassesPage({ searchParams }) {
       </section>
 
       {/* Main Catalog Area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+      <main id="classes-catalog" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 scroll-mt-24">
         {/* Dynamic Search & Filter Hub */}
         <SearchingClasses totalClasses={total} />
 
