@@ -3,84 +3,120 @@ import { getClassById } from "@/lib/api/getClasses";
 import { auth } from "@/lib/auth";
 import { getUserSession } from "@/lib/core/getSession";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-
+import { notFound, redirect } from "next/navigation";
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
   try {
     const classDetails = await getClassById(id);
     return {
-      title: classDetails?.name || "Class Details",
+      title: `${classDetails?.className || classDetails?.name || "Class Details"} - FlexPulse`,
+      description:
+        classDetails?.description ||
+        "Experience elite training with certified master coaches at FlexPulse.",
     };
   } catch {
     return {
-      title: "Class Details",
+      title: "Class Details - FlexPulse",
     };
   }
 }
 
 const ClassDetailsPage = async ({ params }) => {
   const { id } = await params;
-  const user = await getUserSession();
-  const { token } = await auth.api.getToken({ headers: await headers() });
 
+  let user = null;
+  let token = null;
+
+  try {
+    user = await getUserSession();
+  } catch (err) {
+    console.error("Session fetch error:", err);
+  }
+
+  try {
+    const tokenObj = await auth.api.getToken({ headers: await headers() });
+    token = tokenObj?.token;
+  } catch (err) {
+    // Guest or no token
+  }
 
   if (!user) {
     redirect(`/signin?redirect=/all-classes/${id}`);
   }
 
-// app.get('/api/classBookingCount/:id', verifyToken, async (req, res) => {
-//       const { id } = req.params;
-//       const classDoc = await bookingClassCollection.find({
-//         classId: id,
-//       });
-//       const bookingCount = await classDoc.count();
-//       res.send({ bookingCount: bookingCount || 0 });
-  //     });
-  // get the booking count for the class
+  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000";
 
-  const bookingCountRes = await fetch(
-    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/classBookingCount/${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  let classDetails = null;
+  try {
+    classDetails = await getClassById(id);
+  } catch (err) {
+    console.error("Failed to load class details:", err);
+  }
+
+  if (!classDetails) {
+    notFound();
+  }
+
+  let bookingCountData = { bookingCount: classDetails?.bookingCount || 0 };
+  if (token) {
+    try {
+      const bookingCountRes = await fetch(
+        `${serverUrl}/api/classBookingCount/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: "no-store",
+        }
+      );
+      if (bookingCountRes.ok) {
+        bookingCountData = await bookingCountRes.json();
+      }
+    } catch (e) {
+      // Fallback to classDetails.bookingCount
     }
-  );
-  const bookingCountData = await bookingCountRes.json();
-
-  const classDetails = await getClassById(id);
+  }
 
   let isBooked = false;
   let isFavorite = false;
 
   if (user?.id) {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/checkBooking?userId=${user.id}&classId=${id}`,
-    );
-    const data = await res.json();
-    isBooked = data.isBooked;
+    try {
+      const [bookRes, favRes] = await Promise.all([
+        fetch(`${serverUrl}/api/checkBooking?userId=${user.id}&classId=${id}`, {
+          cache: "no-store",
+        }),
+        fetch(`${serverUrl}/api/favorites/check?userId=${user.id}&classId=${id}`, {
+          cache: "no-store",
+        }),
+      ]);
 
-    const favoriteRes = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/favorites/check?userId=${user.id}&classId=${id}`,
-    );
-    const favoriteData = await favoriteRes.json();
-    isFavorite = favoriteData.isFavorite;
+      if (bookRes.ok) {
+        const data = await bookRes.json();
+        isBooked = Boolean(data.isBooked);
+      }
+
+      if (favRes.ok) {
+        const favoriteData = await favRes.json();
+        isFavorite = Boolean(favoriteData.isFavorite);
+      }
+    } catch (err) {
+      console.error("Booking/favorite check error:", err);
+    }
   }
+
   return (
-    <div>
-      <ClassDetailsPageLayout
-        classData={classDetails}
-        isBooked={isBooked}
-        isFavorite={isFavorite}
-        user={user}
-        userId={user?.id}
-        userName={user?.name}
-        userEmail={user?.email}
-        bookingCountData={bookingCountData}
-      />
-    </div>
+    <ClassDetailsPageLayout
+      classData={classDetails}
+      isBooked={isBooked}
+      isFavorite={isFavorite}
+      user={user}
+      userId={user?.id}
+      userName={user?.name}
+      userEmail={user?.email}
+      bookingCountData={bookingCountData}
+    />
   );
 };
 
