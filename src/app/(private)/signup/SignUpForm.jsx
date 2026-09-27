@@ -2,20 +2,26 @@
 
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@heroui/react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   FaArrowRight,
+  FaBullseye,
+  FaCheck,
   FaCheckCircle,
+  FaDumbbell,
   FaEnvelope,
   FaExclamationTriangle,
   FaFire,
+  FaHeartbeat,
   FaImage,
   FaLock,
+  FaRunning,
   FaShieldAlt,
+  FaTimes,
   FaTimesCircle,
   FaUser,
 } from "react-icons/fa";
@@ -61,13 +67,44 @@ const SIGNUP_TESTIMONIALS = [
   },
 ];
 
-const SignUpForm = () => {
+const PRESET_AVATARS = [
+  {
+    id: "marcus",
+    label: "Power",
+    url: "https://prio.co.in/avatar.png",
+  },
+  {
+    id: "elena",
+    label: "Endurance",
+    url: "https://t4.ftcdn.net/jpg/11/66/06/77/360_F_1166067709_2SooAuPWXp20XkGev7oOT7nuK1VThCsN.jpg",
+  },
+  {
+    id: "wasif",
+    label: "Hybrid",
+    url: "https://lh3.googleusercontent.com/a/ACg8ocKzbEXd0N7V406ocsmdiEQkxCVV1BIJpiTn--O3W0TqjLiNy6e3=s96-c",
+  },
+  {
+    id: "sophie",
+    label: "Recomp",
+    url: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop",
+  },
+];
+
+const ATHLETIC_GOALS = [
+  { id: "strength", label: "Strength & Power", icon: FaDumbbell },
+  { id: "endurance", label: "Cardio & Hyrox", icon: FaRunning },
+  { id: "recomp", label: "Fat Loss & Health", icon: FaHeartbeat },
+];
+
+export default function SignUpForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [image, setImage] = useState("");
-  const [role, setRole] = useState("member");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState("strength");
+  const [selectedAvatarId, setSelectedAvatarId] = useState(null);
+  const [showCustomAvatarInput, setShowCustomAvatarInput] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [capsLockActive, setCapsLockActive] = useState(false);
@@ -79,6 +116,22 @@ const SignUpForm = () => {
   const hasLowerCase = /[a-z]/.test(password);
   const isPasswordValid = hasMinLength && hasUpperCase && hasLowerCase;
 
+  // Strength score
+  const getPasswordStrength = () => {
+    let score = 0;
+    if (hasMinLength) score += 1;
+    if (hasUpperCase) score += 1;
+    if (hasLowerCase) score += 1;
+    if (/[0-9]/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+    return score;
+  };
+  const strengthScore = getPasswordStrength();
+
+  const isValidEmail = (val) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+  };
+
   const handleKeyDown = (e) => {
     if (e.getModifierState) {
       setCapsLockActive(e.getModifierState("CapsLock"));
@@ -89,6 +142,12 @@ const SignUpForm = () => {
     if (e.getModifierState) {
       setCapsLockActive(e.getModifierState("CapsLock"));
     }
+  };
+
+  const handleSelectPresetAvatar = (avatarObj) => {
+    setSelectedAvatarId(avatarObj.id);
+    setImage(avatarObj.url);
+    toast.success(`Selected ${avatarObj.label} avatar profile`);
   };
 
   const handleSubmit = async (e) => {
@@ -147,389 +206,538 @@ const SignUpForm = () => {
       {/* Background Engineering Dot Matrix Pattern */}
       <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-50 dark:opacity-30" />
 
-      {/* Ambient Radial Meshes */}
+      {/* Ambient Lighting Meshes */}
       <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-active/10 dark:bg-active/15 rounded-full blur-[140px] pointer-events-none -z-10" />
       <div className="absolute bottom-10 right-1/4 w-[500px] h-[500px] bg-brand-500/10 dark:bg-brand-500/15 rounded-full blur-[140px] pointer-events-none -z-10" />
 
-      {/* Main Container - Aligned to Site's w-11/12 grid */}
-      <div className="w-11/12 mx-auto rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-2xl bg-white dark:bg-[#0c0b1a] flex flex-col lg:flex-row transition-all duration-300 relative z-10">
+      {/* Main Container - Matches Exact Navbar & Footer Width: w-11/12 mx-auto */}
+      <div className="w-11/12 mx-auto relative z-10">
         
+        {/* Main Dual-Column Performance Box */}
+        <div className="w-full rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-2xl bg-white dark:bg-[#0c0b1a] flex flex-col lg:flex-row transition-all duration-300 relative">
 
-        {/* ============================================================ */}
-        {/* Left Column: Athletic Showcase & Real-Time Performance Lab   */}
-        {/* ============================================================ */}
-        <div className="w-full lg:w-5/12 xl:w-[45%] relative bg-[#090814] text-white flex flex-col justify-between p-8 sm:p-10 lg:p-12 xl:p-14 overflow-hidden select-none border-b lg:border-b-0 lg:border-r border-slate-800/60">
-          
-          {/* Backdrop Image */}
-          <div className="absolute inset-0 z-0">
-            <Image
-              src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1470&auto=format&fit=crop"
-              alt="Gym Training"
-              fill
-              priority
-              unoptimized
-              className="object-cover opacity-25 scale-105 transition-transform duration-1000 ease-out"
-            />
-            {/* Scrim */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#090814] via-[#090814]/85 to-[#120f26]/75 z-10" />
-            <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-active/20 rounded-full blur-[100px] z-10 pointer-events-none" />
-          </div>
-
-          {/* Left Column Top: Tag & Status */}
-          <div className="relative z-20 flex items-center justify-between gap-3 mb-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-active/15 border border-active/30 text-active text-xs font-black tracking-wider uppercase backdrop-blur-md">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-active" />
-              </span>
-              <span>New Athlete Onboarding</span>
+          {/* ============================================================ */}
+          {/* Left Column: Athletic Showcase & Real-Time Performance Lab   */}
+          {/* ============================================================ */}
+          <div className="w-full lg:w-5/12 xl:w-[45%] relative bg-[#090814] text-white flex flex-col justify-between p-8 sm:p-10 lg:p-12 xl:p-14 overflow-hidden select-none border-b lg:border-b-0 lg:border-r border-slate-800/60">
+            
+            {/* Facility Photo Backdrop */}
+            <div className="absolute inset-0 z-0">
+              <Image
+                src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1470&auto=format&fit=crop"
+                alt="Gym Training"
+                fill
+                priority
+                unoptimized
+                className="object-cover opacity-25 scale-105 transition-transform duration-1000 ease-out"
+              />
+              {/* Scrim Overlays */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#090814] via-[#090814]/85 to-[#120f26]/75 z-10" />
+              <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-active/20 rounded-full blur-[100px] z-10 pointer-events-none" />
             </div>
 
-            <span className="text-xs font-mono font-semibold text-emerald-400 flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20 backdrop-blur-md">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              7-Day VIP Active
-            </span>
+            {/* Left Column Top: Tag & Status */}
+            <div className="relative z-20 flex items-center justify-between gap-3 mb-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-active/15 border border-active/30 text-active text-xs font-black tracking-wider uppercase backdrop-blur-md">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-active" />
+                </span>
+                <span>New Athlete Onboarding</span>
+              </div>
+
+              <span className="text-xs font-mono font-semibold text-emerald-400 flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20 backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                7-Day VIP Active
+              </span>
+            </div>
+
+            {/* Left Column Center: Headline & Live Perks Card */}
+            <div className="relative z-20 my-auto py-6 sm:py-8 space-y-6">
+              <div>
+                <div className="inline-flex items-center gap-2 text-active text-xs font-black uppercase tracking-widest mb-2">
+                  <FaFire className="w-3.5 h-3.5 text-orange-400" /> Start Your Athletic Journey
+                </div>
+                <h1 className="text-3xl sm:text-4xl xl:text-5xl font-black text-white leading-tight tracking-tight">
+                  Unlock Your Potential. <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-rose-100 to-active drop-shadow-md">
+                    Join FlexPulse Today.
+                  </span>
+                </h1>
+                <p className="mt-3 text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+                  Gain access to 100+ weekly classes, Olympic lifting decks, Finnish contrast saunas, and personalized biometric coaching.
+                </p>
+              </div>
+
+              {/* Live Studio Telemetry Card */}
+              <div className="p-5 sm:p-6 rounded-2xl bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/15 shadow-2xl space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex -space-x-2.5">
+                      <Image
+                        src="https://t4.ftcdn.net/jpg/11/66/06/77/360_F_1166067709_2SooAuPWXp20XkGev7oOT7nuK1VThCsN.jpg"
+                        alt="Coach Alana"
+                        width={32}
+                        height={32}
+                        className="w-8 h-8 rounded-full object-cover ring-2 ring-[#090814]"
+                      />
+                      <Image
+                        src="https://prio.co.in/avatar.png"
+                        alt="Coach Marcus"
+                        width={32}
+                        height={32}
+                        className="w-8 h-8 rounded-full object-cover ring-2 ring-[#090814]"
+                      />
+                      <Image
+                        src="https://lh3.googleusercontent.com/a/ACg8ocKzbEXd0N7V406ocsmdiEQkxCVV1BIJpiTn--O3W0TqjLiNy6e3=s96-c"
+                        alt="Wasif"
+                        width={32}
+                        height={32}
+                        className="w-8 h-8 rounded-full object-cover ring-2 ring-[#090814]"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-sm font-bold text-white block">2,480+ Active Athletes</span>
+                      <span className="text-xs text-slate-300 font-medium">Join an Elite Athletic Roster</span>
+                    </div>
+                  </div>
+                  <span className="text-xs text-emerald-400 font-bold px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30">
+                    VIP Tier
+                  </span>
+                </div>
+
+                {/* 3 Perks Badges */}
+                <div className="grid grid-cols-3 gap-3 text-center pt-1">
+                  <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
+                    <strong className="block text-base sm:text-lg font-black text-white">Free</strong>
+                    <span className="text-[10px] sm:text-xs text-slate-300 uppercase tracking-wider font-semibold">InBody 570</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
+                    <strong className="block text-base sm:text-lg font-black text-active">7-Day</strong>
+                    <span className="text-[10px] sm:text-xs text-slate-300 uppercase tracking-wider font-semibold">VIP Pass</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
+                    <strong className="block text-base sm:text-lg font-black text-white">100%</strong>
+                    <span className="text-[10px] sm:text-xs text-slate-300 uppercase tracking-wider font-semibold">Flexible</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Left Column Bottom: ATHLETE VERIFICATION TICKER */}
+            <div className="relative z-20 pt-4 border-t border-white/10">
+              <AthleteVerificationTicker
+                testimonials={SIGNUP_TESTIMONIALS}
+                title="WHY ATHLETES JOIN"
+                variant="dark"
+              />
+            </div>
           </div>
 
-          {/* Left Column Center: Headline & Live Perks Card */}
-          <div className="relative z-20 my-auto py-6 sm:py-8 space-y-6">
-            <div>
-              <div className="inline-flex items-center gap-2 text-active text-xs font-black uppercase tracking-widest mb-2">
-                <FaFire className="w-3.5 h-3.5 text-orange-400" /> Start Your Athletic Journey
+          {/* ============================================================ */}
+          {/* Right Column: High-Conversion Sign-Up Console                */}
+          {/* ============================================================ */}
+          <div className="w-full lg:w-7/12 xl:w-[55%] p-8 sm:p-10 lg:p-12 xl:p-14 flex flex-col justify-center bg-white dark:bg-[#0c0b1a] relative">
+            
+            {/* Header & Title */}
+            <div className="mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-500/10 text-active text-xs font-black uppercase tracking-wider mb-2.5 border border-rose-200 dark:border-rose-500/20">
+                <FaLock className="w-3 h-3" /> New Membership Registration
               </div>
-              <h1 className="text-3xl sm:text-4xl xl:text-5xl font-black text-white leading-tight tracking-tight">
-                Unlock Your Potential. <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-rose-100 to-active drop-shadow-md">
-                  Join FlexPulse Today.
-                </span>
-              </h1>
-              <p className="mt-3 text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
-                Gain access to 100+ weekly classes, Olympic lifting decks, Finnish contrast saunas, and biometric coaching.
+              <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+                Create Your Account
+              </h2>
+              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1 font-medium">
+                Join FlexPulse to book classes, log workouts, and join discussions.
               </p>
             </div>
 
-            {/* Live Studio Telemetry Card */}
-            <div className="p-5 sm:p-6 rounded-2xl bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/15 shadow-2xl space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex -space-x-2.5">
-                    <Image
-                      src="https://t4.ftcdn.net/jpg/11/66/06/77/360_F_1166067709_2SooAuPWXp20XkGev7oOT7nuK1VThCsN.jpg"
-                      alt="Coach Alana"
-                      width={32}
-                      height={32}
-                      className="w-8 h-8 rounded-full object-cover ring-2 ring-[#090814]"
-                    />
-                    <Image
-                      src="https://prio.co.in/avatar.png"
-                      alt="Coach Marcus"
-                      width={32}
-                      height={32}
-                      className="w-8 h-8 rounded-full object-cover ring-2 ring-[#090814]"
-                    />
-                    <Image
-                      src="https://lh3.googleusercontent.com/a/ACg8ocKzbEXd0N7V406ocsmdiEQkxCVV1BIJpiTn--O3W0TqjLiNy6e3=s96-c"
-                      alt="Wasif"
-                      width={32}
-                      height={32}
-                      className="w-8 h-8 rounded-full object-cover ring-2 ring-[#090814]"
-                    />
-                  </div>
-                  <div>
-                    <span className="text-sm font-bold text-white block">2,480+ Active Athletes</span>
-                    <span className="text-xs text-slate-300 font-medium">Join an Elite Athletic Roster</span>
-                  </div>
-                </div>
-                <span className="text-xs text-emerald-400 font-bold px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30">
-                  VIP Tier
-                </span>
-              </div>
-
-              {/* Perks Grid */}
-              <div className="grid grid-cols-3 gap-3 text-center pt-1">
-                <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
-                  <strong className="block text-base sm:text-lg font-black text-white">Free</strong>
-                  <span className="text-[10px] sm:text-xs text-slate-300 uppercase tracking-wider font-semibold">InBody 570</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
-                  <strong className="block text-base sm:text-lg font-black text-active">7-Day</strong>
-                  <span className="text-[10px] sm:text-xs text-slate-300 uppercase tracking-wider font-semibold">VIP Pass</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
-                  <strong className="block text-base sm:text-lg font-black text-white">100%</strong>
-                  <span className="text-[10px] sm:text-xs text-slate-300 uppercase tracking-wider font-semibold">Flexible</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Left Column Bottom: ATHLETE VERIFICATION TICKER */}
-          <div className="relative z-20 pt-4 border-t border-white/10">
-            <AthleteVerificationTicker
-              testimonials={SIGNUP_TESTIMONIALS}
-              title="WHY ATHLETES JOIN"
-              variant="dark"
-            />
-          </div>
-        </div>
-
-        {/* ============================================================ */}
-        {/* Right Column: High-Conversion Sign-Up Console                */}
-        {/* ============================================================ */}
-        <div className="w-full lg:w-7/12 xl:w-[55%] p-8 sm:p-10 lg:p-12 xl:p-14 flex flex-col justify-center bg-white dark:bg-[#0c0b1a] relative">
-          
-          {/* Header & Title */}
-          <div className="mb-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-500/10 text-active text-xs font-black uppercase tracking-wider mb-2.5 border border-rose-200 dark:border-rose-500/20">
-              <FaLock className="w-3 h-3" /> New Membership Registration
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
-              Create Your Account
-            </h2>
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1 font-medium">
-              Join FlexPulse to book classes, log workouts, and join discussions.
-            </p>
-          </div>
-
-          {/* Google Social Signup */}
-          <motion.button
-            type="button"
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-            onClick={handleGoogleSignup}
-            disabled={googleLoading}
-            className="w-full py-3.5 px-5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-[#141228] dark:hover:bg-[#1c193c] border border-slate-300 dark:border-white/15 text-slate-800 dark:text-slate-100 font-bold text-sm sm:text-base shadow-xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-60"
-          >
-            {googleLoading ? (
-              <span className="w-4 h-4 border-2 border-active border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>
-                <FcGoogle className="w-5 h-5" />
-                <span>Sign up with Google</span>
-              </>
-            )}
-          </motion.button>
-
-          {/* Divider */}
-          <div className="relative flex items-center my-4">
-            <div className="flex-grow border-t border-slate-200 dark:border-white/10" />
-            <span className="shrink-0 px-3 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-              Or register with email
-            </span>
-            <div className="flex-grow border-t border-slate-200 dark:border-white/10" />
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Full Name Field */}
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-1.5"
-              >
-                Full Name
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
-                  <FaUser className="w-4 h-4" />
-                </div>
-                <input
-                  id="name"
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Alex Morgan"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 focus:bg-white dark:bg-[#141228] dark:focus:bg-[#1a1738] border border-slate-300 dark:border-white/15 focus:border-active focus:ring-4 focus:ring-active/15 text-sm sm:text-base text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition-all shadow-2xs font-medium"
-                />
-              </div>
-            </div>
-
-            {/* Email Field */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-1.5"
-              >
-                Email Address
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
-                  <FaEnvelope className="w-4 h-4" />
-                </div>
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="athlete@flexpulse.com"
-                  autoComplete="email"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 focus:bg-white dark:bg-[#141228] dark:focus:bg-[#1a1738] border border-slate-300 dark:border-white/15 focus:border-active focus:ring-4 focus:ring-active/15 text-sm sm:text-base text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition-all shadow-2xs font-medium"
-                />
-              </div>
-            </div>
-
-            {/* Profile Avatar URL */}
-            <div>
-              <label
-                htmlFor="image"
-                className="block text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-1.5"
-              >
-                Avatar URL (Optional)
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
-                  <FaImage className="w-4 h-4" />
-                </div>
-                <input
-                  id="image"
-                  type="url"
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  placeholder="https://example.com/avatar.jpg"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 focus:bg-white dark:bg-[#141228] dark:focus:bg-[#1a1738] border border-slate-300 dark:border-white/15 focus:border-active focus:ring-4 focus:ring-active/15 text-sm sm:text-base text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition-all shadow-2xs font-medium"
-                />
-              </div>
-            </div>
-
-            {/* Password Field */}
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-1.5"
-              >
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
-                  <FaLock className="w-4 h-4" />
-                </div>
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  onKeyUp={handleKeyUp}
-                  placeholder="••••••••••••"
-                  autoComplete="new-password"
-                  className="w-full pl-11 pr-12 py-3 rounded-xl bg-slate-50 focus:bg-white dark:bg-[#141228] dark:focus:bg-[#1a1738] border border-slate-300 dark:border-white/15 focus:border-active focus:ring-4 focus:ring-active/15 text-sm sm:text-base text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition-all shadow-2xs font-medium"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 dark:text-slate-400 hover:text-active transition-colors cursor-pointer"
-                  title={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <IoMdEyeOff className="w-5 h-5" />
-                  ) : (
-                    <IoEye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-
-              {/* Caps Lock Alert Banner */}
-              {capsLockActive && (
-                <div className="mt-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-semibold flex items-center gap-1.5">
-                  <FaExclamationTriangle className="w-3.5 h-3.5" />
-                  <span>Caps Lock is currently ON</span>
-                </div>
-              )}
-
-              {/* Password Requirement Indicators */}
-              <div className="mt-2.5 grid grid-cols-3 gap-2 text-xs">
-                <div
-                  className={`flex items-center gap-1.5 font-medium transition-colors ${
-                    password.length > 0
-                      ? hasMinLength
-                        ? "text-emerald-600 dark:text-emerald-400"
-                        : "text-red-500"
-                      : "text-slate-500 dark:text-slate-400"
-                  }`}
-                >
-                  {hasMinLength ? <FaCheckCircle className="w-3.5 h-3.5" /> : <FaTimesCircle className="w-3.5 h-3.5" />}
-                  <span>6+ chars</span>
-                </div>
-                <div
-                  className={`flex items-center gap-1.5 font-medium transition-colors ${
-                    password.length > 0
-                      ? hasUpperCase
-                        ? "text-emerald-600 dark:text-emerald-400"
-                        : "text-red-500"
-                      : "text-slate-500 dark:text-slate-400"
-                  }`}
-                >
-                  {hasUpperCase ? <FaCheckCircle className="w-3.5 h-3.5" /> : <FaTimesCircle className="w-3.5 h-3.5" />}
-                  <span>Uppercase</span>
-                </div>
-                <div
-                  className={`flex items-center gap-1.5 font-medium transition-colors ${
-                    password.length > 0
-                      ? hasLowerCase
-                        ? "text-emerald-600 dark:text-emerald-400"
-                        : "text-red-500"
-                      : "text-slate-500 dark:text-slate-400"
-                  }`}
-                >
-                  {hasLowerCase ? <FaCheckCircle className="w-3.5 h-3.5" /> : <FaTimesCircle className="w-3.5 h-3.5" />}
-                  <span>Lowercase</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Submit Button */}
+            {/* Google Social Signup */}
             <motion.button
-              type="submit"
-              disabled={!isPasswordValid || loading}
+              type="button"
               whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full py-4 mt-2 bg-btn-bg hover:bg-btn-bg/90 text-btn-text font-black text-sm uppercase tracking-wider rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              whileTap={{ scale: 0.99 }}
+              onClick={handleGoogleSignup}
+              disabled={googleLoading}
+              className="w-full py-3.5 px-5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-[#141228] dark:hover:bg-[#1c193c] border border-slate-300 dark:border-white/15 text-slate-800 dark:text-slate-100 font-bold text-sm sm:text-base shadow-xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-60"
             >
-              {loading ? (
-                <div className="flex items-center gap-2">
-                  <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Creating Account...</span>
-                </div>
+              {googleLoading ? (
+                <span className="w-4 h-4 border-2 border-active border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>Create Athlete Membership</span>
-                  <FaArrowRight className="w-4 h-4" />
+                  <FcGoogle className="w-5 h-5" />
+                  <span>Sign up with Google</span>
                 </>
               )}
             </motion.button>
-          </form>
 
-          {/* Shift Redirect to signin */}
-          <p className="text-center text-sm text-slate-600 dark:text-slate-400 mt-4">
-            Already have an athlete account?{" "}
-            <Link
-              href="/signin"
-              className="text-active font-bold hover:underline"
-            >
-              Sign In Here →
-            </Link>
-          </p>
+            {/* Divider */}
+            <div className="relative flex items-center my-4">
+              <div className="flex-grow border-t border-slate-200 dark:border-white/10" />
+              <span className="shrink-0 px-3 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                Or register with email
+              </span>
+              <div className="flex-grow border-t border-slate-200 dark:border-white/10" />
+            </div>
 
-          {/* Security & Verification Guarantee */}
-          <div className="mt-4 pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-center gap-4 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            <span className="flex items-center gap-1.5 font-medium">
-              <FaShieldAlt className="w-3.5 h-3.5 text-active" /> 256-Bit SSL
-            </span>
-            <span>•</span>
-            <span className="flex items-center gap-1.5 font-medium">
-              <FaCheckCircle className="w-3.5 h-3.5 text-emerald-500" /> SOC-2 Compliant
-            </span>
-            <span>•</span>
-            <span className="font-medium">Instant Membership Sync</span>
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Full Name Field */}
+              <div>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label
+                    htmlFor="name"
+                    className="block text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider"
+                  >
+                    Full Name
+                  </label>
+                  {name.trim().length >= 2 && (
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                      <FaCheck className="w-3 h-3" /> Valid
+                    </span>
+                  )}
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+                    <FaUser className="w-4 h-4" />
+                  </div>
+                  <input
+                    id="name"
+                    type="text"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Alex Morgan"
+                    className="w-full pl-11 pr-10 py-3.5 rounded-xl bg-slate-50 focus:bg-white dark:bg-[#141228] dark:focus:bg-[#1a1738] border border-slate-300 dark:border-white/15 focus:border-active focus:ring-4 focus:ring-active/15 text-sm sm:text-base text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition-all shadow-2xs font-medium"
+                  />
+                  {name && (
+                    <button
+                      type="button"
+                      onClick={() => setName("")}
+                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer"
+                      title="Clear name"
+                    >
+                      <FaTimes className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Email Field */}
+              <div>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label
+                    htmlFor="email"
+                    className="block text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider"
+                  >
+                    Email Address
+                  </label>
+                  {isValidEmail(email) && (
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                      <FaCheck className="w-3 h-3" /> Verified Format
+                    </span>
+                  )}
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+                    <FaEnvelope className="w-4 h-4" />
+                  </div>
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="athlete@flexpulse.com"
+                    autoComplete="email"
+                    className="w-full pl-11 pr-10 py-3.5 rounded-xl bg-slate-50 focus:bg-white dark:bg-[#141228] dark:focus:bg-[#1a1738] border border-slate-300 dark:border-white/15 focus:border-active focus:ring-4 focus:ring-active/15 text-sm sm:text-base text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition-all shadow-2xs font-medium"
+                  />
+                  {email && (
+                    <button
+                      type="button"
+                      onClick={() => setEmail("")}
+                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer"
+                      title="Clear email"
+                    >
+                      <FaTimes className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Athletic Goal Selector */}
+              <div>
+                <label className="block text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-1.5">
+                  Primary Fitness Goal
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {ATHLETIC_GOALS.map((goal) => {
+                    const isGoalSelected = selectedGoal === goal.id;
+                    const GoalIcon = goal.icon;
+                    return (
+                      <button
+                        key={goal.id}
+                        type="button"
+                        onClick={() => setSelectedGoal(goal.id)}
+                        className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1 ${
+                          isGoalSelected
+                            ? "bg-active text-white border-active font-bold shadow-md ring-2 ring-active/30"
+                            : "bg-slate-50 dark:bg-[#141228] border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-active"
+                        }`}
+                      >
+                        <GoalIcon className={`w-4 h-4 ${isGoalSelected ? "text-white" : "text-active"}`} />
+                        <span className="text-xs font-bold leading-tight block">
+                          {goal.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Profile Avatar Selector (Presets or Custom URL) */}
+              <div>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="block text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                    Profile Avatar
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowCustomAvatarInput(!showCustomAvatarInput)}
+                    className="text-xs font-bold text-active hover:underline cursor-pointer"
+                  >
+                    {showCustomAvatarInput ? "Choose from presets" : "Paste custom image URL"}
+                  </button>
+                </div>
+
+                {!showCustomAvatarInput ? (
+                  <div className="grid grid-cols-4 gap-2">
+                    {PRESET_AVATARS.map((preset) => {
+                      const isAvatarSelected = selectedAvatarId === preset.id;
+                      return (
+                        <button
+                          key={preset.id}
+                          type="button"
+                          onClick={() => handleSelectPresetAvatar(preset)}
+                          className={`p-2 rounded-xl border transition-all cursor-pointer flex flex-col items-center gap-1 relative ${
+                            isAvatarSelected
+                              ? "bg-active/10 dark:bg-active/20 border-active ring-2 ring-active"
+                              : "bg-slate-50 dark:bg-[#141228] border-slate-200 dark:border-white/10 hover:border-active"
+                          }`}
+                        >
+                          <Image
+                            src={preset.url}
+                            alt={preset.label}
+                            width={36}
+                            height={36}
+                            className="w-9 h-9 rounded-full object-cover ring-1 ring-current"
+                          />
+                          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                            {preset.label}
+                          </span>
+                          {isAvatarSelected && (
+                            <div className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-active text-white flex items-center justify-center">
+                              <FaCheck className="w-2 h-2" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+                      <FaImage className="w-4 h-4" />
+                    </div>
+                    <input
+                      id="image"
+                      type="url"
+                      value={image}
+                      onChange={(e) => {
+                        setImage(e.target.value);
+                        setSelectedAvatarId(null);
+                      }}
+                      placeholder="https://example.com/your-avatar.jpg"
+                      className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 focus:bg-white dark:bg-[#141228] dark:focus:bg-[#1a1738] border border-slate-300 dark:border-white/15 focus:border-active focus:ring-4 focus:ring-active/15 text-sm sm:text-base text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition-all shadow-2xs font-medium"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Password Field */}
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-1.5"
+                >
+                  Password
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+                    <FaLock className="w-4 h-4" />
+                  </div>
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    onKeyUp={handleKeyUp}
+                    placeholder="••••••••••••"
+                    autoComplete="new-password"
+                    className="w-full pl-11 pr-12 py-3.5 rounded-xl bg-slate-50 focus:bg-white dark:bg-[#141228] dark:focus:bg-[#1a1738] border border-slate-300 dark:border-white/15 focus:border-active focus:ring-4 focus:ring-active/15 text-sm sm:text-base text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition-all shadow-2xs font-medium"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 dark:text-slate-400 hover:text-active transition-colors cursor-pointer"
+                    title={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <IoMdEyeOff className="w-5 h-5" />
+                    ) : (
+                      <IoEye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+
+                {/* Caps Lock Alert Banner */}
+                <AnimatePresence>
+                  {capsLockActive && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      className="mt-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-semibold flex items-center gap-1.5"
+                    >
+                      <FaExclamationTriangle className="w-3.5 h-3.5" />
+                      <span>Caps Lock is currently ON</span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Password Strength Meter */}
+                {password.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-slate-500 dark:text-slate-400 font-medium">Security Level:</span>
+                      <span
+                        className={`font-bold ${
+                          strengthScore <= 2
+                            ? "text-orange-500"
+                            : strengthScore <= 4
+                            ? "text-blue-500"
+                            : "text-emerald-500"
+                        }`}
+                      >
+                        {strengthScore <= 2 ? "Moderate" : strengthScore <= 4 ? "Strong" : "Elite Protection"}
+                      </span>
+                    </div>
+                    <div className="w-full h-1.5 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all duration-300 rounded-full ${
+                          strengthScore <= 2
+                            ? "w-1/3 bg-orange-500"
+                            : strengthScore <= 4
+                            ? "w-3/4 bg-blue-500"
+                            : "w-full bg-emerald-500"
+                        }`}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Password Requirement Indicators */}
+                <div className="mt-2.5 grid grid-cols-3 gap-2 text-xs">
+                  <div
+                    className={`flex items-center gap-1.5 font-medium transition-colors ${
+                      password.length > 0
+                        ? hasMinLength
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : "text-red-500"
+                        : "text-slate-500 dark:text-slate-400"
+                    }`}
+                  >
+                    {hasMinLength ? <FaCheckCircle className="w-3.5 h-3.5" /> : <FaTimesCircle className="w-3.5 h-3.5" />}
+                    <span>6+ chars</span>
+                  </div>
+                  <div
+                    className={`flex items-center gap-1.5 font-medium transition-colors ${
+                      password.length > 0
+                        ? hasUpperCase
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : "text-red-500"
+                        : "text-slate-500 dark:text-slate-400"
+                    }`}
+                  >
+                    {hasUpperCase ? <FaCheckCircle className="w-3.5 h-3.5" /> : <FaTimesCircle className="w-3.5 h-3.5" />}
+                    <span>Uppercase</span>
+                  </div>
+                  <div
+                    className={`flex items-center gap-1.5 font-medium transition-colors ${
+                      password.length > 0
+                        ? hasLowerCase
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : "text-red-500"
+                        : "text-slate-500 dark:text-slate-400"
+                    }`}
+                  >
+                    {hasLowerCase ? <FaCheckCircle className="w-3.5 h-3.5" /> : <FaTimesCircle className="w-3.5 h-3.5" />}
+                    <span>Lowercase</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <motion.button
+                type="submit"
+                disabled={!isPasswordValid || loading}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full py-4 mt-2 bg-btn-bg hover:bg-btn-bg/90 text-btn-text font-black text-sm uppercase tracking-wider rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Creating Account...</span>
+                  </div>
+                ) : (
+                  <>
+                    <span>Create Athlete Membership</span>
+                    <FaArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </motion.button>
+            </form>
+
+            {/* Shift Redirect to signin */}
+            <p className="text-center text-sm text-slate-600 dark:text-slate-400 mt-4">
+              Already have an athlete account?{" "}
+              <Link
+                href="/signin"
+                className="text-active font-bold hover:underline"
+              >
+                Sign In Here →
+              </Link>
+            </p>
+
+            {/* Security & Verification Guarantee */}
+            <div className="mt-4 pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-center gap-4 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+              <span className="flex items-center gap-1.5 font-medium">
+                <FaShieldAlt className="w-3.5 h-3.5 text-active" /> 256-Bit SSL
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1.5 font-medium">
+                <FaCheckCircle className="w-3.5 h-3.5 text-emerald-500" /> SOC-2 Compliant
+              </span>
+              <span>•</span>
+              <span className="font-medium">Instant Membership Sync</span>
+            </div>
+
           </div>
-
         </div>
       </div>
     </div>
   );
-};
-
-export default SignUpForm;
+}
