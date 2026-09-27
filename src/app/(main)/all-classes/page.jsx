@@ -71,22 +71,19 @@ export default async function AllClassesPage({ searchParams }) {
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300 pb-20">
-      {/* Hero Header Section */}
-      <section className="relative overflow-hidden pt-28 pb-16 sm:pb-20 border-b border-slate-200/80 dark:border-white/[0.06] bg-gradient-to-b from-slate-100/60 via-background to-background dark:from-[#110e24]/70 dark:via-background dark:to-background">
-        {/* Ambient atmospheric glows */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-active/15 via-rose-600/5 to-transparent blur-3xl pointer-events-none -z-10" />
-        <div className="absolute top-20 right-10 w-72 h-72 bg-active/10 rounded-full blur-[100px] pointer-events-none -z-10" />
-        <div className="absolute top-40 left-10 w-72 h-72 bg-purple-600/10 rounded-full blur-[100px] pointer-events-none -z-10" />
+      {/* Hero Header Section - Clean, compact & well-proportioned */}
+      <section className="relative overflow-hidden pt-10 pb-8 sm:pt-12 sm:pb-10 border-b border-slate-200/80 dark:border-white/[0.06] bg-gradient-to-b from-slate-100/40 via-background to-background dark:from-[#110e24]/50 dark:via-background dark:to-background">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-64 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-active/10 via-rose-600/5 to-transparent blur-3xl pointer-events-none -z-10" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-3.5">
           {/* Eyebrow Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-active/10 dark:bg-active/15 border border-active/30 text-active text-xs font-black tracking-widest uppercase mb-6 shadow-sm">
-            <FiZap className="w-3.5 h-3.5 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-active/10 dark:bg-active/15 border border-active/30 text-active text-xs font-bold tracking-wider uppercase shadow-xs">
+            <FiZap className="w-3.5 h-3.5 text-active" />
             <span>Curated Performance Curriculum</span>
           </div>
 
           {/* Headline */}
-          <h1 className="font-['Outfit'] text-4xl sm:text-5xl lg:text-6xl font-black text-foreground tracking-tight leading-[1.08] max-w-4xl mx-auto mb-6">
+          <h1 className="font-['Outfit'] text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-tight">
             Master Every Discipline.{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-active via-rose-500 to-amber-500">
               Redefine Your Limit.
@@ -94,49 +91,9 @@ export default async function AllClassesPage({ searchParams }) {
           </h1>
 
           {/* Subtitle */}
-          <p className="font-['Inter'] text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed mb-10">
-            Scientifically calibrated group sessions led by certified master coaches.
-            Explore Olympic barbell complexes, anaerobic turf sprints, kinetic boxing, and clinical mobility.
+          <p className="font-['Inter'] text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-xl mx-auto leading-relaxed">
+            Scientifically calibrated athletic training sessions led by certified master coaches. Filter by discipline, difficulty level, and schedule.
           </p>
-
-          {/* Curriculum Quick Stats Bar */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">
-            <div className="p-3.5 rounded-2xl bg-white/70 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/80 dark:border-white/10 shadow-sm text-center">
-              <span className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground block">
-                45+
-              </span>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                Weekly Masterclasses
-              </span>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-white/70 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/80 dark:border-white/10 shadow-sm text-center">
-              <span className="font-['Outfit'] text-2xl sm:text-3xl font-black text-active block">
-                12+
-              </span>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                Certified Coaches
-              </span>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-white/70 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/80 dark:border-white/10 shadow-sm text-center">
-              <span className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground block">
-                1:15
-              </span>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                Coach-to-Athlete Ratio
-              </span>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-white/70 dark:bg-white/[0.03] backdrop-blur-md border border-slate-200/80 dark:border-white/10 shadow-sm text-center">
-              <span className="font-['Outfit'] text-2xl sm:text-3xl font-black text-emerald-500 block">
-                100%
-              </span>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                Heart Rate Tracked
-              </span>
-            </div>
-          </div>
         </div>
       </section>
 

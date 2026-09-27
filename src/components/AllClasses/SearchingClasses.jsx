@@ -36,19 +36,16 @@ const DIFFICULTY_LEVELS = [
     id: "Beginner",
     label: "Beginner",
     dotColor: "bg-emerald-500",
-    color: "text-emerald-500 border-emerald-500/20 bg-emerald-500/10",
   },
   {
     id: "Intermediate",
     label: "Intermediate",
     dotColor: "bg-amber-500",
-    color: "text-amber-500 border-amber-500/20 bg-amber-500/10",
   },
   {
     id: "Advanced",
     label: "Advanced",
     dotColor: "bg-rose-500",
-    color: "text-rose-500 border-rose-500/20 bg-rose-500/10",
   },
 ];
 
@@ -72,7 +69,6 @@ export default function SearchingClasses({ totalClasses = 0 }) {
   const urlSort = searchParams.get("sort") || "newest";
 
   const [searchInput, setSearchInput] = useState(urlSearch);
-  const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Synchronize search input if URL changes externally (e.g. browser back/forward or reset)
   useEffect(() => {
@@ -111,7 +107,7 @@ export default function SearchingClasses({ totalClasses = 0 }) {
     });
   };
 
-  // Debounced search typing handler (only triggers if user typed something different from URL)
+  // Debounced search typing handler
   useEffect(() => {
     if (searchInput.trim() === urlSearch.trim()) return;
 
@@ -149,25 +145,23 @@ export default function SearchingClasses({ totalClasses = 0 }) {
   );
 
   return (
-    <div className="w-full max-w-6xl mx-auto mb-10">
+    <div className="w-full max-w-6xl mx-auto mb-8">
       {/* Main Glassmorphic Control Deck */}
-      <div className="relative rounded-3xl bg-white/85 dark:bg-[#121124]/90 backdrop-blur-xl border border-slate-200/90 dark:border-white/10 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.07)] dark:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5)] p-5 sm:p-7 transition-all duration-300">
-        {/* Glow ambient background aura */}
-        <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-gradient-to-r from-active/10 via-active/20 to-transparent blur-3xl pointer-events-none -z-10 opacity-70" />
-
-        {/* Top Row: Search Input + Sort Selection + Filter Toggle */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-center">
-          {/* Search Input Field */}
-          <div className="lg:col-span-7 relative">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400">
-              <FiSearch className="w-5 h-5 text-active" />
+      <div className="relative rounded-2xl bg-white/90 dark:bg-[#121124]/90 backdrop-blur-xl border border-slate-200/90 dark:border-white/10 shadow-sm p-4 sm:p-5 transition-all duration-300 space-y-4">
+        
+        {/* Row 1: Search Input & Controls */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          {/* Search Box */}
+          <div className="relative flex-1">
+            <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-slate-400">
+              <FiSearch className="w-4 h-4 text-active" />
             </div>
             <input
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Search classes by name, workout type, or keywords..."
-              className="w-full pl-12 pr-11 py-3.5 bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 rounded-2xl font-['Inter'] text-sm sm:text-base text-foreground placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-active focus:ring-2 focus:ring-active/20 transition-all duration-200 shadow-inner"
+              placeholder="Search classes by name, coach, or workout..."
+              className="w-full pl-10 pr-9 py-2.5 bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 rounded-xl font-['Inter'] text-xs sm:text-sm text-foreground placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-active focus:ring-1 focus:ring-active/20 transition-all shadow-inner"
             />
             {searchInput && (
               <button
@@ -176,61 +170,66 @@ export default function SearchingClasses({ totalClasses = 0 }) {
                   setSearchInput("");
                   applyFilters({ search: "" });
                 }}
-                className="absolute inset-y-0 right-3.5 flex items-center justify-center my-auto w-6 h-6 rounded-full bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300 hover:bg-active hover:text-white transition-colors cursor-pointer"
+                className="absolute inset-y-0 right-3 flex items-center justify-center my-auto w-5 h-5 rounded-full bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300 hover:bg-active hover:text-white transition-colors cursor-pointer"
                 title="Clear search"
               >
-                <FiX className="w-3.5 h-3.5" />
+                <FiX className="w-3 h-3" />
               </button>
             )}
           </div>
 
-          {/* Sort Selection Dropdown */}
-          <div className="lg:col-span-3">
-            <div className="relative">
-              <select
-                value={urlSort}
-                onChange={(e) => handleSortChange(e.target.value)}
-                className="w-full px-4 py-3.5 bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 rounded-2xl font-['Inter'] text-sm font-semibold text-foreground focus:outline-none focus:border-active focus:ring-2 focus:ring-active/20 transition-all appearance-none cursor-pointer pr-10"
-              >
-                {SORT_OPTIONS.map((opt) => (
-                  <option
-                    key={opt.value}
-                    value={opt.value}
-                    className="bg-white dark:bg-[#17152f] text-foreground py-2"
-                  >
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400">
-                <FiChevronDown className="w-4 h-4" />
-              </div>
-            </div>
+          {/* Intensity Selector */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider hidden lg:inline mr-1">
+              Level:
+            </span>
+            {DIFFICULTY_LEVELS.map((lvl) => {
+              const isSelected = urlDifficulty === lvl.id;
+              return (
+                <button
+                  key={lvl.id}
+                  onClick={() => handleDifficultySelect(lvl.id)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                    isSelected
+                      ? "bg-active text-white shadow-xs font-bold ring-1 ring-active"
+                      : "bg-slate-100/90 dark:bg-white/[0.04] text-slate-600 dark:text-slate-300 hover:text-foreground hover:bg-slate-200/70 dark:hover:bg-white/[0.08] border border-slate-200/80 dark:border-white/[0.06]"
+                  }`}
+                >
+                  {lvl.dotColor && !isSelected && (
+                    <span className={`w-1.5 h-1.5 rounded-full ${lvl.dotColor}`} />
+                  )}
+                  <span>{lvl.label}</span>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Intensity & Advanced Filters Toggle Button */}
-          <div className="lg:col-span-2">
-            <button
-              type="button"
-              onClick={() => setShowAdvanced((prev) => !prev)}
-              className={`w-full py-3.5 px-4 rounded-2xl font-['Inter'] text-sm font-bold flex items-center justify-center gap-2 border transition-all duration-300 cursor-pointer ${
-                showAdvanced || (urlDifficulty && urlDifficulty !== "All")
-                  ? "bg-active text-white border-active shadow-md shadow-active/20"
-                  : "bg-slate-100 dark:bg-white/[0.05] text-foreground/80 border-slate-200 dark:border-white/10 hover:border-active/50 hover:text-foreground"
-              }`}
+          {/* Sort Dropdown */}
+          <div className="relative min-w-[170px]">
+            <select
+              value={urlSort}
+              onChange={(e) => handleSortChange(e.target.value)}
+              className="w-full pl-3 pr-8 py-2 bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 rounded-xl font-['Inter'] text-xs font-semibold text-foreground focus:outline-none focus:border-active cursor-pointer appearance-none"
             >
-              <FiSliders className="w-4 h-4" />
-              <span>Intensity</span>
-              {urlDifficulty && urlDifficulty !== "All" && (
-                <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-              )}
-            </button>
+              {SORT_OPTIONS.map((opt) => (
+                <option
+                  key={opt.value}
+                  value={opt.value}
+                  className="bg-white dark:bg-[#17152f] text-foreground"
+                >
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
+              <FiChevronDown className="w-3.5 h-3.5" />
+            </div>
           </div>
         </div>
 
-        {/* Category Filter Tabs */}
-        <div className="mt-5 pt-5 border-t border-slate-200/80 dark:border-white/[0.08]">
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none no-scrollbar">
+        {/* Row 2: Category Tabs with Icons */}
+        <div className="pt-3 border-t border-slate-200/80 dark:border-white/[0.08]">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none no-scrollbar">
             {CATEGORIES.map((cat) => {
               const Icon = cat.icon;
               const isSelected =
@@ -242,13 +241,13 @@ export default function SearchingClasses({ totalClasses = 0 }) {
                 <button
                   key={cat.name}
                   onClick={() => handleCategorySelect(cat.name)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-['Inter'] text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer shrink-0 ${
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-['Inter'] text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer shrink-0 ${
                     isSelected
-                      ? "bg-active text-white shadow-md shadow-active/25 scale-[1.02]"
-                      : "bg-slate-100/80 dark:bg-white/[0.04] text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-white/[0.06] hover:border-active/40 hover:text-foreground hover:bg-slate-200/50 dark:hover:bg-white/[0.08]"
+                      ? "bg-active text-white shadow-sm font-bold ring-1 ring-active"
+                      : "bg-slate-100/80 dark:bg-white/[0.04] text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-white/[0.06] hover:border-active/40 hover:text-foreground hover:bg-slate-200/60 dark:hover:bg-white/[0.08]"
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isSelected ? "text-white" : "text-active"}`} />
+                  <Icon className={`w-3 h-3 ${isSelected ? "text-white" : "text-active"}`} />
                   <span>{cat.label}</span>
                 </button>
               );
@@ -256,60 +255,15 @@ export default function SearchingClasses({ totalClasses = 0 }) {
           </div>
         </div>
 
-        {/* Collapsible Intensity / Difficulty Filters */}
-        {(showAdvanced || (urlDifficulty && urlDifficulty !== "All")) && (
-          <div className="mt-4 pt-4 border-t border-dashed border-slate-200 dark:border-white/[0.08] flex flex-wrap items-center justify-between gap-4 animate-fadeIn">
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 flex items-center gap-1.5 mr-1">
-                <FiActivity className="w-3.5 h-3.5 text-active" />
-                Target Intensity:
-              </span>
-              {DIFFICULTY_LEVELS.map((lvl) => {
-                const isSelected = urlDifficulty === lvl.id;
-                return (
-                  <button
-                    key={lvl.id}
-                    onClick={() => handleDifficultySelect(lvl.id)}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      isSelected
-                        ? "bg-active text-white shadow-sm ring-1 ring-active"
-                        : "bg-slate-100 dark:bg-white/[0.04] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 hover:border-active/40"
-                    }`}
-                  >
-                    {lvl.dotColor && !isSelected && (
-                      <span className={`w-2 h-2 rounded-full ${lvl.dotColor}`} />
-                    )}
-                    <span>{lvl.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {hasActiveFilters && (
-              <button
-                onClick={resetAllFilters}
-                className="text-xs font-bold text-active hover:underline flex items-center gap-1 cursor-pointer ml-auto"
-              >
-                <FiRefreshCw className="w-3 h-3" />
-                <span>Reset All Filters</span>
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Bottom Status & Active Filter Chips Bar */}
-        <div className="mt-5 pt-4 border-t border-slate-200/80 dark:border-white/[0.08] flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+        {/* Row 3: Status Summary & Active Filter Tags */}
+        <div className="pt-3 border-t border-slate-200/80 dark:border-white/[0.08] flex flex-wrap items-center justify-between gap-2.5 text-xs text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center justify-center w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-['Inter']">
-              Showing{" "}
-              <strong className="text-foreground font-bold">
-                {totalClasses}
-              </strong>{" "}
-              {totalClasses === 1 ? "class" : "classes"} in current curriculum
+            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-['Inter'] text-xs">
+              Showing <strong className="text-foreground font-bold">{totalClasses}</strong> {totalClasses === 1 ? "class" : "classes"} in curriculum
             </span>
             {isPending && (
-              <span className="text-active font-semibold animate-pulse ml-2">
+              <span className="text-active font-semibold animate-pulse ml-1 text-xs">
                 Filtering...
               </span>
             )}
@@ -317,13 +271,13 @@ export default function SearchingClasses({ totalClasses = 0 }) {
 
           {/* Active Filter Badges */}
           {hasActiveFilters && (
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                 Active:
               </span>
               {urlSearch && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/[0.06] text-foreground text-[11px] font-medium border border-slate-200 dark:border-white/10">
-                  Keyword: &quot;{urlSearch}&quot;
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-white/[0.06] text-foreground text-[11px] font-medium border border-slate-200 dark:border-white/10">
+                  &quot;{urlSearch}&quot;
                   <button
                     onClick={() => {
                       setSearchInput("");
@@ -336,7 +290,7 @@ export default function SearchingClasses({ totalClasses = 0 }) {
                 </span>
               )}
               {urlCategory && urlCategory !== "All Categories" && urlCategory !== "All" && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/[0.06] text-foreground text-[11px] font-medium border border-slate-200 dark:border-white/10">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-white/[0.06] text-foreground text-[11px] font-medium border border-slate-200 dark:border-white/10">
                   {urlCategory}
                   <button
                     onClick={() => handleCategorySelect("All Categories")}
@@ -347,7 +301,7 @@ export default function SearchingClasses({ totalClasses = 0 }) {
                 </span>
               )}
               {urlDifficulty && urlDifficulty !== "All" && urlDifficulty !== "All Levels" && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/[0.06] text-foreground text-[11px] font-medium border border-slate-200 dark:border-white/10">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-white/[0.06] text-foreground text-[11px] font-medium border border-slate-200 dark:border-white/10">
                   {urlDifficulty}
                   <button
                     onClick={() => handleDifficultySelect("All")}
@@ -358,8 +312,8 @@ export default function SearchingClasses({ totalClasses = 0 }) {
                 </span>
               )}
               {urlSort && urlSort !== "newest" && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/[0.06] text-foreground text-[11px] font-medium border border-slate-200 dark:border-white/10">
-                  Sort: {SORT_OPTIONS.find((s) => s.value === urlSort)?.label}
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-white/[0.06] text-foreground text-[11px] font-medium border border-slate-200 dark:border-white/10">
+                  {SORT_OPTIONS.find((s) => s.value === urlSort)?.label}
                   <button
                     onClick={() => handleSortChange("newest")}
                     className="hover:text-active ml-0.5 cursor-pointer"
