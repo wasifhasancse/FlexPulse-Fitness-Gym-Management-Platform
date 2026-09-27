@@ -1,81 +1,223 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { FaUserCircle } from "react-icons/fa";
+import {
+  FiClock,
+  FiCalendar,
+  FiUsers,
+  FiArrowRight,
+  FiActivity,
+  FiZap,
+  FiCheckCircle,
+} from "react-icons/fi";
+import { FaFire } from "react-icons/fa";
 
 export default function ClassCard({ cls }) {
-  const { className, price, author, duration, slot, classImage, category, level, description } = cls;
+  if (!cls) return null;
+
+  const {
+    _id,
+    className = "Athletic Training Session",
+    price = 35,
+    authorName,
+    author,
+    authorImage,
+    duration = 45,
+    slot = 20,
+    bookingCount = 0,
+    classImage,
+    category = "Cardio",
+    difficultyLevel,
+    level,
+    description = "Engineered athletic conditioning session designed for optimal strength, endurance, and physical performance.",
+    classSchedule,
+    time,
+  } = cls;
+
+  const coachName = authorName || (author && author !== "trainer" ? author : "Coach Marcus Vance");
+  const activeLevel = difficultyLevel || level || "All Levels";
+
+  // Category-specific styling tokens
+  const getCategoryStyles = (cat = "") => {
+    const c = cat.toLowerCase();
+    if (c.includes("weight") || c.includes("strength"))
+      return "from-amber-500/20 to-orange-500/20 text-amber-500 dark:text-amber-400 border-amber-500/30";
+    if (c.includes("hiit") || c.includes("combat"))
+      return "from-rose-500/20 to-red-600/20 text-rose-500 dark:text-rose-400 border-rose-500/30";
+    if (c.includes("cardio") || c.includes("run"))
+      return "from-cyan-500/20 to-blue-500/20 text-cyan-500 dark:text-cyan-400 border-cyan-500/30";
+    if (c.includes("stretch") || c.includes("yoga") || c.includes("pilates"))
+      return "from-emerald-500/20 to-teal-500/20 text-emerald-500 dark:text-emerald-400 border-emerald-500/30";
+    return "from-active/20 to-rose-500/20 text-active border-active/30";
+  };
+
+  const getLevelBadge = (lvl = "") => {
+    const l = lvl.toLowerCase();
+    if (l.includes("advanced"))
+      return {
+        label: "Advanced",
+        class: "bg-rose-500/15 text-rose-500 dark:text-rose-400 border-rose-500/30",
+      };
+    if (l.includes("intermediate"))
+      return {
+        label: "Intermediate",
+        class: "bg-amber-500/15 text-amber-500 dark:text-amber-400 border-amber-500/30",
+      };
+    return {
+      label: "Beginner",
+      class: "bg-emerald-500/15 text-emerald-500 dark:text-emerald-400 border-emerald-500/30",
+    };
+  };
+
+  const getFallbackImage = (cat = "") => {
+    const c = (cat || "").toLowerCase();
+    if (c.includes("weight") || c.includes("strength"))
+      return "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1200&auto=format&fit=crop";
+    if (c.includes("hiit") || c.includes("bootcamp"))
+      return "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1200&auto=format&fit=crop";
+    if (c.includes("combat") || c.includes("box"))
+      return "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?q=80&w=1200&auto=format&fit=crop";
+    if (c.includes("stretch") || c.includes("yoga") || c.includes("pilates"))
+      return "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=1200&auto=format&fit=crop";
+    return "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?q=80&w=1200&auto=format&fit=crop";
+  };
+
+  const levelBadge = getLevelBadge(activeLevel);
+  const remainingSlots = Math.max(0, Number(slot) - Number(bookingCount));
+  const fallbackImg = getFallbackImage(category);
 
   return (
-    <div className="group bg-[#ffffff] dark:bg-[#1B1A55]/40 border border-brand-500/20 rounded-[24px] overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col h-125">
-
-      {/* Top Image portion */}
-      <div className="h-52 w-full relative overflow-hidden bg-brand-800">
+    <div className="group relative flex flex-col h-full rounded-[26px] bg-white dark:bg-[#121124]/90 border border-slate-200/90 dark:border-white/10 hover:border-active/60 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] hover:shadow-[0_20px_45px_-12px_rgba(255,24,68,0.22)] transition-all duration-300 hover:-translate-y-1.5 overflow-hidden">
+      
+      {/* Top Media Banner */}
+      <div className="relative h-56 w-full overflow-hidden bg-slate-900">
         <Image
-          src={classImage || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop"}
+          src={classImage || fallbackImg}
           alt={className}
           fill
           unoptimized
-          className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+          className="object-cover w-full h-full group-hover:scale-108 transition-transform duration-700 ease-out"
         />
 
-        {/* Category Pill Tag */}
-        <span className="absolute top-4 left-4 z-10 bg-red-500/10 dark:bg-red-500/20 text-red-500 dark:text-red-400 text-xs font-bold px-3 py-1 rounded-md backdrop-blur-md">
-          {category || "Cardio"}
-        </span>
+        {/* Ambient Dark Gradient Scrim */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
 
-        {/* Price Tag Overlay */}
-        <span className="absolute top-4 right-4 z-10 bg-active text-btn-text text-xs font-extrabold px-2.5 py-1.5 rounded-lg shadow-md border border-brand-500/10">
-          ${price}
-        </span>
+        {/* Top Floating Badges */}
+        <div className="absolute top-3.5 inset-x-3.5 flex items-center justify-between z-10">
+          {/* Category Chip */}
+          <span
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md bg-black/40 border ${getCategoryStyles(
+              category
+            )} shadow-sm`}
+          >
+            <FaFire className="w-3 h-3" />
+            {category}
+          </span>
+
+          {/* Price Tag with Glow */}
+          <span className="inline-flex items-center px-3 py-1 rounded-xl bg-gradient-to-r from-active to-rose-600 text-white font-['Outfit'] font-black text-sm shadow-md shadow-active/30 border border-white/20">
+            ${price}
+          </span>
+        </div>
+
+        {/* Bottom Media Meta Overlay */}
+        <div className="absolute bottom-3 inset-x-3.5 flex items-center justify-between text-xs z-10">
+          {/* Difficulty Level Pill */}
+          <span
+            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-bold text-[11px] backdrop-blur-md border ${levelBadge.class}`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-current" />
+            {levelBadge.label}
+          </span>
+
+          {/* Remaining Spots */}
+          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-white/90 bg-black/50 backdrop-blur-md px-2.5 py-0.5 rounded-md border border-white/10">
+            <FiUsers className="w-3 h-3 text-active" />
+            {remainingSlots > 0 ? `${remainingSlots} spots left` : "Waitlist"}
+          </span>
+        </div>
       </div>
 
-      {/* Bottom Details portion */}
-      <div className="p-6 flex flex-col flex-1 min-h-0">
-        <h3 className="font-['Outfit'] text-xl font-bold text-foreground leading-tight line-clamp-1 group-hover:text-active transition-colors">
+      {/* Card Content Body */}
+      <div className="p-5 sm:p-6 flex flex-col flex-1">
+        {/* Title */}
+        <h3 className="font-['Outfit'] text-xl font-extrabold text-foreground group-hover:text-active transition-colors duration-200 line-clamp-1 leading-snug">
           {className}
         </h3>
 
-        {/* Trainer Info */}
-        <p className="font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3] mt-1 flex items-center gap-1">
-          <span>by</span> <span className="font-semibold text-foreground">{author || "Trainer"}</span>
-        </p>
-
-        {/* Specs Row */}
-        <div className="flex items-center gap-4 mt-3">
-          <span className="bg-teal-500/10 dark:bg-teal-500/20 text-teal-600 dark:text-teal-400 text-[11px] font-bold px-2 py-0.5 rounded">
-            {level || "Beginner"}
-          </span>
-          <div className="flex items-center gap-1 text-xs text-[#535C91] dark:text-[#9290C3]">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>{duration || 60}</span>
+        {/* Coach Row */}
+        <div className="flex items-center gap-2.5 mt-2.5">
+          <div className="relative w-8 h-8 rounded-full overflow-hidden bg-active/10 border border-active/30 shrink-0">
+            {authorImage ? (
+              <Image
+                src={authorImage}
+                alt={coachName}
+                fill
+                unoptimized
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center font-['Outfit'] text-xs font-bold text-active">
+                {coachName.charAt(0)}
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-1 text-xs text-[#535C91] dark:text-[#9290C3]">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            <span>{slot || 0}</span>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1 text-xs font-bold text-foreground truncate">
+              <span className="truncate">{coachName}</span>
+              <FiCheckCircle className="w-3.5 h-3.5 text-active shrink-0" title="Verified Master Coach" />
+            </div>
+            <p className="text-[11px] text-slate-400 dark:text-slate-400">
+              Master Athletic Coach
+            </p>
+          </div>
+        </div>
+
+        {/* Key Metrics Chips */}
+        <div className="grid grid-cols-2 gap-2 mt-4">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 dark:bg-white/[0.04] border border-slate-100 dark:border-white/[0.05] text-xs font-semibold text-slate-600 dark:text-slate-300">
+            <FiClock className="w-3.5 h-3.5 text-active shrink-0" />
+            <span>{duration} Mins</span>
+          </div>
+
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 dark:bg-white/[0.04] border border-slate-100 dark:border-white/[0.05] text-xs font-semibold text-slate-600 dark:text-slate-300">
+            <FiCalendar className="w-3.5 h-3.5 text-active shrink-0" />
+            <span className="truncate">{classSchedule ? classSchedule.split(",")[0] : "Weekly"}</span>
           </div>
         </div>
 
         {/* Description */}
-        <p className="font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3] line-clamp-2 mt-4 flex-1">
-          {description || "A custom fitness session designed to test your limits, improve body wellness, and build strength."}
+        <p className="font-['Inter'] text-xs sm:text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mt-3.5 leading-relaxed flex-1">
+          {description}
         </p>
 
         {/* Divider */}
-        <div className="border-t border-[#535C91]/15 dark:border-brand-800/40 my-4"></div>
+        <div className="border-t border-slate-100 dark:border-white/[0.08] my-4" />
 
-        {/* Bottom CTA & Price Row */}
-        <div className="flex items-center justify-between mt-auto">
+        {/* Card Action Row */}
+        <div className="flex items-center justify-between gap-3 mt-auto">
           <div>
-            <span className="font-['Outfit'] text-2xl font-black text-active">${price}</span>
-            <span className="text-[11px] text-[#535C91] dark:text-[#9290C3] ml-1">/session</span>
+            <div className="flex items-baseline gap-1">
+              <span className="font-['Outfit'] text-2xl font-black text-foreground">
+                ${price}
+              </span>
+              <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-400">
+                /month
+              </span>
+            </div>
+            <span className="text-[10px] text-emerald-500 font-bold block">
+              Monthly Pass
+            </span>
           </div>
-          <Link href={`/all-classes/${cls._id}`}>
-            <button className="bg-transparent hover:bg-btn-bg text-[#535C91] dark:text-[#9290C3] hover:text-btn-text border border-brand-500/30 dark:border-brand-500/50 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-300 cursor-pointer">
-              View Details
+
+          <Link href={`/all-classes/${_id}`} className="shrink-0">
+            <button
+              type="button"
+              className="group/btn relative inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-active dark:hover:bg-active dark:hover:text-white text-xs font-bold transition-all duration-300 shadow-md hover:shadow-active/30 cursor-pointer"
+            >
+              <span>View Details</span>
+              <FiArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform duration-200" />
             </button>
           </Link>
         </div>
