@@ -1,6 +1,6 @@
 import { serverFetch, serverMutation } from "../core/serverActions";
 
-const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000";
 
 export const getAllClasses = async (
   search = "",
@@ -8,18 +8,23 @@ export const getAllClasses = async (
   page = 1,
   limit = 6,
   includeAll = false,
+  sort = "newest",
+  difficulty = "",
 ) => {
   const params = new URLSearchParams();
 
   if (search) params.set("search", search);
-  if (category && category !== "All Categories")
+  if (category && category !== "All Categories" && category !== "All")
     params.set("category", category);
   if (page > 0) params.set("page", String(page));
   if (limit) params.set("limit", String(limit));
   if (includeAll) params.set("includeAll", "true");
+  if (sort && sort !== "newest") params.set("sort", sort);
+  if (difficulty && difficulty !== "All" && difficulty !== "All Levels")
+    params.set("difficulty", difficulty);
 
   const requestUrl = `${baseUrl}/api/all-class?${params.toString()}`;
-  const res = await fetch(requestUrl);
+  const res = await fetch(requestUrl, { cache: "no-store" });
   if (!res.ok) {
     throw new Error(`Failed to fetch classes: ${res.status}`);
   }
