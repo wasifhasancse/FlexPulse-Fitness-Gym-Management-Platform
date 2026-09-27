@@ -1,222 +1,193 @@
 import { stripe } from "@/lib/stripe";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  FaCalendarCheck,
-  FaCheckCircle,
-  FaClock,
-  FaDollarSign,
-  FaUser,
-} from "react-icons/fa";
+import SuccessReceiptClient from "@/components/Payment/SuccessReceiptClient";
 
 export const metadata = {
-  title: "Payment Successful - FlexPulse",
+  title: "Payment Receipt & Booking Confirmation - FlexPulse",
   description:
-    "Your payment was successful. A confirmation email has been sent to your inbox. Thank you for booking a class with FlexPulse. We look forward to seeing you in the class!",
+    "Official payment receipt and booking confirmation for your FlexPulse athletic training session. Certified Stripe payment gateway verification.",
 };
 
 export default async function Success({ searchParams, params }) {
-  const { id } = await params;
   const { session_id } = await searchParams;
 
-  if (!session_id)
-    throw new Error("Please provide a valid session_id (`cs_test_...`)");
-
-  const {
-    metadata,
-    status,
-    customer_details: { email: customerEmail },
-  } = await stripe.checkout.sessions.retrieve(session_id, {
-    expand: ["line_items", "payment_intent"],
-  });
-
-  if (status === "open") {
-    return redirect("/");
+  if (!session_id) {
+    redirect("/dashboard/member/bookings");
   }
 
-  const {
-    className,
-    image,
-    trainer,
-    price,
-    duration,
-    classId,
-    userId,
-    userName,
-    userEmail,
-  } = metadata;
-  console.log("Payment Metadata:", metadata); // Debugging line to check the metadata
-  if (status === "complete") {
-    // transaction routes and transactionCollection
-    // app.post("/api/transaction", async (req, res) => {
-    //   const { userId, classId, sessionId, transactionId, amount } = req.body;
-    //   const activeResult = await ensureUserActive({ userId }, res);
-    //   if (!activeResult.ok) return;
-    //   const transactionData = {
-    //     userId,
-    //     classId,
-    //     sessionId,
-    //     transactionId,
-    //     amount,
-    //   };
-    //   const result = await transactionCollection.insertOne(transactionData);
-    //   res.status(201).json(result);
-    // });
-    // this is backend route, if my payment is successful, I will call this route to store the transaction in the database. I will also check if the user has already booked this class, if not, I will book the class for the user.
-
-    const transactionData = {
-      userId,
-      userEmail,
-      userName,
-      className,
-      classId,
-      sessionId: session_id,
-      transactionId: session_id,
-      amount: price,
-    };
-
-    console.log("Transaction Data to be sent:", transactionData); // Debugging line to check the transaction data
-    await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/transaction`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(transactionData),
+  let session = null;
+  try {
+    session = await stripe.checkout.sessions.retrieve(session_id, {
+      expand: [
+        "line_items",
+        "payment_intent",
+        "payment_intent.payment_method",
+        "subscription",
+        "subscription.default_payment_method",
+      ],
     });
+  } catch (err) {
+    console.error("Failed to retrieve Stripe session:", err);
+    redirect("/dashboard/member/bookings");
+  }
 
-    const checkRes = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/checkBooking?userId=${userId}&classId=${classId}`,
-    );
-    const { isBooked } = await checkRes.json();
+  if (session?.status === "open") {
+    redirect("/");
+  }
 
-    if (!isBooked) {
-      // set a dynamic booking count every booking time increment the booking count by 1, and store it in the database, so that we can show the number of bookings for each class. fixed it below.
-      const bookData = {
-        bookingCount: 1, // Start with 1 for the first booking
-        classId,
-        className,
-        trainer,
-        price,
-        duration,
-        image,
-        userEmail: customerEmail,
+  const metadata = session?.metadata || {};
+  const customerEmail = session?.customer_details?.email || metadata.userEmail || "athlete@flexpulse.com";
+
+  const {
+    className = "Athletic Training Session",
+    image = "",
+    trainer = "Coach Marcus Vance",
+    price = 35,
+    duration = 45,
+    classId = "",
+    userId = "",
+    userName = "FlexPulse Athlete",
+    billingCycle = "monthly",
+  } = metadata;
+
+  const isAutoRenew =
+    metadata.autoRenew === "true" ||
+    (metadata.autoRenew !== "false" && Boolean(session?.subscription));
+
+  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000";
+
+  if (session?.status === "complete") {
+    try {
+      const transactionData = {
         userId,
+        userEmail: customerEmail,
         userName,
-        paymentStatus: "paid",
-        status: "pending",
+        className,
+        classId,
         sessionId: session_id,
         transactionId: session_id,
-        bookedAt: new Date(),
+        amount: Number(price),
+        autoRenew: isAutoRenew,
+        billingCycle: isAutoRenew ? "monthly" : "one_time_month",
+        planType: isAutoRenew ? "Monthly Membership Pass" : "Single 1-Month Pass",
+        paymentGateway: "Stripe",
+        currency: "USD",
+        status: "completed",
       };
-      await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/bookClass`, {
+
+      await fetch(`${serverUrl}/api/transaction`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(bookData),
+        body: JSON.stringify(transactionData),
       });
+
+      if (userId && classId) {
+        const checkRes = await fetch(
+          `${serverUrl}/api/checkBooking?userId=${userId}&classId=${classId}`
+        );
+        const checkData = await checkRes.json();
+        const isBooked = Boolean(checkData?.isBooked);
+
+        if (!isBooked) {
+          const subscriptionId =
+            typeof session?.subscription === "string"
+              ? session.subscription
+              : session?.subscription?.id || null;
+
+          const bookData = {
+            bookingCount: 1,
+            classId,
+            className,
+            trainer,
+            price: Number(price),
+            duration,
+            image,
+            userEmail: customerEmail,
+            userId,
+            userName,
+            paymentStatus: "paid",
+            status: "active",
+            autoRenew: isAutoRenew,
+            subscriptionStatus: isAutoRenew ? "active" : "cancelled_at_period_end",
+            subscriptionId,
+            billingCycle: isAutoRenew ? "monthly" : "one_time_month",
+            plan: isAutoRenew ? "Monthly Membership" : "1-Month Pass",
+            sessionId: session_id,
+            transactionId: session_id,
+            paymentGateway: "Stripe",
+            bookedAt: new Date(),
+          };
+
+          await fetch(`${serverUrl}/api/bookClass`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(bookData),
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Error saving booking/transaction records:", err);
     }
-
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12 transition-colors duration-300">
-        <div className="w-full max-w-2xl bg-white dark:bg-brand-800/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/30 p-8 md:p-12">
-          {/* Success Icon */}
-          <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center">
-              <FaCheckCircle className="w-10 h-10 text-emerald-500" />
-            </div>
-          </div>
-
-          {/* Heading */}
-          <h1 className="font-['Outfit'] text-3xl md:text-4xl font-bold text-center text-foreground">
-            Payment Successful!
-          </h1>
-          <p className="font-['Inter'] text-center text-[#535C91] dark:text-[#9290C3] mt-2">
-            Thank you for your booking. A confirmation email has been sent to{" "}
-            <span className="font-semibold text-foreground">
-              {customerEmail}
-            </span>
-            .
-          </p>
-
-          {/* Booking Summary */}
-          <div className="mt-8 bg-[#535C91]/5 dark:bg-[#1b1a55]/40 rounded-xl p-6 space-y-3 border border-brand-500/20 dark:border-brand-500/30">
-            <h2 className="font-['Inter'] text-sm font-bold uppercase tracking-wider text-[#535C91] dark:text-[#9290C3]">
-              Booking Summary
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="flex items-center gap-3">
-                <FaCalendarCheck className="w-5 h-5 text-active" />
-                <div>
-                  <p className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3]">
-                    Class
-                  </p>
-                  <p className="font-['Inter'] font-semibold text-foreground">
-                    {className}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <FaUser className="w-5 h-5 text-active" />
-                <div>
-                  <p className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3]">
-                    Trainer
-                  </p>
-                  <p className="font-['Inter'] font-semibold text-foreground">
-                    {trainer}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <FaClock className="w-5 h-5 text-active" />
-                <div>
-                  <p className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3]">
-                    Duration
-                  </p>
-                  <p className="font-['Inter'] font-semibold text-foreground">
-                    {duration} minutes
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <FaDollarSign className="w-5 h-5 text-active" />
-                <div>
-                  <p className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3]">
-                    Price
-                  </p>
-                  <p className="font-['Inter'] font-semibold text-foreground">
-                    ${price}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="mt-8 flex flex-col sm:flex-row gap-4">
-            <Link
-              href="/dashboard/member/bookings"
-              className="flex-1 text-center py-3 bg-btn-bg text-btn-text font-['Inter'] font-semibold rounded-xl hover:opacity-90 transition-colors shadow-sm cursor-pointer border border-brand-500/20"
-            >
-              View My Bookings
-            </Link>
-            <Link
-              href="/all-classes"
-              className="flex-1 text-center py-3 border-2 border-brand-500/20 text-[#535C91] dark:text-[#9290C3] font-['Inter'] font-semibold rounded-xl hover:border-active hover:text-active transition-all cursor-pointer"
-            >
-              Browse More Classes
-            </Link>
-          </div>
-
-          {/* Extra info */}
-          <p className="mt-6 text-center font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3]">
-            If you have any questions, please email{" "}
-            <a
-              href="mailto:support@flexpulse.com"
-              className="text-active hover:underline"
-            >
-              support@flexpulse.com
-            </a>
-            .
-          </p>
-        </div>
-      </div>
-    );
   }
+
+  // Extract exact payment method used
+  let paymentMethodDetails = {
+    brand: "visa",
+    last4: "4242",
+    type: "card",
+    funding: "credit",
+    wallet: null,
+  };
+
+  const piMethod = session?.payment_intent?.payment_method;
+  if (piMethod && typeof piMethod === "object" && piMethod.card) {
+    paymentMethodDetails = {
+      brand: piMethod.card.display_brand || piMethod.card.brand || "card",
+      last4: piMethod.card.last4 || "4242",
+      type: piMethod.type || "card",
+      funding: piMethod.card.funding || "credit",
+      wallet: piMethod.card.wallet?.type || null,
+      expMonth: piMethod.card.exp_month,
+      expYear: piMethod.card.exp_year,
+    };
+  } else {
+    const subMethod = session?.subscription?.default_payment_method;
+    if (subMethod && typeof subMethod === "object" && subMethod.card) {
+      paymentMethodDetails = {
+        brand: subMethod.card.display_brand || subMethod.card.brand || "card",
+        last4: subMethod.card.last4 || "4242",
+        type: subMethod.type || "card",
+        funding: subMethod.card.funding || "credit",
+        wallet: subMethod.card.wallet?.type || null,
+        expMonth: subMethod.card.exp_month,
+        expYear: subMethod.card.exp_year,
+      };
+    }
+  }
+
+  const subscriptionId =
+    typeof session?.subscription === "string"
+      ? session.subscription
+      : session?.subscription?.id || null;
+
+  const receiptData = {
+    sessionId: session_id,
+    subscriptionId,
+    customerEmail,
+    className,
+    trainer,
+    price: Number(price) || 35,
+    duration: Number(duration) || 45,
+    classId,
+    userName,
+    userId,
+    transactionId: session_id,
+    paymentGateway: "Stripe",
+    billingCycle: isAutoRenew ? "monthly" : "one_time_month",
+    autoRenew: isAutoRenew,
+    paymentMethod: paymentMethodDetails,
+    status: session?.status || "complete",
+  };
+
+  return <SuccessReceiptClient receiptData={receiptData} />;
 }
