@@ -149,22 +149,22 @@ export default function Footer() {
             </p>
 
             {/* Quick Metrics */}
-            <div className="grid grid-cols-3 gap-3 p-3.5 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/50 border border-brand-500/20 font-['Outfit'] max-w-sm">
+            <div className="grid grid-cols-3 gap-3 p-3.5 rounded-2xl bg-slate-100 dark:bg-[#1B1A55]/50 border border-brand-500/20 font-['Outfit'] max-w-sm">
               <div>
                 <p className="text-lg sm:text-xl font-black text-active leading-none">18.5K+</p>
-                <p className="text-[10px] text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider mt-1">
+                <p className="text-[10px] text-slate-600 dark:text-[#9290C3] font-bold uppercase tracking-wider mt-1">
                   Athletes
                 </p>
               </div>
               <div className="border-l border-brand-500/20 pl-3">
                 <p className="text-lg sm:text-xl font-black text-active leading-none">45+</p>
-                <p className="text-[10px] text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider mt-1">
+                <p className="text-[10px] text-slate-600 dark:text-[#9290C3] font-bold uppercase tracking-wider mt-1">
                   Classes
                 </p>
               </div>
               <div className="border-l border-brand-500/20 pl-3">
                 <p className="text-lg sm:text-xl font-black text-active leading-none">4 Hubs</p>
-                <p className="text-[10px] text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider mt-1">
+                <p className="text-[10px] text-slate-600 dark:text-[#9290C3] font-bold uppercase tracking-wider mt-1">
                   24/7 Access
                 </p>
               </div>
@@ -173,19 +173,21 @@ export default function Footer() {
             {/* Social Channels */}
             <div className="flex items-center gap-2.5 pt-1">
               {[
-                { icon: FaInstagram, label: "Instagram", href: "#" },
-                { icon: FaXTwitter, label: "X / Twitter", href: "#" },
-                { icon: FaYoutube, label: "YouTube", href: "#" },
-                { icon: FaDiscord, label: "Discord Community", href: "#" },
-                { icon: FaFacebook, label: "Facebook", href: "#" }
+                { icon: FaInstagram, label: "Instagram", href: "https://instagram.com" },
+                { icon: FaXTwitter, label: "X / Twitter", href: "https://twitter.com" },
+                { icon: FaYoutube, label: "YouTube", href: "https://youtube.com" },
+                { icon: FaDiscord, label: "Discord Community", href: "https://discord.com" },
+                { icon: FaFacebook, label: "Facebook", href: "https://facebook.com" }
               ].map((s, i) => {
                 const Icon = s.icon;
                 return (
                   <a
                     key={i}
                     href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     aria-label={s.label}
-                    className="w-9 h-9 rounded-xl bg-[#535C91]/10 dark:bg-[#1B1A55]/70 hover:bg-active hover:text-white border border-brand-500/20 text-[#535C91] dark:text-[#9290C3] transition-all duration-200 flex items-center justify-center cursor-pointer shadow-xs active:scale-95"
+                    className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-[#1B1A55]/70 hover:bg-active hover:text-white border border-brand-500/20 text-slate-600 dark:text-[#9290C3] transition-all duration-200 flex items-center justify-center cursor-pointer shadow-xs active:scale-95"
                   >
                     <Icon className="w-4 h-4" />
                   </a>
@@ -196,7 +198,8 @@ export default function Footer() {
 
           {/* Quick Nav Links (Span 3 on lg) */}
           <div className="lg:col-span-3 space-y-4">
-            <h4 className="font-['Outfit'] text-sm sm:text-base font-bold tracking-wide text-foreground uppercase">
+            <h4 className="font-['Outfit'] text-sm sm:text-base font-bold tracking-wide text-foreground uppercase flex items-center gap-2">
+              <span className="w-1.5 h-3.5 bg-active rounded-full inline-block"></span>
               Explore Platform
             </h4>
             <ul className="space-y-2.5 font-['Inter'] text-xs sm:text-sm">
@@ -208,12 +211,13 @@ export default function Footer() {
                 { label: "Gym & Recovery Facilities", href: "/facilities" },
                 { label: "BMI & Macro Calculator", href: "/calculator" },
                 { label: "Community Forum", href: "/forum" },
-                { label: "VIP Trial Pass", href: "/calculator#trial-pass" }
+                { label: "VIP Trial Pass", href: "/calculator#trial-pass" },
+                { label: "Support & Contact", href: "/contact" }
               ].map((link, i) => (
                 <li key={i}>
                   <Link
                     href={link.href}
-                    className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200 cursor-pointer"
+                    className="text-slate-600 dark:text-slate-300 hover:text-active hover:translate-x-1 inline-block transition-all duration-200 cursor-pointer font-medium"
                   >
                     {link.label}
                   </Link>
@@ -224,7 +228,8 @@ export default function Footer() {
 
           {/* Disciplines & Programs (Span 2 on lg) */}
           <div className="lg:col-span-2 space-y-4">
-            <h4 className="font-['Outfit'] text-sm sm:text-base font-bold tracking-wide text-foreground uppercase">
+            <h4 className="font-['Outfit'] text-sm sm:text-base font-bold tracking-wide text-foreground uppercase flex items-center gap-2">
+              <span className="w-1.5 h-3.5 bg-active rounded-full inline-block"></span>
               Disciplines
             </h4>
             <ul className="space-y-2.5 font-['Inter'] text-xs sm:text-sm">
@@ -234,12 +239,13 @@ export default function Footer() {
                 { label: "Combat Athletics", href: "/all-classes?category=Combat" },
                 { label: "Mobility & Flow", href: "/all-classes?category=Yoga" },
                 { label: "Turf Conditioning", href: "/all-classes?category=Cardio" },
-                { label: "Cold Contrast Bath", href: "/facilities" }
+                { label: "Cold Contrast Bath", href: "/facilities" },
+                { label: "Apply as Trainer", href: "/dashboard/member/apply-trainer" }
               ].map((prog, i) => (
                 <li key={i}>
                   <Link
                     href={prog.href}
-                    className="text-[#535C91] dark:text-[#9290C3] hover:text-active hover:translate-x-1 inline-block transition-all duration-200 cursor-pointer"
+                    className="text-slate-600 dark:text-slate-300 hover:text-active hover:translate-x-1 inline-block transition-all duration-200 cursor-pointer font-medium"
                   >
                     {prog.label}
                   </Link>
@@ -250,10 +256,11 @@ export default function Footer() {
 
           {/* Contact, Hours & Hubs (Span 3 on lg) */}
           <div className="lg:col-span-3 space-y-4">
-            <h4 className="font-['Outfit'] text-sm sm:text-base font-bold tracking-wide text-foreground uppercase">
+            <h4 className="font-['Outfit'] text-sm sm:text-base font-bold tracking-wide text-foreground uppercase flex items-center gap-2">
+              <span className="w-1.5 h-3.5 bg-active rounded-full inline-block"></span>
               Hubs & Concierge
             </h4>
-            <ul className="space-y-3.5 font-['Inter'] text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3]">
+            <ul className="space-y-3.5 font-['Inter'] text-xs sm:text-sm text-slate-600 dark:text-slate-300">
               <li className="flex items-start gap-2.5">
                 <FiMapPin className="text-active w-4 h-4 shrink-0 mt-0.5" />
                 <span className="leading-snug">
@@ -262,11 +269,15 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2.5">
                 <FiPhone className="text-active w-4 h-4 shrink-0" />
-                <span className="font-semibold text-foreground">+880 1712-345678</span>
+                <a href="tel:+8801712345678" className="font-semibold text-foreground hover:text-active transition-colors">
+                  +880 1712-345678
+                </a>
               </li>
               <li className="flex items-center gap-2.5">
                 <FiMail className="text-active w-4 h-4 shrink-0" />
-                <span>concierge@flexpulse.com</span>
+                <a href="mailto:concierge@flexpulse.com" className="hover:text-active transition-colors">
+                  concierge@flexpulse.com
+                </a>
               </li>
               
               <li className="pt-2 border-t border-brand-500/15">
@@ -279,7 +290,7 @@ export default function Footer() {
                         Keyless Turnstiles: 24/7/365
                       </span>
                     </div>
-                    <p className="text-[11px] text-[#535C91] dark:text-[#9290C3]">
+                    <p className="text-[11px] text-slate-600 dark:text-[#9290C3]">
                       Coached Floor: Mon - Sat 06:00 - 22:00
                     </p>
                   </div>
@@ -291,26 +302,44 @@ export default function Footer() {
         </div>
 
         {/* Bottom Legal & Copyright Bar */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3]">
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 font-['Inter'] text-xs text-slate-600 dark:text-slate-400">
           
           <div className="flex flex-wrap items-center gap-2 text-center md:text-left">
             <span>© {new Date().getFullYear()} FlexPulse Athletic Club Inc. All rights reserved.</span>
             <span className="hidden sm:inline">•</span>
-            <span className="inline-flex items-center gap-1 text-emerald-500 font-semibold">
+            <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
               <FiShield className="w-3.5 h-3.5" />
               Verified Performance Facility
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-6">
-            <Link href="/contact" className="hover:text-active transition-colors cursor-pointer">
+          <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-6 font-medium">
+            <Link 
+              href="/privacy" 
+              className="text-slate-700 dark:text-slate-300 hover:text-active hover:underline transition-colors cursor-pointer"
+            >
               Privacy Policy
             </Link>
-            <Link href="/contact" className="hover:text-active transition-colors cursor-pointer">
+            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+            <Link 
+              href="/terms" 
+              className="text-slate-700 dark:text-slate-300 hover:text-active hover:underline transition-colors cursor-pointer"
+            >
               Terms of Membership
             </Link>
-            <Link href="/contact" className="hover:text-active transition-colors cursor-pointer">
+            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+            <Link 
+              href="/club-rules" 
+              className="text-slate-700 dark:text-slate-300 hover:text-active hover:underline transition-colors cursor-pointer"
+            >
               Club Rules
+            </Link>
+            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+            <Link 
+              href="/contact" 
+              className="text-slate-700 dark:text-slate-300 hover:text-active hover:underline transition-colors cursor-pointer"
+            >
+              Support Concierge
             </Link>
           </div>
 

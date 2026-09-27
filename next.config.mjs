@@ -18,6 +18,35 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/privacy-policy",
+        destination: "/privacy",
+        permanent: true,
+      },
+      {
+        source: "/terms-of-membership",
+        destination: "/terms",
+        permanent: true,
+      },
+      {
+        source: "/terms-and-conditions",
+        destination: "/terms",
+        permanent: true,
+      },
+      {
+        source: "/rules",
+        destination: "/club-rules",
+        permanent: true,
+      },
+      {
+        source: "/clubrules",
+        destination: "/club-rules",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
