@@ -1,5 +1,6 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
+import "animate.css";
 import HeroUiThemeProvider from "@/components/providers/HeroUiThemeProvider";
 import { Toast } from "@heroui/react";
 import Footer from "@/components/Footer/Footer";
@@ -34,9 +35,9 @@ export default function RootLayout({ children }) {
           defaultTheme="system"
           enableSystem
         >
-          <Navbar/>
+          <Navbar />
           <main className="flex-1">{children}</main>
-          <Footer/>
+          <Footer />
         </HeroUiThemeProvider>
         <Toast.Provider />
         <Toaster position="top-right" toastOptions={{ duration: 4000 }} />

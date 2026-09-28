@@ -83,7 +83,9 @@ body {
 }
 
 /* Force Poppins font globally to replace arbitrary font declarations */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   font-family: var(--font-poppins), sans-serif !important;
 }
 
@@ -92,6 +94,7 @@ body {
   0% {
     transform: translate3d(0, 0, 0);
   }
+
   100% {
     transform: translate3d(-50%, 0, 0);
   }
@@ -101,6 +104,7 @@ body {
   0% {
     transform: translate3d(-50%, 0, 0);
   }
+
   100% {
     transform: translate3d(0, 0, 0);
   }
@@ -170,6 +174,3 @@ body {
   mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
   -webkit-mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
 }
-
-
-
