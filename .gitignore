@@ -40,3 +40,8 @@ linkedin.txt
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# design, animation and rule reference docs
+design.md
+animation.md
+rule.md
