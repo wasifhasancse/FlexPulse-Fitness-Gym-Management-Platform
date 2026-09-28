@@ -195,10 +195,10 @@ export default function NavSearchModal({ isOpen, onClose }) {
       {/* Backdrop click dismiss */}
       <div className="fixed inset-0 -z-10" onClick={onClose} />
 
-      <div className="w-full max-w-2xl bg-white dark:bg-[#070F2B] border border-brand-500/25 dark:border-brand-500/40 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh]">
+      <div className="w-full max-w-2xl bg-white dark:bg-[#070F2B] border border-brand-500/25 dark:border-brand-500/40 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] animate__animated animate__zoomIn animate__faster">
         {/* Search Input Bar */}
         <div className="p-3.5 sm:p-5 border-b border-brand-500/15 flex items-center gap-2.5 sm:gap-3">
-          <FiSearch className="w-5 h-5 sm:w-6 sm:h-6 text-active shrink-0 ml-1" />
+          <FiSearch className="w-5 h-5 sm:w-6 sm:h-6 text-active shrink-0 ml-1 animate__animated animate__pulse animate__infinite animate__slower" />
           <input
             ref={inputRef}
             type="text"

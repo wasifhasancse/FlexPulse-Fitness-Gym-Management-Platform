@@ -324,10 +324,10 @@ export default function Navbar() {
               {/* Interactive Search Bar Trigger */}
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/60 hover:bg-[#535C91]/20 dark:hover:bg-[#1B1A55] border border-brand-500/20 text-xs font-semibold text-[#535C91] dark:text-[#9290C3] transition-all cursor-pointer shadow-xs hover:border-active/40"
+                className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/60 hover:bg-[#535C91]/20 dark:hover:bg-[#1B1A55] border border-brand-500/20 text-xs font-semibold text-[#535C91] dark:text-[#9290C3] transition-all cursor-pointer shadow-xs hover:border-active/40 group"
                 title="Search classes, trainers, tools"
               >
-                <FiSearch className="w-4 h-4 text-active" />
+                <FiSearch className="w-4 h-4 text-active group-hover:animate__animated group-hover:animate__headShake" />
                 <span className="hidden xl:inline">Search...</span>
                 <kbd className="inline-flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-md bg-background border border-brand-500/20 text-[10px] font-mono font-bold text-foreground/70 select-none shadow-2xs">
                   <span className="text-[11px] leading-none">⌘</span>
@@ -433,7 +433,7 @@ export default function Navbar() {
                   </Link>
                   <Link
                     href="/signup"
-                    className="text-xs font-bold bg-btn-bg text-btn-text px-5 py-2.5 rounded-full border border-brand-500/20 shadow-md hover:scale-105 active:scale-95 transition-all duration-300"
+                    className="text-xs font-bold bg-btn-bg text-btn-text px-5 py-2.5 rounded-full border border-brand-500/20 shadow-md hover:scale-105 active:scale-95 transition-all duration-300 hover:animate__animated hover:animate__pulse"
                   >
                     Join Club
                   </Link>
