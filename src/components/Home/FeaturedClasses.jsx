@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
 import { 
   FiArrowRight, 
   FiClock, 
@@ -15,6 +16,7 @@ import {
   FiCheckCircle 
 } from "react-icons/fi";
 import { FaFire, FaStar } from "react-icons/fa";
+import ScrollAnimate from "@/components/common/ScrollAnimate";
 
 // Easing curve for high-performance animations
 const TRANSITION_EASE = [0.16, 1, 0.3, 1];
@@ -150,35 +152,21 @@ export default function FeaturedClasses({ classes }) {
 
       <div className="w-11/12 mx-auto relative z-10">
         
-        {/* Section Header */}
+        {/* Section Header with Motion Exit & Layout Animation */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 sm:mb-16 gap-6 border-b border-brand-500/15 pb-8">
-          <div className="max-w-2xl space-y-3">
-            
-            {/* Accreditation Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-800/25 dark:bg-[#1B1A55]/70 border border-brand-500/25 text-xs font-bold tracking-wide shadow-xs">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-active"></span>
-              </span>
-              <span className="text-active uppercase tracking-wider font-extrabold text-[11px]">
-                High Demand Sessions
-              </span>
-              <span className="text-[#535C91] dark:text-[#9290C3]">
-                • 100% Certified Master Instructors
-              </span>
-            </div>
-
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-['Outfit'] tracking-tight text-foreground">
-              Our Featured <span className="text-active">Classes</span>
-            </h2>
-
-            <p className="text-sm sm:text-base text-[#535C91] dark:text-[#9290C3] font-['Inter'] leading-relaxed pt-1">
-              Top-rated athletic sessions engineered with biometric heart-rate tracking, structured progressive overload, and capped capacity for tailored coaching attention.
-            </p>
+          <div className="max-w-2xl">
+            <AnimatedSectionTitle
+              badge="High Demand Sessions"
+              badgeDetail="100% Certified Master Instructors"
+              title="Our Featured"
+              highlightText="Classes"
+              subtitle="Top-rated athletic sessions engineered with biometric heart-rate tracking, structured progressive overload, and capped capacity for tailored coaching attention."
+              titleKey={`featured-classes-heading-${activeCategory}`}
+            />
           </div>
 
           {/* Quick Schedule Navigation CTA */}
-          <div className="flex items-center gap-4 shrink-0">
+          <motion.div layout className="flex items-center gap-4 shrink-0">
             <Link
               href="/all-classes"
               className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/70 hover:bg-active hover:text-white text-foreground font-bold text-xs sm:text-sm border border-brand-500/25 hover:border-active transition-all duration-300 group shadow-xs cursor-pointer"
@@ -186,32 +174,45 @@ export default function FeaturedClasses({ classes }) {
               <span>Explore All Classes</span>
               <FiArrowRight className="w-4 h-4 text-active group-hover:text-white group-hover:translate-x-1 transition-all duration-200" />
             </Link>
-          </div>
+          </motion.div>
         </div>
 
-        {/* Interactive Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-10 no-scrollbar select-none">
-          {categories.map((cat) => {
-            const isActive = activeCategory === cat;
-            return (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`relative px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-tight transition-all duration-200 whitespace-nowrap cursor-pointer ${
-                  isActive
-                    ? "bg-active text-white shadow-md shadow-active/20"
-                    : "bg-[#535C91]/8 dark:bg-[#1B1A55]/60 hover:bg-[#535C91]/15 text-[#535C91] dark:text-[#9290C3] border border-brand-500/15"
-                }`}
-              >
-                {cat}
-              </button>
-            );
-          })}
-        </div>
+        {/* Interactive Filter Pills with Motion Layout Animation */}
+        <LayoutGroup id="featuredClassesFiltersGroup">
+          <motion.div layout className="flex items-center gap-2 overflow-x-auto pb-4 mb-10 no-scrollbar select-none">
+            {categories.map((cat) => {
+              const isActive = activeCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className="relative px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-tight whitespace-nowrap cursor-pointer transition-colors duration-200"
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="activeFeaturedClassTabPill"
+                      className="absolute inset-0 bg-active rounded-xl shadow-md shadow-active/20"
+                      transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                    />
+                  )}
+                  <span
+                    className={`relative z-10 ${
+                      isActive
+                        ? "text-white"
+                        : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"
+                    }`}
+                  >
+                    {cat}
+                  </span>
+                </button>
+              );
+            })}
+          </motion.div>
+        </LayoutGroup>
 
-        {/* Classes Grid with GPU Smooth Transitions */}
+        {/* Classes Grid with FLIP Layout Animation */}
         <motion.div 
-          layout="position"
+          layout
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
         >
           <AnimatePresence mode="popLayout">
@@ -258,16 +259,16 @@ export default function FeaturedClasses({ classes }) {
               const formattedDuration = typeof duration === "number" ? `${duration} Mins` : duration;
 
               return (
-                <motion.div
-                  key={_id || idx}
-                  layout="position"
-                  initial={{ opacity: 0, y: 18 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 18 }}
-                  transition={{ duration: 0.35, ease: TRANSITION_EASE }}
-                  className="w-full"
-                >
-                  <div className="group relative rounded-3xl overflow-hidden bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1.5 flex flex-col h-full shadow-lg hover:shadow-2xl">
+                <ScrollAnimate key={_id || idx} className="w-full h-full">
+                  <motion.div
+                    layout
+                    initial={{ opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 18 }}
+                    transition={{ duration: 0.35, ease: TRANSITION_EASE }}
+                    className="w-full h-full"
+                  >
+                    <div className="group relative rounded-3xl overflow-hidden bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1.5 flex flex-col h-full shadow-lg hover:shadow-2xl">
                     
                     {/* Visual Card Image Banner */}
                     <div className="relative h-56 sm:h-60 overflow-hidden bg-brand-800/10">
@@ -317,7 +318,7 @@ export default function FeaturedClasses({ classes }) {
                       
                       <div className="space-y-2">
                         {/* Class Title */}
-                        <h3 className="font-['Outfit'] text-xl font-bold text-foreground leading-snug line-clamp-1 group-hover:text-active transition-colors">
+                        <h3 className="font-['Outfit'] text-xl font-bold text-foreground leading-snug line-clamp-1 group-hover:text-active transition-colors group-hover:animate__animated group-hover:animate__headShake">
                           {className}
                         </h3>
 
@@ -403,6 +404,7 @@ export default function FeaturedClasses({ classes }) {
                     </div>
                   </div>
                 </motion.div>
+              </ScrollAnimate>
               );
             })}
           </AnimatePresence>
