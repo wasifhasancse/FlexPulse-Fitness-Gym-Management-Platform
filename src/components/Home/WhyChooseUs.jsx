@@ -2,15 +2,16 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { 
-  FiCheckCircle, 
-  FiArrowRight, 
-  FiActivity, 
-  FiShield, 
-  FiZap, 
-  FiClock, 
-  FiTarget, 
-  FiAward 
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
+import {
+  FiCheckCircle,
+  FiArrowRight,
+  FiActivity,
+  FiShield,
+  FiZap,
+  FiClock,
+  FiTarget,
+  FiAward
 } from "react-icons/fi";
 import { FaDumbbell, FaFire } from "react-icons/fa";
 
@@ -67,39 +68,20 @@ export default function WhyChooseUs() {
 
       <div className="w-11/12 mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 xl:gap-16 items-center">
-          
+
           {/* Left Column: Proof, Narrative & Value Checklist (5 cols) */}
-          <div className="lg:col-span-5 space-y-6">
-            
-            {/* Accreditation Kicker Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-800/25 dark:bg-[#1B1A55]/70 border border-brand-500/25 text-xs font-bold tracking-wide shadow-xs">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-active"></span>
-              </span>
-              <span className="text-active uppercase tracking-wider font-extrabold text-[11px]">
-                The FlexPulse Advantage
-              </span>
-              <span className="text-[#535C91] dark:text-[#9290C3]">
-                • Precision Athletic Training
-              </span>
-            </div>
-
-            {/* Section Headline */}
-            <div className="space-y-2">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-['Outfit'] tracking-tight text-foreground leading-[1.12]">
-                We Push You to <br />
-                <span className="text-active">Exceed Your Goals</span>
-              </h2>
-              <div className="w-20 h-1 bg-linear-to-r from-active to-transparent rounded-full" />
-            </div>
-
-            <p className="text-sm sm:text-base text-[#535C91] dark:text-[#9290C3] font-['Inter'] leading-relaxed">
-              At FlexPulse, we reject generic gym models. We combine science-backed progressive overload, elite coaching biomechanics, and recovery technology to ensure every hour you invest yields measurable athletic output.
-            </p>
+          <motion.div layout className="lg:col-span-5 space-y-6">
+            <AnimatedSectionTitle
+              badge="The FlexPulse Advantage"
+              badgeDetail="Precision Athletic Training"
+              title="We Push You to"
+              highlightText="Exceed Your Goals"
+              subtitle="At FlexPulse, we reject generic gym models. We combine science-backed progressive overload, elite coaching biomechanics, and recovery technology to ensure every hour you invest yields measurable athletic output."
+              titleKey="why-choose-us-heading"
+            />
 
             {/* Key Value Pillars Checklist */}
-            <div className="space-y-2.5 pt-1 font-['Inter'] text-xs sm:text-sm text-foreground">
+            <motion.div layout className="space-y-2.5 pt-1 font-['Inter'] text-xs sm:text-sm text-foreground">
               {VALUE_PILLARS.map((pillar, idx) => (
                 <div key={idx} className="flex items-start gap-2.5">
                   <div className="p-0.5 rounded-full bg-active/10 text-active shrink-0 mt-0.5">
@@ -110,10 +92,10 @@ export default function WhyChooseUs() {
                   </span>
                 </div>
               ))}
-            </div>
+            </motion.div>
 
             {/* Verified Performance Metrics Strip */}
-            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-brand-500/15 font-['Outfit']">
+            <motion.div layout className="grid grid-cols-3 gap-4 pt-6 border-t border-brand-500/15 font-['Outfit']">
               <div>
                 <p className="text-2xl sm:text-3xl font-black text-active tracking-tight">98.4%</p>
                 <p className="text-[10px] sm:text-xs text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider mt-0.5">
@@ -132,13 +114,13 @@ export default function WhyChooseUs() {
                   Facility Access
                 </p>
               </div>
-            </div>
+            </motion.div>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <motion.div layout className="flex flex-wrap items-center gap-3 pt-2">
               <Link
                 href="/facilities"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-btn-bg text-btn-text hover:opacity-95 font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer group"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-btn-bg text-btn-text hover:opacity-95 font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer group hover:animate__animated hover:animate__pulse"
               >
                 <span>Explore Facilities & Gear</span>
                 <FiArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -149,25 +131,26 @@ export default function WhyChooseUs() {
               >
                 <span>Claim VIP Day Pass</span>
               </Link>
-            </div>
+            </motion.div>
 
-          </div>
+          </motion.div>
 
           {/* Right Column: 4-Card Bento Grid Architecture (7 cols) */}
-          <div className="lg:col-span-7">
+          <motion.div layout className="lg:col-span-7">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
               {FEATURES.map((feature, i) => {
                 const Icon = feature.icon;
                 return (
                   <motion.div
                     key={feature.index}
+                    layout
                     initial={{ opacity: 0, y: 22 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ duration: 0.55, delay: i * 0.12, ease: TRANSITION_EASE }}
                   >
                     <div className="group relative p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1.5 flex flex-col justify-between h-full shadow-lg hover:shadow-2xl overflow-hidden cursor-pointer">
-                      
+
                       {/* Watermark Index Number in Top Right */}
                       <span className="absolute top-4 right-5 font-['Outfit'] font-black text-4xl sm:text-5xl text-foreground/5 dark:text-white/10 group-hover:text-active/30 transition-colors duration-300 select-none pointer-events-none">
                         {feature.index}
@@ -176,17 +159,17 @@ export default function WhyChooseUs() {
                       <div>
                         {/* Icon & Category Pill */}
                         <div className="flex items-center justify-between gap-3 mb-5">
-                          <div className="w-12 h-12 rounded-2xl bg-btn-bg/10 dark:bg-active/10 flex items-center justify-center text-active group-hover:scale-110 group-hover:bg-active group-hover:text-white transition-all duration-300 shadow-inner">
+                          <div className="w-12 h-12 rounded-2xl bg-btn-bg/10 dark:bg-active/10 flex items-center justify-center text-active group-hover:scale-110 group-hover:bg-active group-hover:text-white transition-all duration-300 shadow-inner group-hover:animate__animated group-hover:animate__bounceIn">
                             <Icon className="w-5 h-5 transition-transform" />
                           </div>
-                          
+
                           <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full border ${feature.badgeColor}`}>
                             {feature.tag}
                           </span>
                         </div>
 
                         {/* Title */}
-                        <h3 className="font-['Outfit'] text-lg sm:text-xl font-bold text-foreground mb-2.5 leading-snug group-hover:text-active transition-colors">
+                        <h3 className="font-['Outfit'] text-lg sm:text-xl font-bold text-foreground mb-2.5 leading-snug group-hover:text-active transition-colors group-hover:animate__animated group-hover:animate__headShake">
                           {feature.title}
                         </h3>
 
@@ -204,7 +187,7 @@ export default function WhyChooseUs() {
                 );
               })}
             </div>
-          </div>
+          </motion.div>
 
         </div>
 
