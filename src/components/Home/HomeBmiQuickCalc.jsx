@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
 import { 
   FiArrowRight, 
   FiActivity, 
@@ -266,30 +267,15 @@ export default function HomeBmiQuickCalc() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 xl:gap-14 items-start">
           
           {/* Left Column: Interactive WHO Spectrum Matrix & Actionable Entrypoints (5 cols) */}
-          <div className="lg:col-span-5 space-y-6">
-            
-            {/* Accreditation Kicker Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-800/25 dark:bg-[#1B1A55]/70 border border-brand-500/25 text-xs font-bold tracking-wide shadow-xs">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-active"></span>
-              </span>
-              <span className="text-active uppercase tracking-wider font-extrabold text-[11px]">
-                Instant Health Gauge
-              </span>
-              <span className="text-[#535C91] dark:text-[#9290C3]">
-                • Clinical Biometrics
-              </span>
-            </div>
-
-            {/* Section Headline */}
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-['Outfit'] tracking-tight text-foreground leading-[1.12]">
-              Know Your <span className="text-active">BMI</span> & Physical Baseline
-            </h2>
-
-            <p className="text-sm sm:text-base text-[#535C91] dark:text-[#9290C3] font-['Inter'] leading-relaxed">
-              Body Mass Index (BMI) is a clinical baseline utilized by master trainers to evaluate physical readiness, calibrate training volume, and formulate individualized nutrition protocols.
-            </p>
+          <motion.div layout className="lg:col-span-5 space-y-6">
+            <AnimatedSectionTitle
+              badge="Instant Health Gauge"
+              badgeDetail="Clinical Biometrics"
+              title="Know Your"
+              highlightText="BMI & Physical Baseline"
+              subtitle="Body Mass Index (BMI) is a clinical baseline utilized by master trainers to evaluate physical readiness, calibrate training volume, and formulate individualized nutrition protocols."
+              titleKey={`bmi-heading-${unit}-${currentStatus.key}`}
+            />
 
             {/* Interactive Clinical Spectrum Matrix with Clickable Presets */}
             <div className="rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 p-5 shadow-lg space-y-2.5 font-['Inter']">
@@ -351,7 +337,7 @@ export default function HomeBmiQuickCalc() {
             <div className="pt-1">
               <Link
                 href={macroCalculatorUrl}
-                className="group p-4 rounded-2xl bg-linear-to-r from-active/10 via-[#1B1A55]/20 to-active/10 border border-brand-500/25 hover:border-active transition-all duration-300 flex items-center justify-between gap-4 shadow-sm"
+                className="group p-4 rounded-2xl bg-linear-to-r from-active/10 via-[#1B1A55]/20 to-active/10 border border-brand-500/25 hover:border-active transition-all duration-300 flex items-center justify-between gap-4 shadow-sm hover:animate__animated hover:animate__pulse"
               >
                 <div className="space-y-0.5">
                   <span className="text-xs font-bold text-foreground block group-hover:text-active transition-colors">
@@ -367,7 +353,7 @@ export default function HomeBmiQuickCalc() {
               </Link>
             </div>
 
-          </div>
+          </motion.div>
 
           {/* Right Column: Interactive Biometric Console & Real-time Action Matching (7 cols) */}
           <div className="lg:col-span-7 space-y-6">
@@ -384,37 +370,49 @@ export default function HomeBmiQuickCalc() {
                   </p>
                 </div>
 
-                {/* Metric / Imperial Segmented Controller - Single Line Pill Design */}
-                <div className="inline-flex items-center p-1 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/80 border border-brand-500/20 font-['Inter'] text-xs font-extrabold shrink-0 whitespace-nowrap select-none shadow-xs">
-                  <button
-                    type="button"
-                    onClick={() => handleUnitSwitch("metric")}
-                    className={`px-4 py-2 rounded-xl transition-all duration-200 cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5 ${
-                      unit === "metric"
-                        ? "bg-active text-white shadow-xs font-black"
-                        : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"
-                    }`}
-                  >
-                    <span>Metric</span>
-                    <span className={`text-[11px] font-semibold ${unit === "metric" ? "text-white/85" : "text-[#535C91]/70 dark:text-[#9290C3]/70"}`}>
-                      (kg/cm)
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleUnitSwitch("imperial")}
-                    className={`px-4 py-2 rounded-xl transition-all duration-200 cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5 ${
-                      unit === "imperial"
-                        ? "bg-active text-white shadow-xs font-black"
-                        : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"
-                    }`}
-                  >
-                    <span>Imperial</span>
-                    <span className={`text-[11px] font-semibold ${unit === "imperial" ? "text-white/85" : "text-[#535C91]/70 dark:text-[#9290C3]/70"}`}>
-                      (lbs/ft)
-                    </span>
-                  </button>
-                </div>
+                {/* Metric / Imperial Segmented Controller - Single Line Pill Design with Motion Layout Animation */}
+                <LayoutGroup id="bmiQuickCalcUnitGroup">
+                  <div className="inline-flex items-center p-1 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/80 border border-brand-500/20 font-['Inter'] text-xs font-extrabold shrink-0 whitespace-nowrap select-none shadow-xs">
+                    <button
+                      type="button"
+                      onClick={() => handleUnitSwitch("metric")}
+                      className="relative px-4 py-2 rounded-xl transition-colors duration-200 cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5"
+                    >
+                      {unit === "metric" && (
+                        <motion.span
+                          layoutId="activeBmiUnitTab"
+                          className="absolute inset-0 bg-active rounded-xl shadow-xs"
+                          transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                        />
+                      )}
+                      <span className={`relative z-10 ${unit === "metric" ? "text-white font-black" : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"}`}>
+                        Metric
+                      </span>
+                      <span className={`relative z-10 text-[11px] font-semibold ${unit === "metric" ? "text-white/85" : "text-[#535C91]/70 dark:text-[#9290C3]/70"}`}>
+                        (kg/cm)
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleUnitSwitch("imperial")}
+                      className="relative px-4 py-2 rounded-xl transition-colors duration-200 cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5"
+                    >
+                      {unit === "imperial" && (
+                        <motion.span
+                          layoutId="activeBmiUnitTab"
+                          className="absolute inset-0 bg-active rounded-xl shadow-xs"
+                          transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                        />
+                      )}
+                      <span className={`relative z-10 ${unit === "imperial" ? "text-white font-black" : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"}`}>
+                        Imperial
+                      </span>
+                      <span className={`relative z-10 text-[11px] font-semibold ${unit === "imperial" ? "text-white/85" : "text-[#535C91]/70 dark:text-[#9290C3]/70"}`}>
+                        (lbs/ft)
+                      </span>
+                    </button>
+                  </div>
+                </LayoutGroup>
               </div>
 
               {/* Interactive Precision Sliders & Steppers (UX-focused) */}
@@ -661,7 +659,7 @@ export default function HomeBmiQuickCalc() {
                 {/* WORKABLE BUTTON 1: Matched Classes Button with Category Filter */}
                 <Link
                   href={matchedClassUrl}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-active text-white hover:opacity-95 font-extrabold text-xs tracking-tight shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 group cursor-pointer"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-active text-white hover:opacity-95 font-extrabold text-xs tracking-tight shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 group cursor-pointer hover:animate__animated hover:animate__pulse"
                 >
                   <FiZap className="w-3.5 h-3.5" />
                   <span>Find Matched Classes ({currentStatus.targetCategory})</span>

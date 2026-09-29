@@ -2,15 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  FiCheck, 
-  FiArrowRight, 
-  FiZap, 
-  FiShield, 
-  FiStar, 
-  FiAward, 
-  FiCheckCircle 
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
+import {
+  FiCheck,
+  FiArrowRight,
+  FiZap,
+  FiShield,
+  FiStar,
+  FiAward,
+  FiCheckCircle
 } from "react-icons/fi";
 import { FaFire } from "react-icons/fa";
 
@@ -91,67 +92,65 @@ export default function HomePricingPreview() {
       <div className="absolute bottom-1/4 right-0 w-80 sm:w-120 h-80 sm:h-120 bg-brand-500/8 rounded-full blur-[130px] pointer-events-none -z-10" />
 
       <div className="w-11/12 mx-auto relative z-10">
-        
+
         {/* Section Header */}
+        {/* Section Header with Motion Exit & Layout Animation */}
         <div className="text-center max-w-3xl mx-auto mb-14 sm:mb-18 space-y-4">
-          
-          {/* Accreditation Kicker Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-800/25 dark:bg-[#1B1A55]/70 border border-brand-500/25 text-xs font-bold tracking-wide shadow-xs">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-active"></span>
-            </span>
-            <span className="text-active uppercase tracking-wider font-extrabold text-[11px]">
-              Transparent Memberships
-            </span>
-            <span className="text-[#535C91] dark:text-[#9290C3]">
-              • Zero Long-Term Contracts
-            </span>
-          </div>
+          <AnimatedSectionTitle
+            align="center"
+            badge="Transparent Memberships"
+            badgeDetail="Zero Long-Term Contracts"
+            title="Invest in Your"
+            highlightText="Transformation"
+            subtitle="Transparent pricing with no hidden enrollment fees. Pause, upgrade, or cancel your membership anytime with zero friction."
+            titleKey={`pricing-preview-heading-${billingCycle}`}
+          />
 
-          {/* Section Headline */}
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-['Outfit'] tracking-tight text-foreground leading-[1.12]">
-            Invest in Your <span className="text-active">Transformation</span>
-          </h2>
+          {/* Billing Cycle Segmented Controller with Motion Layout Animation */}
+          <LayoutGroup id="homePricingCycleGroup">
+            <motion.div layout className="inline-flex items-center p-1.5 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/80 border border-brand-500/20 font-['Inter'] text-xs sm:text-sm font-bold shrink-0 whitespace-nowrap select-none shadow-sm mt-3">
+              <button
+                type="button"
+                onClick={() => setBillingCycle("monthly")}
+                className="relative px-5 py-2.5 rounded-xl transition-colors duration-200 cursor-pointer whitespace-nowrap"
+              >
+                {billingCycle === "monthly" && (
+                  <motion.span
+                    layoutId="activeHomePricingCyclePill"
+                    className="absolute inset-0 bg-active rounded-xl shadow-xs"
+                    transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                  />
+                )}
+                <span className={`relative z-10 ${billingCycle === "monthly" ? "text-white font-extrabold" : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"}`}>
+                  Billed Monthly
+                </span>
+              </button>
 
-          <p className="text-sm sm:text-base text-[#535C91] dark:text-[#9290C3] font-['Inter'] leading-relaxed max-w-2xl mx-auto">
-            Transparent pricing with no hidden enrollment fees. Pause, upgrade, or cancel your membership anytime with zero friction.
-          </p>
-
-          {/* Billing Cycle Segmented Controller - Single Line Pill Design */}
-          <div className="inline-flex items-center p-1.5 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/80 border border-brand-500/20 font-['Inter'] text-xs sm:text-sm font-bold shrink-0 whitespace-nowrap select-none shadow-sm mt-3">
-            <button
-              type="button"
-              onClick={() => setBillingCycle("monthly")}
-              className={`px-5 py-2.5 rounded-xl transition-all duration-200 cursor-pointer whitespace-nowrap ${
-                billingCycle === "monthly"
-                  ? "bg-active text-white shadow-xs font-extrabold"
-                  : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"
-              }`}
-            >
-              Billed Monthly
-            </button>
-            
-            <button
-              type="button"
-              onClick={() => setBillingCycle("annual")}
-              className={`px-5 py-2.5 rounded-xl transition-all duration-200 cursor-pointer whitespace-nowrap inline-flex items-center gap-2 ${
-                billingCycle === "annual"
-                  ? "bg-active text-white shadow-xs font-extrabold"
-                  : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"
-              }`}
-            >
-              <span>Billed Annually</span>
-              <span className="px-2 py-0.5 rounded-md bg-amber-400 text-black text-[10px] font-black uppercase tracking-wider shadow-xs">
-                Save 20%
-              </span>
-            </button>
-          </div>
-
+              <button
+                type="button"
+                onClick={() => setBillingCycle("annual")}
+                className="relative px-5 py-2.5 rounded-xl transition-colors duration-200 cursor-pointer whitespace-nowrap inline-flex items-center gap-2"
+              >
+                {billingCycle === "annual" && (
+                  <motion.span
+                    layoutId="activeHomePricingCyclePill"
+                    className="absolute inset-0 bg-active rounded-xl shadow-xs"
+                    transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                  />
+                )}
+                <span className={`relative z-10 ${billingCycle === "annual" ? "text-white font-extrabold" : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"}`}>
+                  Billed Annually
+                </span>
+                <span className="relative z-10 px-2 py-0.5 rounded-md bg-amber-400 text-black text-[10px] font-black uppercase tracking-wider shadow-xs animate__animated animate__heartBeat animate__infinite animate__slower">
+                  Save 20%
+                </span>
+              </button>
+            </motion.div>
+          </LayoutGroup>
         </div>
 
-        {/* Pricing Cards Grid (3 Columns) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-7 lg:gap-8 items-stretch">
+        {/* Pricing Cards Grid (3 Columns) with Motion Layout Animation */}
+        <motion.div layout className="grid grid-cols-1 md:grid-cols-3 gap-7 lg:gap-8 items-stretch">
           {TIERS.map((tier, index) => {
             const price = billingCycle === "monthly" ? tier.monthlyPrice : tier.annualPrice;
             const isAnnual = billingCycle === "annual";
@@ -159,6 +158,7 @@ export default function HomePricingPreview() {
             return (
               <motion.div
                 key={tier.id}
+                layout
                 initial={{ opacity: 0, y: 22 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
@@ -166,15 +166,14 @@ export default function HomePricingPreview() {
                 className="flex"
               >
                 <div
-                  className={`group relative rounded-3xl p-7 sm:p-8 flex flex-col justify-between w-full transition-all duration-300 ease-out hover:-translate-y-1.5 shadow-xl hover:shadow-2xl ${
-                    tier.highlight
+                  className={`group relative rounded-3xl p-7 sm:p-8 flex flex-col justify-between w-full transition-all duration-300 ease-out hover:-translate-y-1.5 shadow-xl hover:shadow-2xl ${tier.highlight
                       ? "bg-white dark:bg-[#070F2B] border-2 border-active shadow-2xl ring-4 ring-active/10"
                       : "bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60"
-                  }`}
+                    }`}
                 >
                   {/* Top Popular Floating Badge */}
                   {tier.popular && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-active text-white text-[11px] font-black uppercase tracking-wider shadow-md flex items-center gap-1.5 whitespace-nowrap">
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-active text-white text-[11px] font-black uppercase tracking-wider shadow-md flex items-center gap-1.5 whitespace-nowrap animate__animated animate__pulse animate__infinite">
                       <FaFire className="w-3 h-3 text-amber-300" />
                       <span>{tier.badge}</span>
                     </div>
@@ -245,11 +244,10 @@ export default function HomePricingPreview() {
                   {/* Call to Action Button */}
                   <Link
                     href="/pricing"
-                    className={`w-full py-3.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm text-center transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-md ${
-                      tier.popular
+                    className={`w-full py-3.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm text-center transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-md hover:animate__animated hover:animate__pulse ${tier.popular
                         ? "bg-btn-bg text-btn-text hover:opacity-95 shadow-active/20 hover:scale-[1.01]"
                         : "bg-[#535C91]/15 dark:bg-[#1B1A55] text-foreground hover:border-active/60 border border-brand-500/20 hover:bg-[#535C91]/20"
-                    }`}
+                      }`}
                   >
                     <span>{tier.cta}</span>
                     <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -259,7 +257,7 @@ export default function HomePricingPreview() {
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* Section Diagnostic Trust Banner */}
         <div className="mt-14 sm:mt-18 p-6 sm:p-8 rounded-3xl bg-linear-to-r from-brand-800/30 via-[#1B1A55]/40 to-brand-800/30 border border-brand-500/25 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
