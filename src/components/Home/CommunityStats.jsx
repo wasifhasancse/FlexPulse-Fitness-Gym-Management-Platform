@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { 
-  FiUsers, 
-  FiTrendingUp, 
-  FiAward, 
-  FiCheckCircle, 
-  FiArrowRight, 
+import {
+  FiUsers,
+  FiTrendingUp,
+  FiAward,
+  FiCheckCircle,
+  FiArrowRight,
   FiMessageSquare,
   FiActivity,
   FiZap,
@@ -103,10 +103,10 @@ export default function CommunityStats() {
       <div className="absolute bottom-10 right-0 w-80 sm:w-120 h-80 sm:h-120 bg-active/6 rounded-full blur-[130px] pointer-events-none -z-10" />
 
       <div className="w-11/12 mx-auto relative z-10">
-        
+
         {/* Section Header */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-10 sm:mb-14 gap-6 border-b border-brand-500/15 pb-8">
-          
+
           <div className="max-w-2xl space-y-3">
             {/* Industry Kicker Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-800/25 dark:bg-[#1B1A55]/70 border border-brand-500/25 text-xs font-bold tracking-wide shadow-xs">
@@ -124,7 +124,7 @@ export default function CommunityStats() {
 
             {/* Headline */}
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-['Outfit'] tracking-tight text-foreground leading-[1.12]">
-              Built By Athletes, <span className="text-active">For The Community</span>
+              Built By Athletes, <span className="text-active inline-block hover:animate__animated hover:animate__headShake cursor-default">For The Community</span>
             </h2>
 
             <p className="text-sm sm:text-base text-[#535C91] dark:text-[#9290C3] font-['Inter'] leading-relaxed pt-1">
@@ -133,7 +133,7 @@ export default function CommunityStats() {
           </div>
 
           {/* Interactive Live Activity Ticker Widget */}
-          <div 
+          <div
             className="flex items-center gap-4 bg-white dark:bg-[#070F2B] p-4 rounded-2xl border border-brand-500/25 shadow-md shrink-0 self-start lg:self-end max-w-md w-full lg:w-auto"
             onMouseEnter={() => setIsTickerPaused(true)}
             onMouseLeave={() => setIsTickerPaused(false)}
@@ -202,11 +202,10 @@ export default function CommunityStats() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-tight transition-all duration-200 whitespace-nowrap cursor-pointer shrink-0 ${
-                  isActive
+                className={`relative px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-tight transition-all duration-200 whitespace-nowrap cursor-pointer shrink-0 ${isActive
                     ? "bg-active text-white shadow-md shadow-active/20"
                     : "bg-[#535C91]/8 dark:bg-[#1B1A55]/60 hover:bg-[#535C91]/15 text-[#535C91] dark:text-[#9290C3] border border-brand-500/15"
-                }`}
+                  }`}
               >
                 {tab.label}
               </button>
@@ -216,13 +215,13 @@ export default function CommunityStats() {
 
         {/* High-Impact Asymmetric Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 sm:gap-8 mb-12 sm:mb-16">
-          
+
           {/* Bento Card 1 (Span 7 on lg): The Living Athlete Engine */}
           {(activeTab === "all" || activeTab === "challenges") && (
             <div className="lg:col-span-7 rounded-3xl p-7 sm:p-8 bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1.5 flex flex-col justify-between shadow-lg hover:shadow-2xl relative overflow-hidden group">
               {/* Background Glow */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-active/8 rounded-full blur-[80px] pointer-events-none -z-0" />
-              
+
               <div className="relative z-10">
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
                   <div className="flex items-center gap-3">
@@ -270,10 +269,9 @@ export default function CommunityStats() {
                   <div className="grid grid-cols-7 gap-2 items-end h-20 pt-2 border-b border-brand-500/15 pb-2">
                     {WEEKLY_PEAK_DAYS.map((item) => (
                       <div key={item.day} className="flex flex-col items-center gap-1.5 h-full justify-end">
-                        <div 
-                          className={`w-full rounded-t-lg transition-all duration-500 ${
-                            item.active ? "bg-active group-hover:bg-active/90 shadow-xs" : "bg-[#535C91]/25 dark:bg-[#1B1A55]"
-                          }`}
+                        <div
+                          className={`w-full rounded-t-lg transition-all duration-500 ${item.active ? "bg-active group-hover:bg-active/90 shadow-xs" : "bg-[#535C91]/25 dark:bg-[#1B1A55]"
+                            }`}
                           style={{ height: item.height }}
                         />
                         <span className="text-[10px] font-bold text-[#535C91] dark:text-[#9290C3] font-['Outfit']">
@@ -488,7 +486,7 @@ export default function CommunityStats() {
 
         {/* Community Engagement & Athlete Hub Banner */}
         <div className="relative rounded-3xl p-7 sm:p-10 bg-linear-to-r from-brand-800/30 via-[#1B1A55]/40 to-brand-800/30 border border-brand-500/25 shadow-xl overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8">
-          
+
           {/* Left: Avatar Stack & Value Prop */}
           <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-5 max-w-2xl">
             {/* Avatar Group */}
