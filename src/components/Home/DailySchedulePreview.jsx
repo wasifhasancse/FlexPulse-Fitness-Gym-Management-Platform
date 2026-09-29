@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { 
-  FiClock, 
-  FiCalendar, 
-  FiUsers, 
-  FiMapPin, 
-  FiArrowRight, 
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
+import {
+  FiClock,
+  FiCalendar,
+  FiUsers,
+  FiMapPin,
+  FiArrowRight,
   FiCheckCircle,
   FiZap,
   FiActivity
@@ -351,37 +353,22 @@ export default function DailySchedulePreview() {
       <div className="absolute bottom-10 right-0 w-80 sm:w-120 h-80 sm:h-120 bg-active/6 rounded-full blur-[130px] pointer-events-none -z-10" />
 
       <div className="w-11/12 mx-auto relative z-10">
-        
-        {/* Section Header */}
+
+        {/* Section Header with Motion Exit & Layout Animation */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 sm:mb-16 gap-6 border-b border-brand-500/15 pb-8">
-          
-          <div className="max-w-2xl space-y-3">
-            {/* Kicker Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-800/25 dark:bg-[#1B1A55]/70 border border-brand-500/25 text-xs font-bold tracking-wide shadow-xs">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-active"></span>
-              </span>
-              <span className="text-active uppercase tracking-wider font-extrabold text-[11px]">
-                Live Timetable
-              </span>
-              <span className="text-[#535C91] dark:text-[#9290C3]">
-                • Real-Time Class Availability
-              </span>
-            </div>
-
-            {/* Headline */}
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-['Outfit'] tracking-tight text-foreground leading-[1.12]">
-              Weekly Live <span className="text-active">Schedule</span>
-            </h2>
-
-            <p className="text-sm sm:text-base text-[#535C91] dark:text-[#9290C3] font-['Inter'] leading-relaxed pt-1">
-              From dawn metabolic conditioning at 06:30 AM to evening Olympic lifting and decompression flow. Filter by day and time to plan your weekly athletic regimen.
-            </p>
+          <div className="max-w-2xl">
+            <AnimatedSectionTitle
+              badge="Live Timetable"
+              badgeDetail="Real-Time Class Availability"
+              title="Weekly Live"
+              highlightText="Schedule"
+              subtitle="From dawn metabolic conditioning at 06:30 AM to evening Olympic lifting and decompression flow. Filter by day and time to plan your weekly athletic regimen."
+              titleKey={`schedule-preview-heading-${selectedDay}-${selectedPeriod}`}
+            />
           </div>
 
           {/* Quick Schedule Telemetry */}
-          <div className="flex items-center gap-4 sm:gap-6 bg-[#535C91]/5 dark:bg-[#1B1A55]/50 p-4 rounded-2xl border border-brand-500/20 shrink-0 font-['Outfit'] self-start lg:self-end">
+          <motion.div layout className="flex items-center gap-4 sm:gap-6 bg-[#535C91]/5 dark:bg-[#1B1A55]/50 p-4 rounded-2xl border border-brand-500/20 shrink-0 font-['Outfit'] self-start lg:self-end">
             <div>
               <p className="text-2xl font-black text-active tracking-tight">45+</p>
               <p className="text-[10px] sm:text-xs text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider">
@@ -402,177 +389,214 @@ export default function DailySchedulePreview() {
                 Coach Led
               </p>
             </div>
-          </div>
-
+          </motion.div>
         </div>
 
-        {/* Day Selector (Single Line Tabs) */}
+        {/* Day Selector (Single Line Tabs with Motion Layout Animation) */}
         <div className="flex items-center justify-between gap-4 overflow-x-auto pb-4 mb-6 no-scrollbar select-none border-b border-brand-500/15">
-          <div className="flex items-center gap-2">
-            {DAYS.map((day) => {
-              const isActive = selectedDay === day;
-              return (
-                <button
-                  key={day}
-                  type="button"
-                  onClick={() => setSelectedDay(day)}
-                  className={`relative px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-tight transition-all duration-200 whitespace-nowrap cursor-pointer shrink-0 ${
-                    isActive
-                      ? "bg-active text-white shadow-md shadow-active/20"
-                      : "bg-[#535C91]/8 dark:bg-[#1B1A55]/60 hover:bg-[#535C91]/15 text-[#535C91] dark:text-[#9290C3] border border-brand-500/15"
-                  }`}
-                >
-                  {day}
-                </button>
-              );
-            })}
-          </div>
+          <LayoutGroup id="schedulePreviewDaysGroup">
+            <motion.div layout className="flex items-center gap-2">
+              {DAYS.map((day) => {
+                const isActive = selectedDay === day;
+                return (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => setSelectedDay(day)}
+                    className="relative px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-tight whitespace-nowrap cursor-pointer shrink-0 transition-colors duration-200"
+                  >
+                    {isActive && (
+                      <motion.span
+                        layoutId="activeScheduleDayPill"
+                        className="absolute inset-0 bg-active rounded-xl shadow-md shadow-active/20"
+                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                      />
+                    )}
+                    <span
+                      className={`relative z-10 ${isActive
+                          ? "text-white"
+                          : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"
+                        }`}
+                    >
+                      {day}
+                    </span>
+                  </button>
+                );
+              })}
+            </motion.div>
+          </LayoutGroup>
 
-          {/* Time Filter Pills */}
-          <div className="hidden sm:flex items-center gap-1.5 shrink-0 bg-[#535C91]/5 dark:bg-[#1B1A55]/50 p-1 rounded-xl border border-brand-500/15 text-xs font-['Inter']">
-            {[
-              { id: "all", label: "All Slots" },
-              { id: "morning", label: "Morning" },
-              { id: "midday", label: "Midday" },
-              { id: "evening", label: "Evening" }
-            ].map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => setSelectedPeriod(p.id)}
-                className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
-                  selectedPeriod === p.id 
-                    ? "bg-active text-white shadow-xs" 
-                    : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"
-                }`}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
+          {/* Time Filter Pills with LayoutGroup */}
+          <LayoutGroup id="schedulePreviewTimeGroup">
+            <motion.div layout className="hidden sm:flex items-center gap-1.5 shrink-0 bg-[#535C91]/5 dark:bg-[#1B1A55]/50 p-1 rounded-xl border border-brand-500/15 text-xs font-['Inter']">
+              {[
+                { id: "all", label: "All Slots" },
+                { id: "morning", label: "Morning" },
+                { id: "midday", label: "Midday" },
+                { id: "evening", label: "Evening" }
+              ].map((p) => {
+                const isActive = selectedPeriod === p.id;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setSelectedPeriod(p.id)}
+                    className="relative px-3 py-1.5 rounded-lg font-bold cursor-pointer transition-colors duration-200"
+                  >
+                    {isActive && (
+                      <motion.span
+                        layoutId="activeSchedulePeriodPill"
+                        className="absolute inset-0 bg-active rounded-lg shadow-xs"
+                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                      />
+                    )}
+                    <span
+                      className={`relative z-10 ${isActive
+                          ? "text-white"
+                          : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"
+                        }`}
+                    >
+                      {p.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </motion.div>
+          </LayoutGroup>
         </div>
 
-        {/* Class Rows Container */}
-        <div className="space-y-4 mb-12 sm:mb-16">
-          {dayClasses.length === 0 ? (
-            <div className="p-12 text-center rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 text-[#535C91] dark:text-[#9290C3]">
-              <FiCalendar className="w-10 h-10 mx-auto mb-3 text-active/60" />
-              <p className="font-bold text-base text-foreground font-['Outfit']">No classes scheduled for this filter</p>
-              <p className="text-xs mt-1 font-['Inter']">Try switching to all slots or selecting another day.</p>
-            </div>
-          ) : (
-            dayClasses.map((item) => {
-              const occupancy = Math.round((item.enrolled / item.capacity) * 100);
-              const isWaitlist = item.status === "Waitlist Only";
-              const isFillingFast = item.status === "Filling Fast";
+        {/* Class Rows Container with Motion FLIP Layout Transitions */}
+        <motion.div layout className="space-y-4 mb-12 sm:mb-16">
+          <AnimatePresence mode="popLayout">
+            {dayClasses.length === 0 ? (
+              <motion.div
+                key="empty-schedule-filter"
+                layout
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 16 }}
+                className="p-12 text-center rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 text-[#535C91] dark:text-[#9290C3]"
+              >
+                <FiCalendar className="w-10 h-10 mx-auto mb-3 text-active/60" />
+                <p className="font-bold text-base text-foreground font-['Outfit']">No classes scheduled for this filter</p>
+                <p className="text-xs mt-1 font-['Inter']">Try switching to all slots or selecting another day.</p>
+              </motion.div>
+            ) : (
+              dayClasses.map((item) => {
+                const occupancy = Math.round((item.enrolled / item.capacity) * 100);
+                const isWaitlist = item.status === "Waitlist Only";
+                const isFillingFast = item.status === "Filling Fast";
 
-              return (
-                <div
-                  key={item.id}
-                  className="group relative rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1 flex flex-col lg:flex-row lg:items-center justify-between gap-5 shadow-sm hover:shadow-xl"
-                >
-                  {/* Left Column: Time & Discipline */}
-                  <div className="flex items-start sm:items-center gap-4 sm:gap-6 min-w-64">
-                    <div className="p-3.5 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/80 border border-brand-500/20 text-center shrink-0 w-24">
-                      <span className="block text-base sm:text-lg font-black font-['Outfit'] text-foreground group-hover:text-active transition-colors leading-tight">
-                        {item.time}
-                      </span>
-                      <span className="block text-[11px] font-bold text-[#535C91] dark:text-[#9290C3] mt-0.5">
-                        {item.duration}
-                      </span>
-                    </div>
-
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-active">
-                        {item.discipline}
-                      </span>
-                      <h3 className="font-['Outfit'] text-base sm:text-lg font-bold text-foreground group-hover:text-active transition-colors leading-snug">
-                        {item.title}
-                      </h3>
-                      <div className="flex items-center gap-2 text-xs text-[#535C91] dark:text-[#9290C3] font-['Inter']">
-                        <span className="flex items-center gap-1">
-                          <FiMapPin className="w-3.5 h-3.5 text-active" />
-                          {item.studio}
+                return (
+                  <motion.div
+                    key={item.id}
+                    layout
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 16 }}
+                    transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+                    className="group relative rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1 flex flex-col lg:flex-row lg:items-center justify-between gap-5 shadow-sm hover:shadow-xl"
+                  >
+                    {/* Left Column: Time & Discipline */}
+                    <div className="flex items-start sm:items-center gap-4 sm:gap-6 min-w-64">
+                      <div className="p-3.5 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/80 border border-brand-500/20 text-center shrink-0 w-24">
+                        <span className="block text-base sm:text-lg font-black font-['Outfit'] text-foreground group-hover:text-active transition-colors leading-tight">
+                          {item.time}
                         </span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1 font-semibold text-foreground/80">
-                          <FaFire className="w-3 h-3 text-active" />
-                          {item.calories}
+                        <span className="block text-[11px] font-bold text-[#535C91] dark:text-[#9290C3] mt-0.5">
+                          {item.duration}
                         </span>
                       </div>
-                    </div>
-                  </div>
 
-                  {/* Middle Column: Instructor Profile */}
-                  <div className="flex items-center gap-3 min-w-52">
-                    <div className="relative w-10 h-10 rounded-full overflow-hidden ring-2 ring-brand-500/20 shrink-0">
-                      <Image
-                        src={item.coachAvatar}
-                        alt={item.coach}
-                        fill
-                        unoptimized
-                        className="object-cover"
-                      />
-                    </div>
-                    <div>
-                      <p className="font-['Outfit'] text-xs sm:text-sm font-bold text-foreground leading-tight">
-                        {item.coach}
-                      </p>
-                      <p className="font-['Inter'] text-[11px] text-[#535C91] dark:text-[#9290C3]">
-                        {item.coachRole}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Right Column: Capacity Meter & Action CTA */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between lg:justify-end gap-4 min-w-64 pt-3 sm:pt-0 border-t sm:border-t-0 border-brand-500/15">
-                    
-                    {/* Capacity Meter */}
-                    <div className="space-y-1.5 w-full sm:w-36">
-                      <div className="flex items-center justify-between text-[11px] font-['Inter']">
-                        <span className="font-semibold text-[#535C91] dark:text-[#9290C3]">
-                          {item.enrolled}/{item.capacity} Spots
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-active">
+                          {item.discipline}
                         </span>
-                        <span className={`font-bold text-[10px] uppercase px-1.5 py-0.5 rounded ${
-                          isWaitlist 
-                            ? "bg-rose-500/10 text-rose-500" 
-                            : isFillingFast 
-                            ? "bg-amber-500/10 text-amber-500" 
-                            : "bg-emerald-500/10 text-emerald-500"
-                        }`}>
-                          {item.status}
-                        </span>
+                        <h3 className="font-['Outfit'] text-base sm:text-lg font-bold text-foreground group-hover:text-active transition-colors leading-snug">
+                          {item.title}
+                        </h3>
+                        <div className="flex items-center gap-2 text-xs text-[#535C91] dark:text-[#9290C3] font-['Inter']">
+                          <span className="flex items-center gap-1">
+                            <FiMapPin className="w-3.5 h-3.5 text-active" />
+                            {item.studio}
+                          </span>
+                          <span>•</span>
+                          <span className="flex items-center gap-1 font-semibold text-foreground/80">
+                            <FaFire className="w-3 h-3 text-active" />
+                            {item.calories}
+                          </span>
+                        </div>
                       </div>
-                      <div className="w-full h-1.5 rounded-full bg-[#535C91]/15 dark:bg-[#1B1A55] overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all duration-500 ${
-                            isWaitlist ? "bg-rose-500" : isFillingFast ? "bg-amber-400" : "bg-active"
-                          }`}
-                          style={{ width: `${occupancy}%` }}
+                    </div>
+
+                    {/* Middle Column: Instructor Profile */}
+                    <div className="flex items-center gap-3 min-w-52">
+                      <div className="relative w-10 h-10 rounded-full overflow-hidden ring-2 ring-brand-500/20 shrink-0">
+                        <Image
+                          src={item.coachAvatar}
+                          alt={item.coach}
+                          fill
+                          unoptimized
+                          className="object-cover"
                         />
                       </div>
+                      <div>
+                        <p className="font-['Outfit'] text-xs sm:text-sm font-bold text-foreground leading-tight">
+                          {item.coach}
+                        </p>
+                        <p className="font-['Inter'] text-[11px] text-[#535C91] dark:text-[#9290C3]">
+                          {item.coachRole}
+                        </p>
+                      </div>
                     </div>
 
-                    {/* Book CTA */}
-                    <Link
-                      href="/schedule"
-                      className={`inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 cursor-pointer shadow-xs whitespace-nowrap active:scale-95 ${
-                        isWaitlist
-                          ? "bg-[#535C91]/15 dark:bg-[#1B1A55]/80 hover:bg-[#535C91]/25 text-foreground border border-brand-500/20"
-                          : "bg-btn-bg text-btn-text hover:opacity-90 shadow-active/20"
-                      }`}
-                    >
-                      <span>{isWaitlist ? "Join Waitlist" : "Reserve Slot"}</span>
-                      <FiArrowRight className="w-3.5 h-3.5" />
-                    </Link>
+                    {/* Right Column: Capacity Meter & Action CTA */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between lg:justify-end gap-4 min-w-64 pt-3 sm:pt-0 border-t sm:border-t-0 border-brand-500/15">
 
-                  </div>
+                      {/* Capacity Meter */}
+                      <div className="space-y-1.5 w-full sm:w-36">
+                        <div className="flex items-center justify-between text-[11px] font-['Inter']">
+                          <span className="font-semibold text-[#535C91] dark:text-[#9290C3]">
+                            {item.enrolled}/{item.capacity} Spots
+                          </span>
+                          <span className={`font-bold text-[10px] uppercase px-1.5 py-0.5 rounded ${isWaitlist
+                              ? "bg-rose-500/10 text-rose-500"
+                              : isFillingFast
+                                ? "bg-amber-500/10 text-amber-500"
+                                : "bg-emerald-500/10 text-emerald-500"
+                            }`}>
+                            {item.status}
+                          </span>
+                        </div>
+                        <div className="w-full h-1.5 rounded-full bg-[#535C91]/15 dark:bg-[#1B1A55] overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${isWaitlist ? "bg-rose-500" : isFillingFast ? "bg-amber-400" : "bg-active"
+                              }`}
+                            style={{ width: `${occupancy}%` }}
+                          />
+                        </div>
+                      </div>
 
-                </div>
-              );
-            })
-          )}
-        </div>
+                      {/* Book CTA */}
+                      <Link
+                        href="/schedule"
+                        className={`inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 cursor-pointer shadow-xs whitespace-nowrap active:scale-95 ${isWaitlist
+                            ? "bg-[#535C91]/15 dark:bg-[#1B1A55]/80 hover:bg-[#535C91]/25 text-foreground border border-brand-500/20"
+                            : "bg-btn-bg text-btn-text hover:opacity-90 shadow-active/20"
+                          }`}
+                      >
+                        <span>{isWaitlist ? "Join Waitlist" : "Reserve Slot"}</span>
+                        <FiArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+
+                    </div>
+
+                  </motion.div>
+                );
+              })
+            )}
+          </AnimatePresence>
+        </motion.div>
 
         {/* Bottom Full Schedule Navigation Banner */}
         <div className="rounded-3xl p-6 sm:p-8 bg-linear-to-r from-brand-800/30 via-[#1B1A55]/40 to-brand-800/30 border border-brand-500/25 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">

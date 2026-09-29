@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { 
-  FiArrowRight, 
-  FiCheckCircle, 
-  FiShield, 
-  FiMapPin, 
-  FiClock, 
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
+import {
+  FiArrowRight,
+  FiCheckCircle,
+  FiShield,
+  FiMapPin,
+  FiClock,
   FiMaximize2,
   FiZap
 } from "react-icons/fi";
@@ -112,37 +114,22 @@ export default function FacilitiesShowcase() {
       <div className="absolute bottom-10 left-0 w-80 sm:w-120 h-80 sm:h-120 bg-brand-500/8 rounded-full blur-[130px] pointer-events-none -z-10" />
 
       <div className="w-11/12 mx-auto relative z-10">
-        
-        {/* Section Header */}
+
+        {/* Section Header with Motion Exit & Layout Animation */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 sm:mb-16 gap-6 border-b border-brand-500/15 pb-8">
-          
-          <div className="max-w-2xl space-y-3">
-            {/* Kicker Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-800/25 dark:bg-[#1B1A55]/70 border border-brand-500/25 text-xs font-bold tracking-wide shadow-xs">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-active"></span>
-              </span>
-              <span className="text-active uppercase tracking-wider font-extrabold text-[11px]">
-                World-Class Infrastructure
-              </span>
-              <span className="text-[#535C91] dark:text-[#9290C3]">
-                • 45,000 Sq. Ft. Across 4 Hubs
-              </span>
-            </div>
-
-            {/* Headline */}
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-['Outfit'] tracking-tight text-foreground leading-[1.12]">
-              Engineered For Intensity, <span className="text-active">Built For Recovery</span>
-            </h2>
-
-            <p className="text-sm sm:text-base text-[#535C91] dark:text-[#9290C3] font-['Inter'] leading-relaxed pt-1">
-              Step inside spaces designed without compromise. From Olympic-certified Eleiko barbells and curved treadmills to sub-zero cold plunge tubs and Finnish cedar saunas.
-            </p>
+          <div className="max-w-2xl">
+            <AnimatedSectionTitle
+              badge="World-Class Infrastructure"
+              badgeDetail="45,000 Sq. Ft. Across 4 Hubs"
+              title="Engineered For Intensity,"
+              highlightText="Built For Recovery"
+              subtitle="Step inside spaces designed without compromise. From Olympic-certified Eleiko barbells and curved treadmills to sub-zero cold plunge tubs and Finnish cedar saunas."
+              titleKey={`facilities-heading-${activeCategory}`}
+            />
           </div>
 
           {/* Quick Facility Metric Specs */}
-          <div className="flex items-center gap-4 sm:gap-6 bg-[#535C91]/5 dark:bg-[#1B1A55]/50 p-4 rounded-2xl border border-brand-500/20 shrink-0 font-['Outfit'] self-start lg:self-end">
+          <motion.div layout className="flex items-center gap-4 sm:gap-6 bg-[#535C91]/5 dark:bg-[#1B1A55]/50 p-4 rounded-2xl border border-brand-500/20 shrink-0 font-['Outfit'] self-start lg:self-end">
             <div>
               <p className="text-2xl font-black text-active tracking-tight">4</p>
               <p className="text-[10px] sm:text-xs text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider">
@@ -163,109 +150,131 @@ export default function FacilitiesShowcase() {
                 Sanitized Daily
               </p>
             </div>
-          </div>
-
+          </motion.div>
         </div>
 
-        {/* Single-Line Amenities Category Filter Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-10 no-scrollbar select-none">
-          {CATEGORIES.map((category) => {
-            const isActive = activeCategory === category;
-            return (
-              <button
-                key={category}
-                type="button"
-                onClick={() => setActiveCategory(category)}
-                className={`relative px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-tight transition-all duration-200 whitespace-nowrap cursor-pointer shrink-0 ${
-                  isActive
-                    ? "bg-active text-white shadow-md shadow-active/20"
-                    : "bg-[#535C91]/8 dark:bg-[#1B1A55]/60 hover:bg-[#535C91]/15 text-[#535C91] dark:text-[#9290C3] border border-brand-500/15"
-                }`}
-              >
-                {category}
-              </button>
-            );
-          })}
-        </div>
+        {/* Single-Line Amenities Category Filter Tabs with Motion Layout Animation */}
+        <LayoutGroup id="facilitiesFilterGroup">
+          <motion.div layout className="flex items-center gap-2 overflow-x-auto pb-4 mb-10 no-scrollbar select-none">
+            {CATEGORIES.map((category) => {
+              const isActive = activeCategory === category;
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => setActiveCategory(category)}
+                  className="relative px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-tight whitespace-nowrap cursor-pointer shrink-0 transition-colors duration-200"
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="activeFacilityShowcaseTabPill"
+                      className="absolute inset-0 bg-active rounded-xl shadow-md shadow-active/20"
+                      transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                    />
+                  )}
+                  <span
+                    className={`relative z-10 ${isActive
+                        ? "text-white"
+                        : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"
+                      }`}
+                  >
+                    {category}
+                  </span>
+                </button>
+              );
+            })}
+          </motion.div>
+        </LayoutGroup>
 
         {/* Facilities Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
-          {filteredFacilities.map((fac) => (
-            <div
-              key={fac.id}
-              className="group relative rounded-3xl overflow-hidden bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1.5 flex flex-col shadow-lg hover:shadow-2xl"
-            >
-              {/* Image Banner */}
-              <div className="relative h-60 sm:h-64 overflow-hidden">
-                <Image
-                  src={fac.image}
-                  alt={fac.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-[#070F2B] via-[#070F2B]/40 to-transparent" />
+        {/* Facilities Grid with Motion FLIP Layout Transitions */}
+        <motion.div
+          layout
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16"
+        >
+          <AnimatePresence mode="popLayout">
+            {filteredFacilities.map((fac) => (
+              <motion.div
+                key={fac.id}
+                layout
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 18 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                className="group relative rounded-3xl overflow-hidden bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1.5 flex flex-col shadow-lg hover:shadow-2xl"
+              >
+                {/* Image Banner */}
+                <div className="relative h-60 sm:h-64 overflow-hidden">
+                  <Image
+                    src={fac.image}
+                    alt={fac.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-[#070F2B] via-[#070F2B]/40 to-transparent" />
 
-                {/* Top Badge & Category */}
-                <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2">
-                  <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full border backdrop-blur-md ${fac.badgeColor}`}>
-                    {fac.badge}
-                  </span>
-                  <span className="px-2.5 py-1 rounded-full bg-background/85 dark:bg-[#1B1A55]/90 backdrop-blur-md border border-brand-500/20 text-foreground text-[10px] font-bold uppercase tracking-wider">
-                    {fac.category}
-                  </span>
-                </div>
+                  {/* Top Badge & Category */}
+                  <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2">
+                    <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full border backdrop-blur-md ${fac.badgeColor}`}>
+                      {fac.badge}
+                    </span>
+                    <span className="px-2.5 py-1 rounded-full bg-background/85 dark:bg-[#1B1A55]/90 backdrop-blur-md border border-brand-500/20 text-foreground text-[10px] font-bold uppercase tracking-wider">
+                      {fac.category}
+                    </span>
+                  </div>
 
-                {/* Bottom Image Specs */}
-                <div className="absolute bottom-3 left-3.5 right-3.5 flex items-center justify-between text-xs font-['Inter']">
-                  <span className="px-2.5 py-1 rounded-lg bg-active text-white font-extrabold text-[10px] uppercase tracking-wide shadow-sm">
-                    {fac.spec}
-                  </span>
-                  <span className="px-2.5 py-1 rounded-lg bg-background/85 dark:bg-[#1B1A55]/90 backdrop-blur-md border border-brand-500/20 text-foreground text-[10px] font-semibold">
-                    {fac.temp}
-                  </span>
-                </div>
-              </div>
-
-              {/* Body Content */}
-              <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between space-y-5">
-                <div>
-                  <h3 className="font-['Outfit'] text-lg sm:text-xl font-bold text-foreground group-hover:text-active transition-colors leading-tight">
-                    {fac.title}
-                  </h3>
-
-                  <p className="mt-2.5 font-['Inter'] text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3] leading-relaxed line-clamp-3">
-                    {fac.desc}
-                  </p>
-
-                  {/* Bullet Highlights */}
-                  <div className="mt-4 pt-3.5 border-t border-brand-500/15 space-y-1.5 font-['Inter']">
-                    {fac.features.map((feature, i) => (
-                      <div key={i} className="flex items-center gap-2 text-xs text-foreground/90 font-medium">
-                        <FiCheckCircle className="w-3.5 h-3.5 text-active shrink-0" />
-                        <span>{feature}</span>
-                      </div>
-                    ))}
+                  {/* Bottom Image Specs */}
+                  <div className="absolute bottom-3 left-3.5 right-3.5 flex items-center justify-between text-xs font-['Inter']">
+                    <span className="px-2.5 py-1 rounded-lg bg-active text-white font-extrabold text-[10px] uppercase tracking-wide shadow-sm">
+                      {fac.spec}
+                    </span>
+                    <span className="px-2.5 py-1 rounded-lg bg-background/85 dark:bg-[#1B1A55]/90 backdrop-blur-md border border-brand-500/20 text-foreground text-[10px] font-semibold">
+                      {fac.temp}
+                    </span>
                   </div>
                 </div>
 
-                {/* Card Action Link */}
-                <div className="pt-4 border-t border-brand-500/15 flex items-center justify-between text-xs font-['Inter']">
-                  <span className="text-[#535C91] dark:text-[#9290C3] font-semibold text-[11px]">
-                    Included in All Full Tiers
-                  </span>
-                  <Link
-                    href="/facilities"
-                    className="inline-flex items-center gap-1 font-bold text-active hover:underline cursor-pointer group-hover:translate-x-0.5 transition-transform"
-                  >
-                    <span>Explore Space</span>
-                    <FiArrowRight className="w-3.5 h-3.5" />
-                  </Link>
+                {/* Body Content */}
+                <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between space-y-5">
+                  <div>
+                    <h3 className="font-['Outfit'] text-lg sm:text-xl font-bold text-foreground group-hover:text-active transition-colors leading-tight">
+                      {fac.title}
+                    </h3>
+
+                    <p className="mt-2.5 font-['Inter'] text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3] leading-relaxed line-clamp-3">
+                      {fac.desc}
+                    </p>
+
+                    {/* Bullet Highlights */}
+                    <div className="mt-4 pt-3.5 border-t border-brand-500/15 space-y-1.5 font-['Inter']">
+                      {fac.features.map((feature, i) => (
+                        <div key={i} className="flex items-center gap-2 text-xs text-foreground/90 font-medium">
+                          <FiCheckCircle className="w-3.5 h-3.5 text-active shrink-0" />
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Card Action Link */}
+                  <div className="pt-4 border-t border-brand-500/15 flex items-center justify-between text-xs font-['Inter']">
+                    <span className="text-[#535C91] dark:text-[#9290C3] font-semibold text-[11px]">
+                      Included in All Full Tiers
+                    </span>
+                    <Link
+                      href="/facilities"
+                      className="inline-flex items-center gap-1 font-bold text-active hover:underline cursor-pointer group-hover:translate-x-0.5 transition-transform"
+                    >
+                      <span>Explore Space</span>
+                      <FiArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
 
         {/* Bottom CTA Banner */}
         <div className="rounded-3xl p-6 sm:p-8 bg-linear-to-r from-brand-800/30 via-[#1B1A55]/40 to-brand-800/30 border border-brand-500/25 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
