@@ -1,17 +1,18 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { 
-  FiArrowRight, 
-  FiAward, 
-  FiStar, 
-  FiUsers, 
-  FiCheckCircle, 
-  FiCalendar, 
-  FiActivity 
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
+import {
+  FiArrowRight,
+  FiAward,
+  FiStar,
+  FiUsers,
+  FiCheckCircle,
+  FiCalendar,
+  FiActivity
 } from "react-icons/fi";
 import { FaInstagram, FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
 import { FaDumbbell, FaFire } from "react-icons/fa";
@@ -114,37 +115,22 @@ export default function TrainersSpotlight() {
       <div className="absolute bottom-10 left-0 w-80 sm:w-120 h-80 sm:h-120 bg-brand-500/8 rounded-full blur-[130px] pointer-events-none -z-10" />
 
       <div className="w-11/12 mx-auto relative z-10">
-        
-        {/* Section Header */}
+
+        {/* Section Header with Motion Exit & Layout Animation */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 sm:mb-16 gap-6 border-b border-brand-500/15 pb-8">
-          <div className="max-w-2xl space-y-3">
-            
-            {/* Accreditation Kicker Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-800/25 dark:bg-[#1B1A55]/70 border border-brand-500/25 text-xs font-bold tracking-wide shadow-xs">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-active"></span>
-              </span>
-              <span className="text-active uppercase tracking-wider font-extrabold text-[11px]">
-                World-Class Mentorship
-              </span>
-              <span className="text-[#535C91] dark:text-[#9290C3]">
-                • Olympic & CSCS Master Coaches
-              </span>
-            </div>
-
-            {/* Headline */}
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-['Outfit'] tracking-tight text-foreground leading-[1.12]">
-              Meet Our <span className="text-active">Master Coaches</span>
-            </h2>
-
-            <p className="text-sm sm:text-base text-[#535C91] dark:text-[#9290C3] font-['Inter'] leading-relaxed pt-1">
-              Instructed exclusively by exercise physiologists, biomechanics researchers, and competitive athletes committed to progressive overload, form safety, and measurable physical transformation.
-            </p>
+          <div className="max-w-2xl">
+            <AnimatedSectionTitle
+              badge="World-Class Mentorship"
+              badgeDetail="Olympic & CSCS Master Coaches"
+              title="Meet Our"
+              highlightText="Master Coaches"
+              subtitle="Instructed exclusively by exercise physiologists, biomechanics researchers, and competitive athletes committed to progressive overload, form safety, and measurable physical transformation."
+              titleKey={`trainers-spotlight-heading-${selectedDiscipline}`}
+            />
           </div>
 
           {/* Quick Roster Link */}
-          <div className="flex items-center gap-4 shrink-0">
+          <motion.div layout className="flex items-center gap-4 shrink-0">
             <Link
               href="/trainers"
               className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/70 hover:bg-active hover:text-white text-foreground font-bold text-xs sm:text-sm border border-brand-500/25 hover:border-active transition-all duration-300 group shadow-xs cursor-pointer"
@@ -152,39 +138,51 @@ export default function TrainersSpotlight() {
               <span>Explore All Coaches</span>
               <FiArrowRight className="w-4 h-4 text-active group-hover:text-white group-hover:translate-x-1 transition-all duration-200" />
             </Link>
-          </div>
+          </motion.div>
         </div>
 
-        {/* Interactive Discipline Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-10 no-scrollbar select-none">
-          {CATEGORIES.map((discipline) => {
-            const isActive = selectedDiscipline === discipline;
-            return (
-              <button
-                key={discipline}
-                onClick={() => setSelectedDiscipline(discipline)}
-                className={`relative px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-tight transition-all duration-200 whitespace-nowrap cursor-pointer ${
-                  isActive
-                    ? "bg-active text-white shadow-md shadow-active/20"
-                    : "bg-[#535C91]/8 dark:bg-[#1B1A55]/60 hover:bg-[#535C91]/15 text-[#535C91] dark:text-[#9290C3] border border-brand-500/15"
-                }`}
-              >
-                {discipline}
-              </button>
-            );
-          })}
-        </div>
+        {/* Interactive Discipline Filter Pills with Motion Layout Animation */}
+        <LayoutGroup id="trainersSpotlightGroup">
+          <motion.div layout className="flex items-center gap-2 overflow-x-auto pb-4 mb-10 no-scrollbar select-none">
+            {CATEGORIES.map((discipline) => {
+              const isActive = selectedDiscipline === discipline;
+              return (
+                <button
+                  key={discipline}
+                  onClick={() => setSelectedDiscipline(discipline)}
+                  className="relative px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-tight whitespace-nowrap cursor-pointer transition-colors duration-200"
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="activeTrainersSpotlightPill"
+                      className="absolute inset-0 bg-active rounded-xl shadow-md shadow-active/20"
+                      transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                    />
+                  )}
+                  <span
+                    className={`relative z-10 ${isActive
+                        ? "text-white"
+                        : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"
+                      }`}
+                  >
+                    {discipline}
+                  </span>
+                </button>
+              );
+            })}
+          </motion.div>
+        </LayoutGroup>
 
         {/* Coaches Grid with Decoupled GPU-Smooth Animations */}
-        <motion.div 
-          layout="position"
+        <motion.div
+          layout
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-7"
         >
           <AnimatePresence mode="popLayout">
             {filteredTrainers.map((coach, index) => (
               <motion.div
                 key={coach.id}
-                layout="position"
+                layout
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 18 }}
@@ -192,7 +190,7 @@ export default function TrainersSpotlight() {
                 className="w-full"
               >
                 <div className="group relative rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 ease-out hover:-translate-y-1.5 flex flex-col h-full cursor-pointer">
-                  
+
                   {/* Portrait Photo Container */}
                   <div className="relative h-72 sm:h-80 overflow-hidden bg-brand-800/10">
                     <Image
@@ -202,7 +200,7 @@ export default function TrainersSpotlight() {
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       className="object-cover group-hover:scale-106 transition-transform duration-500 ease-out"
                     />
-                    
+
                     {/* Dark Vignette Overlay */}
                     <div className="absolute inset-0 bg-linear-to-t from-[#070F2B] via-[#070F2B]/40 to-transparent opacity-90" />
 
