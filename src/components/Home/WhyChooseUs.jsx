@@ -3,7 +3,9 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
 import Link from "next/link";
-import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 import {
   FiCheckCircle,
   FiArrowRight,
@@ -15,6 +17,10 @@ import {
   FiAward
 } from "react-icons/fi";
 import { FaDumbbell, FaFire } from "react-icons/fa";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const TRANSITION_EASE = [0.16, 1, 0.3, 1];
 
@@ -66,67 +72,69 @@ const bentoGridContainerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      delayChildren: 1.2, // Staged delay after entering screen viewport
-      staggerChildren: 0.18, // Stagger each card separately
+      staggerChildren: 0.16, // Stagger each card separately
     },
   },
 };
 
 const bentoCardVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.96 },
+  hidden: { opacity: 0, y: 32, scale: 0.96 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
     transition: {
-      duration: 1.4,
+      duration: 1.5,
       ease: [0.16, 1, 0.3, 1],
-      staggerChildren: 0.12,
-      delayChildren: 0.15,
+      staggerChildren: 0.1,
+      delayChildren: 0.12,
     },
   },
 };
 
 const bentoWatermarkVariants = {
-  hidden: { opacity: 0, x: 20, y: -15, rotate: 6 },
+  hidden: { opacity: 0, x: 25, y: -15, rotate: 10 },
   visible: {
     opacity: 1,
     x: 0,
     y: 0,
     rotate: 0,
-    transition: { duration: 1.3, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 1.5, ease: [0.16, 1, 0.3, 1] },
   },
 };
 
 const bentoIconVariants = {
-  hidden: { opacity: 0, scale: 0.7 },
+  hidden: { opacity: 0, scale: 0.2, rotate: -15 },
   visible: {
     opacity: 1,
     scale: 1,
+    rotate: 0,
     transition: { type: "spring", stiffness: 140, damping: 20 },
   },
 };
 
 const bentoBadgeVariants = {
-  hidden: { opacity: 0, y: -12 },
+  hidden: { opacity: 0, x: 20, y: -10 },
   visible: {
     opacity: 1,
+    x: 0,
     y: 0,
-    transition: { duration: 1.2, ease: "easeOut" },
+    transition: { duration: 1.3, ease: [0.16, 1, 0.3, 1] },
   },
 };
 
 const bentoTitleVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 22, filter: "blur(4px)" },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 1.4, ease: [0.16, 1, 0.3, 1] },
+    filter: "blur(0px)",
+    transition: { duration: 1.5, ease: [0.16, 1, 0.3, 1] },
   },
 };
 
 const bentoDescVariants = {
-  hidden: { opacity: 0, y: -15 },
+  hidden: { opacity: 0, y: -14 },
   visible: {
     opacity: 1,
     y: 0,
@@ -139,26 +147,177 @@ const bentoBarVariants = {
   visible: {
     opacity: 1,
     scaleX: 1,
+    transition: { duration: 1.4, ease: "easeOut" },
+  },
+};
+
+// Bottom Trust Banner Motion Variants (Cinematic Staged)
+const calloutContainerVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.98 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 1.5,
+      ease: [0.16, 1, 0.3, 1],
+      staggerChildren: 0.12,
+      delayChildren: 0.15,
+    },
+  },
+};
+
+const calloutIconVariants = {
+  hidden: { opacity: 0, scale: 0.3, rotate: -15 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    rotate: 0,
+    transition: { type: "spring", stiffness: 140, damping: 20 },
+  },
+};
+
+const calloutTitleVariants = {
+  hidden: { opacity: 0, y: 20, filter: "blur(4px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 1.4, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const calloutDescVariants = {
+  hidden: { opacity: 0, y: -14 },
+  visible: {
+    opacity: 1,
+    y: 0,
     transition: { duration: 1.2, ease: "easeOut" },
   },
 };
 
+const calloutBtnVariants = {
+  hidden: { opacity: 0, x: 25, scale: 0.92 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 140, damping: 20 },
+  },
+};
+
 export default function WhyChooseUs() {
+  const sectionRef = useRef(null);
   const bentoGridRef = useRef(null);
   const isBentoInView = useInView(bentoGridRef, { once: true, amount: 0.15 });
   const [cardsTriggered, setCardsTriggered] = useState(false);
 
+  // Counter Value Refs for dynamic 0 -> Target number count animation
+  const retentionValRef = useRef(null);
+  const classesValRef = useRef(null);
+
+  // Universal Staged Viewport Delay: Trigger bento card transitions after 1.0s in screen viewport
   useEffect(() => {
     if (isBentoInView) {
       const timer = setTimeout(() => {
         setCardsTriggered(true);
-      }, 1200);
+      }, 1000);
       return () => clearTimeout(timer);
     }
   }, [isBentoInView]);
 
+  // GSAP Viewport-Triggered Timeline for Section Header & Telemetry Counters
+  useGSAP(
+    () => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 85%",
+          once: true,
+        },
+        defaults: { ease: "power3.out" },
+      });
+
+      // 1. Kicker Badge: Dignified downward entrance (Slowed to 1.6s)
+      tl.fromTo(
+        ".why-kicker",
+        { y: -30, opacity: 0, filter: "blur(6px)" },
+        { y: 0, opacity: 1, filter: "blur(0px)", duration: 1.6, ease: "power2.out" }
+      ).addLabel("kickerEnd");
+
+      // 2. Main Title: Majestic upward rising sweep with de-blur (Slowed to 2.2s)
+      tl.fromTo(
+        ".why-title",
+        { y: 45, opacity: 0, filter: "blur(8px)", scale: 0.96 },
+        { y: 0, opacity: 1, filter: "blur(0px)", scale: 1, duration: 2.2, ease: "power3.out" },
+        "kickerEnd-=0.4"
+      ).addLabel("titleEnd");
+
+      // 3. Section Description: Contrasting downward drop from above under title (Slowed to 1.8s)
+      tl.fromTo(
+        ".why-desc",
+        { y: -30, opacity: 0, filter: "blur(5px)" },
+        { y: 0, opacity: 1, filter: "blur(0px)", duration: 1.8, ease: "power2.out" },
+        "titleEnd-=0.3"
+      );
+
+      // 4. Value Pillars Checklist: Staggered horizontal spring slide
+      tl.fromTo(
+        ".why-pillar-item",
+        { x: -25, opacity: 0 },
+        { x: 0, opacity: 1, duration: 1.3, ease: "power2.out", stagger: 0.08 },
+        "titleEnd-=0.2"
+      );
+
+      // 5. Performance Metrics Strip & Dynamic 0 -> Target Count Animation (Slowed to 2.8s)
+      tl.fromTo(
+        ".why-metric-item",
+        { y: 20, opacity: 0, scale: 0.94 },
+        { y: 0, opacity: 1, scale: 1, duration: 1.4, ease: "back.out(1.2)", stagger: 0.1 },
+        "titleEnd"
+      );
+
+      const metricsCounter = { retention: 0, classes: 0 };
+      tl.fromTo(
+        metricsCounter,
+        { retention: 0, classes: 0 },
+        {
+          retention: 98.4,
+          classes: 45,
+          duration: 2.8,
+          ease: "power1.out",
+          onStart: () => {
+            if (retentionValRef.current) retentionValRef.current.textContent = "0.0%";
+            if (classesValRef.current) classesValRef.current.textContent = "0";
+          },
+          onUpdate: () => {
+            if (retentionValRef.current) {
+              retentionValRef.current.textContent = metricsCounter.retention.toFixed(1) + "%";
+            }
+            if (classesValRef.current) {
+              classesValRef.current.textContent = Math.round(metricsCounter.classes);
+            }
+          },
+        },
+        "titleEnd"
+      );
+
+      // 6. Action Buttons: Spring pop
+      tl.fromTo(
+        ".why-actions",
+        { y: 18, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1.2, ease: "power2.out" },
+        "titleEnd+=0.2"
+      );
+    },
+    { scope: sectionRef }
+  );
+
   return (
-    <section className="py-20 lg:py-28 bg-background transition-colors duration-300 relative overflow-hidden border-t border-brand-500/15">
+    <section
+      ref={sectionRef}
+      className="py-20 lg:py-28 bg-background transition-colors duration-300 relative overflow-hidden border-t border-brand-500/15"
+    >
       {/* Background Ambient Lighting Mesh */}
       <div className="absolute top-1/3 left-0 w-96 sm:w-140 h-96 sm:h-140 bg-active/6 rounded-full blur-[140px] pointer-events-none -z-10" />
       <div className="absolute bottom-10 right-0 w-80 sm:w-120 h-80 sm:h-120 bg-brand-500/8 rounded-full blur-[130px] pointer-events-none -z-10" />
@@ -167,21 +326,41 @@ export default function WhyChooseUs() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 xl:gap-16 items-center">
 
           {/* Left Column: Proof, Narrative & Value Checklist (5 cols) */}
-          <motion.div layout className="lg:col-span-5 space-y-6">
-            <AnimatedSectionTitle
-              badge="The FlexPulse Advantage"
-              badgeDetail="Precision Athletic Training"
-              title="We Push You to"
-              highlightText="Exceed Your Goals"
-              subtitle="At FlexPulse, we reject generic gym models. We combine science-backed progressive overload, elite coaching biomechanics, and recovery technology to ensure every hour you invest yields measurable athletic output."
-              titleKey="why-choose-us-heading"
-            />
+          <div className="lg:col-span-5 space-y-6">
+            
+            {/* Tag 1: Kicker Badge */}
+            <div className="why-kicker inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/25 mb-4 backdrop-blur-md">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-active" />
+              </span>
+              <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-widest text-foreground font-['Outfit']">
+                The FlexPulse Advantage
+              </span>
+              <span className="text-[11px] sm:text-xs text-brand-500/60 font-semibold">•</span>
+              <span className="text-[11px] sm:text-xs font-semibold text-secondary font-['Inter']">
+                Precision Athletic Training
+              </span>
+            </div>
 
-            {/* Key Value Pillars Checklist */}
-            <motion.div layout className="space-y-2.5 pt-1 font-['Inter'] text-xs sm:text-sm text-foreground">
+            {/* Tag 2: Section Headline Title */}
+            <h2 className="why-title text-3xl sm:text-4xl md:text-5xl font-black font-['Outfit'] tracking-tight text-foreground leading-[1.15]">
+              We Push You to{" "}
+              <span className="text-active inline-block hover:animate-[headShake_1s_ease-in-out]">
+                Exceed Your Goals
+              </span>
+            </h2>
+
+            {/* Tag 3: Description Paragraph */}
+            <p className="why-desc text-sm sm:text-base text-secondary font-['Inter'] leading-relaxed max-w-xl">
+              At FlexPulse, we reject generic gym models. We combine science-backed progressive overload, elite coaching biomechanics, and recovery technology to ensure every hour you invest yields measurable athletic output.
+            </p>
+
+            {/* Tag 4: Key Value Pillars Checklist */}
+            <div className="why-pillars space-y-2.5 pt-1 font-['Inter'] text-xs sm:text-sm text-foreground">
               {VALUE_PILLARS.map((pillar, idx) => (
-                <div key={idx} className="flex items-start gap-2.5">
-                  <div className="p-0.5 rounded-full bg-active/10 text-active shrink-0 mt-0.5">
+                <div key={idx} className="why-pillar-item flex items-start gap-2.5">
+                  <div className="p-0.5 rounded-full bg-active/10 text-active shrink-0 mt-0.5 shadow-2xs">
                     <FiCheckCircle className="w-4 h-4 text-active" />
                   </div>
                   <span className="leading-snug text-secondary font-medium">
@@ -189,67 +368,73 @@ export default function WhyChooseUs() {
                   </span>
                 </div>
               ))}
-            </motion.div>
+            </div>
 
-            {/* Verified Performance Metrics Strip */}
-            <motion.div layout className="grid grid-cols-3 gap-4 pt-6 border-t border-brand-500/15 font-['Outfit']">
-              <div>
-                <p className="text-2xl sm:text-3xl font-black text-active tracking-tight">98.4%</p>
+            {/* Tag 5: Verified Performance Metrics Strip with Dynamic 0 -> Target Counter */}
+            <div className="why-metrics grid grid-cols-3 gap-4 pt-6 border-t border-brand-500/15 font-['Outfit']">
+              <div className="why-metric-item">
+                <p className="text-2xl sm:text-3xl font-black text-active tracking-tight">
+                  <span ref={retentionValRef}>0.0%</span>
+                </p>
                 <p className="text-[10px] sm:text-xs text-secondary font-bold uppercase tracking-wider mt-0.5">
                   Retention Rate
                 </p>
               </div>
-              <div>
-                <p className="text-2xl sm:text-3xl font-black text-active tracking-tight">45+</p>
+              <div className="why-metric-item">
+                <p className="text-2xl sm:text-3xl font-black text-active tracking-tight">
+                  <span ref={classesValRef}>0</span><span className="text-active">+</span>
+                </p>
                 <p className="text-[10px] sm:text-xs text-secondary font-bold uppercase tracking-wider mt-0.5">
                   Weekly Classes
                 </p>
               </div>
-              <div>
-                <p className="text-2xl sm:text-3xl font-black text-active tracking-tight">24/7</p>
+              <div className="why-metric-item">
+                <div className="flex items-center gap-1.5">
+                  <p className="text-2xl sm:text-3xl font-black text-active tracking-tight">
+                    24/7
+                  </p>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse mt-0.5" />
+                </div>
                 <p className="text-[10px] sm:text-xs text-secondary font-bold uppercase tracking-wider mt-0.5">
                   Facility Access
                 </p>
               </div>
-            </motion.div>
+            </div>
 
-            {/* Action Buttons */}
-            <motion.div layout className="flex flex-wrap items-center gap-3 pt-2">
+            {/* Tag 6: Action Buttons */}
+            <div className="why-actions flex flex-wrap items-center gap-3 pt-2">
               <Link
                 href="/facilities"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-btn-bg text-btn-text hover:opacity-95 font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer group hover:animate__animated hover:animate__pulse"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-btn-bg text-btn-text hover:brightness-105 active:scale-95 font-extrabold text-xs sm:text-sm shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group border border-white/20"
               >
                 <span>Explore Facilities & Gear</span>
                 <FiArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="/calculator#trial-pass"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-background dark:bg-[#1B1A55]/70 hover:bg-[#535C91]/15 text-foreground font-bold text-xs sm:text-sm border border-brand-500/25 hover:border-active/40 transition-all duration-200 cursor-pointer"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-searchbox-bg hover:bg-searchbox-hover text-foreground font-bold text-xs sm:text-sm border border-brand-500/25 hover:border-active/40 transition-all duration-200 cursor-pointer shadow-xs"
               >
                 <span>Claim VIP Day Pass</span>
               </Link>
-            </motion.div>
+            </div>
 
-          </motion.div>
+          </div>
 
           {/* Right Column: 4-Card Bento Grid with Universal Viewport Delay & Element Transitions (7 cols) */}
-          <motion.div
-            ref={bentoGridRef}
-            layout
-            variants={bentoGridContainerVariants}
-            initial="hidden"
-            animate={cardsTriggered ? "visible" : "hidden"}
-            className="lg:col-span-7"
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+          <div ref={bentoGridRef} className="lg:col-span-7">
+            <motion.div
+              layout
+              variants={bentoGridContainerVariants}
+              initial="hidden"
+              animate={cardsTriggered ? "visible" : "hidden"}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6"
+            >
               {FEATURES.map((feature) => {
                 const Icon = feature.icon;
                 return (
                   <motion.div
                     key={feature.index}
                     layout
-                    initial="hidden"
-                    animate={cardsTriggered ? "visible" : "hidden"}
                     variants={bentoCardVariants}
                     className="h-full"
                   >
@@ -268,7 +453,7 @@ export default function WhyChooseUs() {
                         <div className="flex items-center justify-between gap-3 mb-5">
                           <motion.div
                             variants={bentoIconVariants}
-                            className="w-12 h-12 rounded-2xl bg-btn-bg/10 dark:bg-active/10 flex items-center justify-center text-active group-hover:scale-110 group-hover:bg-active group-hover:text-white transition-all duration-300 shadow-inner group-hover:animate__animated group-hover:animate__bounceIn"
+                            className="w-12 h-12 rounded-2xl bg-active/10 dark:bg-active/15 flex items-center justify-center text-active group-hover:scale-110 group-hover:bg-active group-hover:text-white transition-all duration-300 shadow-2xs border border-active/20"
                           >
                             <Icon className="w-5 h-5 transition-transform" />
                           </motion.div>
@@ -284,7 +469,7 @@ export default function WhyChooseUs() {
                         {/* Title */}
                         <motion.h3
                           variants={bentoTitleVariants}
-                          className="font-['Outfit'] text-lg sm:text-xl font-bold text-foreground mb-2.5 leading-snug group-hover:text-active transition-colors group-hover:animate__animated group-hover:animate__headShake"
+                          className="font-['Outfit'] text-lg sm:text-xl font-bold text-foreground mb-2.5 leading-snug group-hover:text-active transition-colors"
                         >
                           {feature.title}
                         </motion.h3>
@@ -309,34 +494,58 @@ export default function WhyChooseUs() {
                   </motion.div>
                 );
               })}
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
 
         </div>
 
-        {/* Section Diagnostic Trust Banner */}
-        <div className="mt-14 sm:mt-18 p-6 sm:p-8 rounded-3xl bg-linear-to-r from-brand-800/30 via-[#1B1A55]/40 to-brand-800/30 border border-brand-500/25 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-active/20 flex items-center justify-center text-active shrink-0 border border-brand-500/30">
+        {/* Bottom Diagnostic Trust Banner: Theme-harmonious, high contrast conversion card */}
+        <motion.div
+          variants={calloutContainerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          className="mt-14 sm:mt-18 p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/40 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs relative overflow-hidden transition-colors duration-300"
+        >
+          {/* Subtle Ambient Accent Shimmer */}
+          <div className="absolute inset-0 bg-linear-to-r from-brand-500/5 via-transparent to-active/5 pointer-events-none" />
+
+          <div className="flex items-center gap-4 relative z-10">
+            <motion.div
+              variants={calloutIconVariants}
+              className="w-12 h-12 rounded-2xl bg-active/10 dark:bg-active/20 flex items-center justify-center text-active shrink-0 border border-active/25 shadow-2xs"
+            >
               <FiAward className="w-6 h-6 text-active" />
-            </div>
+            </motion.div>
             <div>
-              <h4 className="font-['Outfit'] text-lg sm:text-xl font-extrabold text-foreground">
+              <motion.h4
+                variants={calloutTitleVariants}
+                className="font-['Outfit'] text-lg sm:text-xl font-extrabold text-foreground"
+              >
                 Experience the FlexPulse Standard in Person
-              </h4>
-              <p className="font-['Inter'] text-xs sm:text-sm text-secondary mt-0.5">
+              </motion.h4>
+              <motion.p
+                variants={calloutDescVariants}
+                className="font-['Inter'] text-xs sm:text-sm text-secondary mt-0.5"
+              >
                 Tour our Olympic weight halls, recovery plunge suites, and turf tracks with a master coach.
-              </p>
+              </motion.p>
             </div>
           </div>
-          <Link
-            href="/facilities"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-btn-bg text-btn-text font-bold text-xs sm:text-sm whitespace-nowrap shadow-md hover:opacity-90 transition-all cursor-pointer shrink-0"
+
+          <motion.div
+            variants={calloutBtnVariants}
+            className="flex items-center gap-3 shrink-0 font-['Inter'] relative z-10"
           >
-            <span>Take Virtual Tour</span>
-            <FiArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
+            <Link
+              href="/facilities"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-btn-bg text-btn-text font-extrabold text-xs sm:text-sm whitespace-nowrap shadow-sm hover:shadow-md hover:brightness-105 active:scale-95 transition-all cursor-pointer border border-white/20"
+            >
+              <span>Take Virtual Tour</span>
+              <FiArrowRight className="w-4 h-4" />
+            </Link>
+          </motion.div>
+        </motion.div>
 
       </div>
     </section>
