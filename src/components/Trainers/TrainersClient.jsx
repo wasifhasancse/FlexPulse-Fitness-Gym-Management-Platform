@@ -3,6 +3,8 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
 import {
   FiUsers,
   FiSearch,
@@ -21,6 +23,7 @@ import {
   FiCalendar,
   FiAward,
 } from "react-icons/fi";
+import ScrollAnimate from "@/components/common/ScrollAnimate";
 import { FaDumbbell } from "react-icons/fa";
 
 // Curated authentic roster of coaches across all fitness specialties
@@ -337,21 +340,15 @@ export default function TrainersClient({ initialTrainers = [] }) {
   return (
     <div className="min-h-screen bg-background text-foreground py-10 sm:py-14 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
       <div className="max-w-7xl mx-auto space-y-8 sm:space-y-10">
-        {/* Header Section */}
-        <div className="text-center space-y-3.5 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-active/30 bg-active/10 text-active text-xs font-bold uppercase tracking-wider shadow-xs">
-            <FiUsers size={14} />
-            Certified Athletic Staff
-          </div>
-
-          <h1 className="font-['Outfit'] text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
-            Meet Our <span className="text-active">Elite Coaches</span>
-          </h1>
-
-          <p className="font-['Inter'] text-xs sm:text-sm text-secondary max-w-xl mx-auto leading-relaxed">
-            Work with certified coaches dedicated to refining your technique, building functional strength, and achieving verified results.
-          </p>
-        </div>
+        {/* Header Section with Exit Animation */}
+        <AnimatedSectionTitle
+          kicker="Certified Athletic Staff"
+          title="Meet Our Elite Coaches"
+          highlightText="Elite Coaches"
+          subtitle="Work with certified coaches dedicated to refining your technique, building functional strength, and achieving verified results."
+          align="center"
+          className="mb-6 sm:mb-8"
+        />
 
         {/* Filter, Search & Sorting Controls Hub */}
         <div
@@ -402,63 +399,84 @@ export default function TrainersClient({ initialTrainers = [] }) {
                 </select>
               </div>
 
-              {/* View Switcher */}
-              <div className="flex items-center bg-background/80 p-1 rounded-xl border border-brand-500/20">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  title="Grid View"
-                  className={`p-1.5 rounded-lg transition-all cursor-pointer ${
-                    viewMode === "grid"
-                      ? "bg-active text-btn-text shadow-xs"
-                      : "text-secondary hover:text-foreground"
-                  }`}
-                >
-                  <FiGrid size={15} />
-                </button>
-                <button
-                  onClick={() => setViewMode("list")}
-                  title="Detailed Studio View"
-                  className={`p-1.5 rounded-lg transition-all cursor-pointer ${
-                    viewMode === "list"
-                      ? "bg-active text-btn-text shadow-xs"
-                      : "text-secondary hover:text-foreground"
-                  }`}
-                >
-                  <FiList size={15} />
-                </button>
-              </div>
+              {/* View Switcher with Layout Animation */}
+              <LayoutGroup id="trainersViewModeGroup">
+                <div className="flex items-center bg-background/80 p-1 rounded-xl border border-brand-500/20">
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    title="Grid View"
+                    className={`relative p-1.5 rounded-lg transition-colors cursor-pointer ${
+                      viewMode === "grid" ? "text-btn-text" : "text-secondary hover:text-foreground"
+                    }`}
+                  >
+                    {viewMode === "grid" && (
+                      <motion.span
+                        layoutId="activeTrainersViewModePill"
+                        className="absolute inset-0 rounded-lg bg-active shadow-xs"
+                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                      />
+                    )}
+                    <FiGrid size={15} className="relative z-10" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode("list")}
+                    title="Detailed Studio View"
+                    className={`relative p-1.5 rounded-lg transition-colors cursor-pointer ${
+                      viewMode === "list" ? "text-btn-text" : "text-secondary hover:text-foreground"
+                    }`}
+                  >
+                    {viewMode === "list" && (
+                      <motion.span
+                        layoutId="activeTrainersViewModePill"
+                        className="absolute inset-0 rounded-lg bg-active shadow-xs"
+                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                      />
+                    )}
+                    <FiList size={15} className="relative z-10" />
+                  </button>
+                </div>
+              </LayoutGroup>
             </div>
           </div>
 
-          {/* Specialty Category Pills with Counts */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none border-t border-brand-500/15 pt-3">
-            {specialtyStats.keys.map((spec) => {
-              const isSelected = selectedSpecialty === spec;
-              const count = specialtyStats.counts[spec] || 0;
-              return (
-                <button
-                  key={spec}
-                  onClick={() => setSelectedSpecialty(spec)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
-                    isSelected
-                      ? "bg-active text-btn-text shadow-sm ring-1 ring-active"
-                      : "bg-background/80 hover:bg-background text-secondary hover:text-foreground border border-brand-500/15"
-                  }`}
-                >
-                  <span>{spec}</span>
-                  <span
-                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
+          {/* Specialty Category Pills with Counts & Layout Animation */}
+          <LayoutGroup id="trainersSpecialtyGroup">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none border-t border-brand-500/15 pt-3">
+              {specialtyStats.keys.map((spec) => {
+                const isSelected = selectedSpecialty === spec;
+                const count = specialtyStats.counts[spec] || 0;
+                return (
+                  <button
+                    key={spec}
+                    onClick={() => setSelectedSpecialty(spec)}
+                    className={`relative px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
                       isSelected
-                        ? "bg-white/20 text-white"
-                        : "bg-brand-500/10 text-secondary"
+                        ? "text-btn-text"
+                        : "bg-background/80 hover:bg-background text-secondary hover:text-foreground border border-brand-500/15"
                     }`}
                   >
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                    {isSelected && (
+                      <motion.span
+                        layoutId="activeTrainersSpecialtyPill"
+                        className="absolute inset-0 rounded-xl bg-active shadow-sm"
+                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                      />
+                    )}
+                    <span className="relative z-10">{spec}</span>
+                    <span
+                      className={`relative z-10 px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
+                        isSelected
+                          ? "bg-white/20 text-white"
+                          : "bg-brand-500/10 text-secondary"
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </LayoutGroup>
 
           {/* Active Filters Summary Bar */}
           <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-brand-500/15 text-xs text-secondary">
@@ -503,12 +521,18 @@ export default function TrainersClient({ initialTrainers = [] }) {
           </div>
         ) : viewMode === "grid" ? (
           /* Grid View Mode */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-            {paginatedTrainers.map((trainer) => (
-              <div
-                key={trainer._id}
-                className="group bg-brand-900/40 dark:bg-[#121026]/75 border border-brand-500/20 hover:border-active/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
-              >
+          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+            <AnimatePresence mode="popLayout">
+              {paginatedTrainers.map((trainer) => (
+                <ScrollAnimate key={trainer._id} className="h-full" speed="animate__faster">
+                  <motion.div
+                    layout
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                    className="group bg-brand-900/40 dark:bg-[#121026]/75 border border-brand-500/20 hover:border-active/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full"
+                  >
                 {/* Image Section */}
                 <div className="relative h-64 w-full overflow-hidden bg-brand-800/30">
                   <Image
@@ -532,9 +556,9 @@ export default function TrainersClient({ initialTrainers = [] }) {
 
                   {/* Name & Specialty Over Image */}
                   <div className="absolute bottom-3 left-3.5 right-3.5 text-white">
-                    <h3 className="font-['Outfit'] text-xl font-black tracking-tight group-hover:text-active transition-colors flex items-center gap-1.5">
+                    <h3 className="font-['Outfit'] text-xl font-black tracking-tight group-hover:text-active transition-colors flex items-center gap-1.5 group-hover:animate__animated group-hover:animate__headShake">
                       {trainer.name}
-                      <FiCheckCircle className="text-active shrink-0" size={15} />
+                      <FiCheckCircle className="text-active shrink-0 animate__animated animate__bounceIn" size={15} />
                     </h3>
                     <p className="text-xs text-white/80 font-medium">
                       {trainer.specialty} Coach
@@ -585,7 +609,7 @@ export default function TrainersClient({ initialTrainers = [] }) {
                   <div className="pt-3.5 border-t border-brand-500/15 flex items-center gap-2">
                     <Link
                       href={`/all-classes?search=${encodeURIComponent(trainer.name)}`}
-                      className="flex-1 py-2.5 rounded-xl bg-active text-btn-text text-xs font-bold text-center hover:opacity-90 shadow-sm transition-all flex items-center justify-center gap-1.5"
+                      className="flex-1 py-2.5 rounded-xl bg-active text-btn-text text-xs font-bold text-center hover:opacity-90 shadow-sm transition-all flex items-center justify-center gap-1.5 hover:animate__animated hover:animate__pulse"
                     >
                       <FaDumbbell size={11} /> Classes
                     </Link>
@@ -601,15 +625,17 @@ export default function TrainersClient({ initialTrainers = [] }) {
                     <Link
                       href={`/contact?coach=${encodeURIComponent(trainer.name)}`}
                       title="Contact Coach"
-                      className="p-2.5 rounded-xl border border-brand-500/25 bg-background hover:border-active text-secondary hover:text-active transition-colors"
+                      className="p-2.5 rounded-xl border border-brand-500/25 bg-background hover:border-active text-secondary hover:text-active transition-colors group/mail"
                     >
-                      <FiMail size={15} />
+                      <FiMail size={15} className="group-hover/mail:animate__animated group-hover/mail:animate__headShake" />
                     </Link>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              </motion.div>
+            </ScrollAnimate>
+          ))}
+          </AnimatePresence>
+          </motion.div>
         ) : (
           /* Detailed List View Mode */
           <div className="space-y-4">

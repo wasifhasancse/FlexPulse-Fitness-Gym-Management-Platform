@@ -3,6 +3,8 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
 import {
   FiCalendar,
   FiClock,
@@ -19,6 +21,7 @@ import {
   FiColumns,
 } from "react-icons/fi";
 import { FaFireAlt, FaDumbbell } from "react-icons/fa";
+import ScrollAnimate from "@/components/common/ScrollAnimate";
 
 const DAYS_OF_WEEK = [
   { full: "Monday", short: "Mon" },
@@ -305,77 +308,87 @@ export default function ScheduleClient({ initialClasses = [] }) {
       {/* ========================================================================= */}
       <div className="max-w-7xl mx-auto space-y-8 sm:space-y-10 print:hidden">
         
-        {/* Header - Compact, refined & modern */}
-        <div className="text-center space-y-3.5 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-active/30 bg-active/10 text-active text-xs font-bold uppercase tracking-wider shadow-xs">
-            <FiCalendar size={14} />
-            Weekly Class Timetable
-          </div>
-
-          <h1 className="font-['Outfit'] text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
-            Plan Your <span className="text-active">Weekly Routine</span>
-          </h1>
-
-          <p className="font-['Inter'] text-xs sm:text-sm text-secondary max-w-xl mx-auto leading-relaxed">
-            From high-energy strength complexes to evening recovery flows, browse our weekly class schedule led by certified coaches.
-          </p>
-        </div>
+        {/* Header with Exit Animation */}
+        <AnimatedSectionTitle
+          kicker="Weekly Class Timetable"
+          title="Plan Your Weekly Routine"
+          highlightText="Weekly Routine"
+          subtitle="From high-energy strength complexes to evening recovery flows, browse our weekly class schedule led by certified coaches."
+          align="center"
+          className="mb-6 sm:mb-8"
+        />
 
         {/* Schedule Controls Deck */}
         <div
           ref={scheduleGridRef}
           className="bg-brand-900/50 dark:bg-[#121026]/75 border border-brand-500/20 rounded-2xl p-4 sm:p-5 backdrop-blur-md shadow-sm space-y-4"
         >
-          {/* Day of Week Selector Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-            <button
-              onClick={() => setSelectedDay("All Days")}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
-                selectedDay === "All Days"
-                  ? "bg-active text-btn-text shadow-sm ring-1 ring-active"
-                  : "bg-background border border-brand-500/15 text-secondary hover:text-foreground hover:bg-brand-500/10"
-              }`}
-            >
-              <span>All Days</span>
-              <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
+          {/* Day of Week Selector Pills with Layout Animation */}
+          <LayoutGroup id="scheduleDaySelectorGroup">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+              <button
+                onClick={() => setSelectedDay("All Days")}
+                className={`relative px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
                   selectedDay === "All Days"
-                    ? "bg-white/20 text-white"
-                    : "bg-brand-500/10 text-secondary"
+                    ? "text-btn-text"
+                    : "bg-background border border-brand-500/15 text-secondary hover:text-foreground hover:bg-brand-500/10"
                 }`}
               >
-                {dayCounts["All Days"] || 0}
-              </span>
-            </button>
-
-            {DAYS_OF_WEEK.map((day) => {
-              const isSelected = selectedDay === day.full;
-              const count = dayCounts[day.full] || 0;
-              return (
-                <button
-                  key={day.full}
-                  onClick={() => setSelectedDay(day.full)}
-                  className={`px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
-                    isSelected
-                      ? "bg-active text-btn-text shadow-sm ring-1 ring-active"
-                      : "bg-background border border-brand-500/15 text-secondary hover:text-foreground hover:bg-brand-500/10"
+                {selectedDay === "All Days" && (
+                  <motion.span
+                    layoutId="activeScheduleDaySelectorPill"
+                    className="absolute inset-0 rounded-xl bg-active shadow-sm"
+                    transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                  />
+                )}
+                <span className="relative z-10">All Days</span>
+                <span
+                  className={`relative z-10 px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
+                    selectedDay === "All Days"
+                      ? "bg-white/20 text-white"
+                      : "bg-brand-500/10 text-secondary"
                   }`}
                 >
-                  <span className="hidden sm:inline">{day.full}</span>
-                  <span className="sm:hidden">{day.short}</span>
-                  <span
-                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
+                  {dayCounts["All Days"] || 0}
+                </span>
+              </button>
+
+              {DAYS_OF_WEEK.map((day) => {
+                const isSelected = selectedDay === day.full;
+                const count = dayCounts[day.full] || 0;
+                return (
+                  <button
+                    key={day.full}
+                    onClick={() => setSelectedDay(day.full)}
+                    className={`relative px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
                       isSelected
-                        ? "bg-white/20 text-white"
-                        : "bg-brand-500/10 text-secondary"
+                        ? "text-btn-text"
+                        : "bg-background border border-brand-500/15 text-secondary hover:text-foreground hover:bg-brand-500/10"
                     }`}
                   >
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                    {isSelected && (
+                      <motion.span
+                        layoutId="activeScheduleDaySelectorPill"
+                        className="absolute inset-0 rounded-xl bg-active shadow-sm"
+                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                      />
+                    )}
+                    <span className="relative z-10 hidden sm:inline">{day.full}</span>
+                    <span className="relative z-10 sm:hidden">{day.short}</span>
+                    <span
+                      className={`relative z-10 px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
+                        isSelected
+                          ? "bg-white/20 text-white"
+                          : "bg-brand-500/10 text-secondary"
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </LayoutGroup>
 
           {/* Search, Category & View Switcher Row */}
           <div className="pt-3 border-t border-brand-500/15 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4">
@@ -402,22 +415,34 @@ export default function ScheduleClient({ initialClasses = [] }) {
               )}
             </div>
 
-            {/* Category Filter Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-                    selectedCategory === cat
-                      ? "bg-active text-btn-text font-bold shadow-xs"
-                      : "bg-background border border-brand-500/15 text-secondary hover:text-foreground"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
+            {/* Category Filter Pills with Layout Animation */}
+            <LayoutGroup id="scheduleCategorySelectorGroup">
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+                {categories.map((cat) => {
+                  const isSelected = selectedCategory === cat;
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(cat)}
+                      className={`relative px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+                        isSelected
+                          ? "text-btn-text font-bold"
+                          : "bg-background border border-brand-500/15 text-secondary hover:text-foreground"
+                      }`}
+                    >
+                      {isSelected && (
+                        <motion.span
+                          layoutId="activeScheduleCategorySelectorPill"
+                          className="absolute inset-0 rounded-xl bg-active shadow-xs"
+                          transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                        />
+                      )}
+                      <span className="relative z-10">{cat}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </LayoutGroup>
 
             {/* Right Tools: View Mode & Print */}
             <div className="flex items-center justify-between md:justify-end gap-2 shrink-0">
@@ -431,42 +456,38 @@ export default function ScheduleClient({ initialClasses = [] }) {
                 <span>Print Timetable</span>
               </button>
 
-              {/* View Mode Toggle */}
-              <div className="flex items-center bg-background p-1 rounded-xl border border-brand-500/20">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  title="Card Grid View"
-                  className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                    viewMode === "grid"
-                      ? "bg-active text-btn-text shadow-xs"
-                      : "text-secondary hover:text-foreground"
-                  }`}
-                >
-                  <FiGrid size={15} />
-                </button>
-                <button
-                  onClick={() => setViewMode("weekly")}
-                  title="Day-by-Day Timetable"
-                  className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                    viewMode === "weekly"
-                      ? "bg-active text-btn-text shadow-xs"
-                      : "text-secondary hover:text-foreground"
-                  }`}
-                >
-                  <FiColumns size={15} />
-                </button>
-                <button
-                  onClick={() => setViewMode("table")}
-                  title="Table Ledger View"
-                  className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                    viewMode === "table"
-                      ? "bg-active text-btn-text shadow-xs"
-                      : "text-secondary hover:text-foreground"
-                  }`}
-                >
-                  <FiList size={15} />
-                </button>
-              </div>
+              {/* View Mode Toggle with Layout Animation */}
+              <LayoutGroup id="scheduleViewModeGroup">
+                <div className="flex items-center bg-background p-1 rounded-xl border border-brand-500/20">
+                  {[
+                    { id: "grid", title: "Card Grid View", icon: FiGrid },
+                    { id: "weekly", title: "Day-by-Day Timetable", icon: FiColumns },
+                    { id: "table", title: "Table Ledger View", icon: FiList },
+                  ].map((mode) => {
+                    const Icon = mode.icon;
+                    const isActive = viewMode === mode.id;
+                    return (
+                      <button
+                        key={mode.id}
+                        onClick={() => setViewMode(mode.id)}
+                        title={mode.title}
+                        className={`relative p-1.5 rounded-lg transition-colors cursor-pointer ${
+                          isActive ? "text-btn-text" : "text-secondary hover:text-foreground"
+                        }`}
+                      >
+                        {isActive && (
+                          <motion.span
+                            layoutId="activeScheduleViewModePill"
+                            className="absolute inset-0 rounded-lg bg-active shadow-xs"
+                            transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                          />
+                        )}
+                        <Icon size={15} className="relative z-10" />
+                      </button>
+                    );
+                  })}
+                </div>
+              </LayoutGroup>
             </div>
           </div>
 
@@ -528,12 +549,18 @@ export default function ScheduleClient({ initialClasses = [] }) {
         ) : viewMode === "grid" ? (
           /* View 1: Card Grid View with Pagination */
           <div className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {paginatedSessions.map((session, index) => (
-                <div
-                  key={`${session._id}-${session.day}-${index}`}
-                  className="group bg-brand-900/40 dark:bg-[#121026]/75 border border-brand-500/20 hover:border-active/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
-                >
+            <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <AnimatePresence mode="popLayout">
+                {paginatedSessions.map((session, index) => (
+                  <ScrollAnimate key={`${session._id}-${session.day}-${index}`} className="h-full" speed="animate__faster">
+                    <motion.div
+                      layout
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                      className="group bg-brand-900/40 dark:bg-[#121026]/75 border border-brand-500/20 hover:border-active/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full"
+                    >
                   {/* Image & Top Badges */}
                   <div className="relative h-44 w-full overflow-hidden bg-brand-800/30">
                     <Image
@@ -547,7 +574,7 @@ export default function ScheduleClient({ initialClasses = [] }) {
 
                     {/* Day & Category Badges */}
                     <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                      <span className="px-2.5 py-1 rounded-full bg-active text-btn-text text-[10px] font-black uppercase tracking-wider shadow">
+                      <span className="px-2.5 py-1 rounded-full bg-active text-btn-text text-[10px] font-black uppercase tracking-wider shadow group-hover:animate__animated group-hover:animate__pulse">
                         {session.day}
                       </span>
                       <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[10px] font-bold border border-white/10">
@@ -558,7 +585,7 @@ export default function ScheduleClient({ initialClasses = [] }) {
                     {/* Bottom Image Info */}
                     <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white text-xs">
                       <span className="flex items-center gap-1 font-bold text-amber-300 drop-shadow">
-                        <FaFireAlt size={11} /> {session.calories}
+                        <FaFireAlt size={11} className="group-hover:animate__animated group-hover:animate__bounce" /> {session.calories}
                       </span>
                       <span className="px-2 py-0.5 rounded-md bg-white/20 backdrop-blur-md text-[10px] font-bold uppercase">
                         {session.level}
@@ -569,7 +596,7 @@ export default function ScheduleClient({ initialClasses = [] }) {
                   {/* Content Section */}
                   <div className="p-4 sm:p-5 space-y-3.5 flex-1 flex flex-col justify-between">
                     <div className="space-y-2">
-                      <h3 className="font-['Outfit'] text-lg font-bold text-foreground group-hover:text-active transition-colors line-clamp-1">
+                      <h3 className="font-['Outfit'] text-lg font-bold text-foreground group-hover:text-active transition-colors line-clamp-1 group-hover:animate__animated group-hover:animate__headShake">
                         {session.className}
                       </h3>
 
@@ -606,15 +633,17 @@ export default function ScheduleClient({ initialClasses = [] }) {
 
                       <Link
                         href={`/all-classes/${session._id}`}
-                        className="px-4 py-2 rounded-xl bg-active text-btn-text text-xs font-bold hover:opacity-90 shadow-sm transition-all flex items-center gap-1.5"
+                        className="px-4 py-2 rounded-xl bg-active text-btn-text text-xs font-bold hover:opacity-90 shadow-sm transition-all flex items-center gap-1.5 hover:animate__animated hover:animate__pulse"
                       >
                         <FiZap size={13} /> Book Class
                       </Link>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                </motion.div>
+              </ScrollAnimate>
+            ))}
+          </AnimatePresence>
+        </motion.div>
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
