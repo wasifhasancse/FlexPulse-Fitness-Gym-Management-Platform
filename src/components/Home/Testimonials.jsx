@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { FaQuoteLeft, FaStar } from "react-icons/fa";
-import { 
-  FiCheck, 
-  FiTrendingUp, 
+import {
+  FiCheck,
+  FiTrendingUp,
   FiCheckCircle,
   FiChevronLeft,
   FiChevronRight
@@ -163,10 +163,10 @@ export default function Testimonials() {
       <div className="absolute bottom-10 left-0 w-80 sm:w-120 h-80 sm:h-120 bg-brand-500/8 rounded-full blur-[130px] pointer-events-none -z-10" />
 
       <div className="w-11/12 mx-auto relative z-10">
-        
+
         {/* Section Header with Telemetry & Carousel Controls */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 sm:mb-16 gap-6 border-b border-brand-500/15 pb-8">
-          
+
           <div className="max-w-2xl space-y-3">
             {/* Accreditation Kicker Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-800/25 dark:bg-[#1B1A55]/70 border border-brand-500/25 text-xs font-bold tracking-wide shadow-xs">
@@ -194,7 +194,7 @@ export default function Testimonials() {
 
           {/* Controls: Rating Summary + Prev/Next Buttons */}
           <div className="flex flex-wrap items-center gap-4 sm:gap-6 self-start lg:self-end">
-            
+
             {/* Rating Widget */}
             <div className="flex items-center gap-3 bg-[#535C91]/5 dark:bg-[#1B1A55]/50 px-4 py-2.5 rounded-2xl border border-brand-500/20 font-['Outfit']">
               <div>
@@ -234,7 +234,7 @@ export default function Testimonials() {
         </div>
 
         {/* Carousel Container (Single Horizontal Line with Auto-Swipe) */}
-        <div 
+        <div
           className="relative overflow-hidden cursor-grab active:cursor-grabbing pb-2"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
@@ -256,7 +256,7 @@ export default function Testimonials() {
                 style={{ width: `${100 / visibleCards}%` }}
               >
                 <div className="group relative rounded-3xl p-7 sm:p-8 bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1.5 flex flex-col justify-between w-full shadow-lg hover:shadow-2xl overflow-hidden">
-                  
+
                   {/* Subtle Background Watermark Quote Icon */}
                   <FaQuoteLeft className="text-foreground/5 dark:text-white/5 w-16 h-16 absolute top-6 right-6 pointer-events-none group-hover:text-active/15 group-hover:scale-110 transition-all duration-300" />
 
@@ -329,7 +329,7 @@ export default function Testimonials() {
 
         {/* Carousel Bottom Indicator & Controls Bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-4 border-t border-brand-500/15 font-['Inter']">
-          
+
           {/* Segmented Pill Pagination Dots */}
           <div className="flex items-center gap-2">
             {Array.from({ length: maxIndex + 1 }).map((_, idx) => {
@@ -339,11 +339,10 @@ export default function Testimonials() {
                   key={idx}
                   type="button"
                   onClick={() => setCurrentIndex(idx)}
-                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                    isActive 
-                      ? "w-8 bg-active shadow-xs" 
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${isActive
+                      ? "w-8 bg-active shadow-xs"
                       : "w-2 bg-[#535C91]/30 dark:bg-[#1B1A55]/80 hover:bg-[#535C91]/50"
-                  }`}
+                    }`}
                   aria-label={`Go to slide ${idx + 1}`}
                 />
               );

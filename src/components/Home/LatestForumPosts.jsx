@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
 import { 
   FiArrowRight, 
   FiHeart, 
@@ -154,31 +155,14 @@ export default function LatestForumPosts({ posts }) {
         
         {/* Section Header with Telemetry Bar */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 sm:mb-16 gap-6 border-b border-brand-500/15 pb-8">
-          <div className="max-w-2xl space-y-3">
-            
-            {/* Accreditation Kicker Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-800/25 dark:bg-[#1B1A55]/70 border border-brand-500/25 text-xs font-bold tracking-wide shadow-xs">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-active"></span>
-              </span>
-              <span className="text-active uppercase tracking-wider font-extrabold text-[11px]">
-                Knowledge Sharing
-              </span>
-              <span className="text-[#535C91] dark:text-[#9290C3]">
-                • Research & Athlete Insights
-              </span>
-            </div>
-
-            {/* Headline */}
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-['Outfit'] tracking-tight text-foreground leading-[1.12]">
-              Latest From Our <span className="text-active">Community Forum</span>
-            </h2>
-
-            <p className="text-sm sm:text-base text-[#535C91] dark:text-[#9290C3] font-['Inter'] leading-relaxed pt-1">
-              Scientific training breakdowns, nutrition protocols, and injury prevention insights published by certified master coaches, exercise physiologists, and community athletes.
-            </p>
-          </div>
+          <AnimatedSectionTitle
+            kicker="Knowledge Sharing • Research & Athlete Insights"
+            title="Latest From Our Community Forum"
+            highlightText="Community Forum"
+            subtitle="Scientific training breakdowns, nutrition protocols, and injury prevention insights published by certified master coaches, exercise physiologists, and community athletes."
+            align="left"
+            className="mb-0"
+          />
 
           {/* Quick Curriculum Data Specs */}
           <div className="flex items-center gap-4 sm:gap-6 bg-[#535C91]/5 dark:bg-[#1B1A55]/50 p-4 rounded-2xl border border-brand-500/20 shrink-0 font-['Outfit']">
@@ -205,25 +189,34 @@ export default function LatestForumPosts({ posts }) {
           </div>
         </div>
 
-        {/* Interactive Topic Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-10 no-scrollbar select-none">
-          {TOPIC_FILTERS.map((topic) => {
-            const isActive = selectedTopic === topic;
-            return (
-              <button
-                key={topic}
-                onClick={() => setSelectedTopic(topic)}
-                className={`relative px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-tight transition-all duration-200 whitespace-nowrap cursor-pointer ${
-                  isActive
-                    ? "bg-active text-white shadow-md shadow-active/20"
-                    : "bg-[#535C91]/8 dark:bg-[#1B1A55]/60 hover:bg-[#535C91]/15 text-[#535C91] dark:text-[#9290C3] border border-brand-500/15"
-                }`}
-              >
-                {topic}
-              </button>
-            );
-          })}
-        </div>
+        {/* Interactive Topic Filter Pills with Layout Animation */}
+        <LayoutGroup id="latestForumTopicGroup">
+          <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-10 no-scrollbar select-none">
+            {TOPIC_FILTERS.map((topic) => {
+              const isActive = selectedTopic === topic;
+              return (
+                <button
+                  key={topic}
+                  onClick={() => setSelectedTopic(topic)}
+                  className={`relative px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-tight transition-colors duration-200 whitespace-nowrap cursor-pointer ${
+                    isActive
+                      ? "text-white"
+                      : "bg-[#535C91]/8 dark:bg-[#1B1A55]/60 hover:bg-[#535C91]/15 text-[#535C91] dark:text-[#9290C3] border border-brand-500/15"
+                  }`}
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="activeLatestForumTopicPill"
+                      className="absolute inset-0 rounded-xl bg-active shadow-md shadow-active/20"
+                      transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                    />
+                  )}
+                  <span className="relative z-10">{topic}</span>
+                </button>
+              );
+            })}
+          </div>
+        </LayoutGroup>
 
         {/* Forum Cards Grid with Decoupled Smooth Transitions */}
         <motion.div 
@@ -256,7 +249,7 @@ export default function LatestForumPosts({ posts }) {
               return (
                 <motion.div
                   key={_id || idx}
-                  layout="position"
+                  layout
                   initial={{ opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 18 }}
