@@ -91,8 +91,8 @@ export default function TrialPassBanner() {
               <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
                 
                 {/* Accreditation Kicker Badge */}
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-800/25 dark:bg-[#1B1A55]/70 border border-brand-500/25 text-xs font-bold tracking-wide shadow-xs">
-                  <span className="relative flex h-2 w-2">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-800/25 dark:bg-[#1B1A55]/70 border border-brand-500/25 text-xs font-bold tracking-wide shadow-xs animate__animated animate__fadeInDown animate__faster">
+                  <span className="relative flex h-2 w-2 animate__animated animate__pulse animate__infinite">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-active"></span>
                   </span>
@@ -169,7 +169,7 @@ export default function TrialPassBanner() {
               <div className="lg:col-span-5 flex flex-col items-center lg:items-end justify-center">
                 <div className="w-full max-w-sm p-6 sm:p-7 rounded-3xl bg-white/70 dark:bg-[#121026]/80 backdrop-blur-xl border border-brand-500/25 shadow-xl space-y-4 text-center">
                   
-                  <div className="w-12 h-12 rounded-2xl bg-active/10 text-active flex items-center justify-center mx-auto shadow-inner">
+                  <div className="w-12 h-12 rounded-2xl bg-active/10 text-active flex items-center justify-center mx-auto shadow-inner animate__animated animate__pulse animate__infinite animate__slower">
                     <FiZap className="w-6 h-6 text-active" />
                   </div>
 
@@ -189,7 +189,7 @@ export default function TrialPassBanner() {
                       setPassCode(null);
                       setIsOpen(true);
                     }}
-                    className="w-full py-4 px-6 bg-btn-bg text-btn-text hover:opacity-95 font-extrabold rounded-2xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all text-sm sm:text-base cursor-pointer flex items-center justify-center gap-2 group"
+                    className="w-full py-4 px-6 bg-btn-bg text-btn-text hover:opacity-95 font-extrabold rounded-2xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all text-sm sm:text-base cursor-pointer flex items-center justify-center gap-2 group hover:animate__animated hover:animate__pulse"
                   >
                     <FiZap className="w-4 h-4 text-btn-text group-hover:scale-120 transition-transform" />
                     <span>Claim Free Day Pass</span>
@@ -226,7 +226,7 @@ export default function TrialPassBanner() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               transition={{ duration: 0.3, ease: TRANSITION_EASE }}
-              className="bg-[#070F2B] border border-active/40 rounded-3xl max-w-md w-full p-6 sm:p-8 relative shadow-2xl text-foreground font-['Inter']"
+              className="bg-[#070F2B] border border-active/40 rounded-3xl max-w-md w-full p-6 sm:p-8 relative shadow-2xl text-foreground font-['Inter'] animate__animated animate__zoomIn animate__faster"
             >
               {/* Close Button */}
               <button
@@ -241,7 +241,7 @@ export default function TrialPassBanner() {
               {passCode ? (
                 /* Generated VIP Ticket Display */
                 <div className="text-center space-y-5">
-                  <div className="w-16 h-16 rounded-full bg-active/20 text-active flex items-center justify-center mx-auto shadow-inner">
+                  <div className="w-16 h-16 rounded-full bg-active/20 text-active flex items-center justify-center mx-auto shadow-inner animate__animated animate__bounceIn">
                     <FiCheckCircle className="w-8 h-8 text-active" />
                   </div>
 
@@ -255,7 +255,7 @@ export default function TrialPassBanner() {
                   </div>
 
                   {/* Ticket Notch Container */}
-                  <div className="relative p-5 rounded-2xl bg-black/70 border border-active/60 shadow-inner space-y-2">
+                  <div className="relative p-5 rounded-2xl bg-black/70 border border-active/60 shadow-inner space-y-2 animate__animated animate__tada animate__faster">
                     <p className="text-[10px] text-active font-extrabold uppercase tracking-widest">
                       Official FlexPulse Passcode
                     </p>
