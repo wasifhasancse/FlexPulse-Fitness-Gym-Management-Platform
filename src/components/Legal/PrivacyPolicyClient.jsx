@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, LayoutGroup } from "framer-motion";
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -231,18 +232,14 @@ export default function PrivacyPolicyClient() {
 
         <div className="w-11/12 mx-auto relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="max-w-2xl space-y-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-active/15 border border-active/30 text-active text-xs font-black tracking-wider uppercase">
-                <FaShieldAlt className="w-3.5 h-3.5" />
-                <span>Athletic Data Integrity • GDPR & HIPAA Aligned</span>
-              </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black font-['Outfit'] tracking-tight text-foreground leading-tight">
-                Athlete Privacy Policy
-              </h1>
-              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 font-['Inter'] leading-relaxed">
-                How FlexPulse safeguards your biometric telemetry, InBody scans, facility access timestamps, and coaching analytics with zero-knowledge encryption.
-              </p>
-            </div>
+            <AnimatedSectionTitle
+              kicker="Athletic Data Integrity • GDPR & HIPAA Aligned"
+              title="Athlete Privacy Policy"
+              highlightText="Privacy Policy"
+              subtitle="How FlexPulse safeguards your biometric telemetry, InBody scans, facility access timestamps, and coaching analytics with zero-knowledge encryption."
+              align="left"
+              className="mb-0"
+            />
 
             {/* Quick Meta & Actions */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -312,27 +309,39 @@ export default function PrivacyPolicyClient() {
                   <span className="text-[11px] font-mono uppercase tracking-wider font-extrabold text-slate-500 dark:text-slate-400 block mb-3">
                     Table of Contents
                   </span>
-                  <nav className="space-y-1">
-                    {filteredSections.map((sec) => (
-                      <button
-                        key={sec.id}
-                        type="button"
-                        onClick={() => {
-                          setActiveSection(sec.id);
-                          const el = document.getElementById(sec.id);
-                          if (el) el.scrollIntoView({ behavior: "smooth" });
-                        }}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-between ${
-                          activeSection === sec.id
-                            ? "bg-active text-white shadow-xs"
-                            : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
-                        }`}
-                      >
-                        <span className="truncate">{sec.title}</span>
-                        {activeSection === sec.id && <FiCheck className="w-3.5 h-3.5 shrink-0" />}
-                      </button>
-                    ))}
-                  </nav>
+                  <LayoutGroup id="privacyTocGroup">
+                    <nav className="space-y-1">
+                      {filteredSections.map((sec) => {
+                        const isActive = activeSection === sec.id;
+                        return (
+                          <button
+                            key={sec.id}
+                            type="button"
+                            onClick={() => {
+                              setActiveSection(sec.id);
+                              const el = document.getElementById(sec.id);
+                              if (el) el.scrollIntoView({ behavior: "smooth" });
+                            }}
+                            className={`relative w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer flex items-center justify-between ${
+                              isActive
+                                ? "text-white"
+                                : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
+                            }`}
+                          >
+                            {isActive && (
+                              <motion.span
+                                layoutId="activePrivacyTocPill"
+                                className="absolute inset-0 rounded-lg bg-active shadow-xs"
+                                transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                              />
+                            )}
+                            <span className="truncate relative z-10">{sec.title}</span>
+                            {isActive && <FiCheck className="w-3.5 h-3.5 shrink-0 relative z-10" />}
+                          </button>
+                        );
+                      })}
+                    </nav>
+                  </LayoutGroup>
                 </div>
 
                 {/* Quick Assistance Box */}

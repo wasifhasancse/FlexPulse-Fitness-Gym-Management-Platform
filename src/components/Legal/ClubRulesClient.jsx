@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, LayoutGroup } from "framer-motion";
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -213,18 +214,14 @@ export default function ClubRulesClient() {
 
         <div className="w-11/12 mx-auto relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="max-w-2xl space-y-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-active/15 border border-active/30 text-active text-xs font-black tracking-wider uppercase">
-                <FaDumbbell className="w-3.5 h-3.5" />
-                <span>Arena Etiquette & Performance Standards</span>
-              </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black font-['Outfit'] tracking-tight text-foreground leading-tight">
-                Club Rules & Etiquette
-              </h1>
-              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 font-['Inter'] leading-relaxed">
-                The standard of discipline, safety, and mutual respect upheld by every athlete across our training floors, lifting platforms, and recovery suites.
-              </p>
-            </div>
+            <AnimatedSectionTitle
+              kicker="Arena Etiquette & Performance Standards"
+              title="Club Rules & Etiquette"
+              highlightText="Rules & Etiquette"
+              subtitle="The standard of discipline, safety, and mutual respect upheld by every athlete across our training floors, lifting platforms, and recovery suites."
+              align="left"
+              className="mb-0"
+            />
 
             {/* Quick Actions */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -294,27 +291,39 @@ export default function ClubRulesClient() {
                   <span className="text-[11px] font-mono uppercase tracking-wider font-extrabold text-slate-500 dark:text-slate-400 block mb-3">
                     Code of Conduct
                   </span>
-                  <nav className="space-y-1">
-                    {filteredSections.map((sec) => (
-                      <button
-                        key={sec.id}
-                        type="button"
-                        onClick={() => {
-                          setActiveSection(sec.id);
-                          const el = document.getElementById(sec.id);
-                          if (el) el.scrollIntoView({ behavior: "smooth" });
-                        }}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-between ${
-                          activeSection === sec.id
-                            ? "bg-active text-white shadow-xs"
-                            : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
-                        }`}
-                      >
-                        <span className="truncate">{sec.title}</span>
-                        {activeSection === sec.id && <FiCheck className="w-3.5 h-3.5 shrink-0" />}
-                      </button>
-                    ))}
-                  </nav>
+                  <LayoutGroup id="clubRulesTocGroup">
+                    <nav className="space-y-1">
+                      {filteredSections.map((sec) => {
+                        const isActive = activeSection === sec.id;
+                        return (
+                          <button
+                            key={sec.id}
+                            type="button"
+                            onClick={() => {
+                              setActiveSection(sec.id);
+                              const el = document.getElementById(sec.id);
+                              if (el) el.scrollIntoView({ behavior: "smooth" });
+                            }}
+                            className={`relative w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer flex items-center justify-between ${
+                              isActive
+                                ? "text-white"
+                                : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
+                            }`}
+                          >
+                            {isActive && (
+                              <motion.span
+                                layoutId="activeClubRulesTocPill"
+                                className="absolute inset-0 rounded-lg bg-active shadow-xs"
+                                transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                              />
+                            )}
+                            <span className="truncate relative z-10">{sec.title}</span>
+                            {isActive && <FiCheck className="w-3.5 h-3.5 shrink-0 relative z-10" />}
+                          </button>
+                        );
+                      })}
+                    </nav>
+                  </LayoutGroup>
                 </div>
 
                 {/* Report an Issue */}
