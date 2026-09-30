@@ -3,6 +3,8 @@
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
 import {
   FiCheckCircle,
   FiClock,
@@ -635,21 +637,17 @@ export default function FacilitiesClient() {
         </div>
 
         {/* ============================================================== */}
-        {/* 2. HERO HEADER - Proportional, High Impact, Athletic           */}
+        {/* 2. HERO HEADER WITH EXIT ANIMATION                             */}
         {/* ============================================================== */}
         <div className="text-center space-y-3.5 max-w-2xl mx-auto relative pt-1 sm:pt-2">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-active/30 bg-active/10 text-active text-xs font-bold uppercase tracking-wider shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-active animate-pulse" />
-            <span>FLEXPULSE ATHLETIC CAMPUS • 25,000 SQ FT</span>
-          </div>
-
-          <h1 className="font-['Outfit'] text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-tight">
-            Built for Elite <span className="text-active">Performance</span>
-          </h1>
-
-          <p className="font-['Inter'] text-xs sm:text-sm text-secondary max-w-xl mx-auto leading-relaxed">
-            Competition-grade powerlifting decks, curved metabolic turf, infrared hot studios, and contrast hydrotherapy recovery spas engineered for serious athletes.
-          </p>
+          <AnimatedSectionTitle
+            kicker="FLEXPULSE ATHLETIC CAMPUS • 25,000 SQ FT"
+            title="Built for Elite Performance"
+            highlightText="Performance"
+            subtitle="Competition-grade powerlifting decks, curved metabolic turf, infrared hot studios, and contrast hydrotherapy recovery spas engineered for serious athletes."
+            align="center"
+            className="mb-1"
+          />
 
           {/* Quick Action Badges */}
           <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
@@ -741,107 +739,117 @@ export default function FacilitiesClient() {
               )}
             </div>
 
-            {/* View Mode Toggle: Split (Left/Right) vs Grid vs Blueprint */}
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-[#121026]/70 border border-slate-200 dark:border-brand-500/20 self-end sm:self-auto shrink-0">
-              <button
-                onClick={() => setViewMode("split")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === "split"
-                    ? "bg-active text-btn-text shadow-xs"
-                    : "text-secondary hover:text-foreground"
-                }`}
-                title="Alternating Left / Right Showcase"
-              >
-                <FiLayers size={13} />
-                <span>Showcase (Left/Right)</span>
-              </button>
-
-              <button
-                onClick={() => setViewMode("grid")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === "grid"
-                    ? "bg-active text-btn-text shadow-xs"
-                    : "text-secondary hover:text-foreground"
-                }`}
-                title="Card Grid View"
-              >
-                <FiGrid size={13} />
-                <span className="hidden sm:inline">Cards</span>
-              </button>
-
-              <button
-                onClick={() => setViewMode("blueprint")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === "blueprint"
-                    ? "bg-active text-btn-text shadow-xs"
-                    : "text-secondary hover:text-foreground"
-                }`}
-                title="Blueprint Spec Ledger View"
-              >
-                <FiList size={13} />
-                <span className="hidden sm:inline">Specs Ledger</span>
-              </button>
-            </div>
+            {/* View Mode Toggle with Layout Animation */}
+            <LayoutGroup id="facilitiesViewModeGroup">
+              <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-[#121026]/70 border border-slate-200 dark:border-brand-500/20 self-end sm:self-auto shrink-0">
+                {[
+                  { id: "split", label: "Showcase (Left/Right)", icon: FiLayers, title: "Alternating Left / Right Showcase" },
+                  { id: "grid", label: "Cards", icon: FiGrid, title: "Card Grid View" },
+                  { id: "blueprint", label: "Specs Ledger", icon: FiList, title: "Blueprint Spec Ledger View" },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isActive = viewMode === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setViewMode(item.id)}
+                      className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                        isActive ? "text-btn-text" : "text-secondary hover:text-foreground"
+                      }`}
+                      title={item.title}
+                    >
+                      {isActive && (
+                        <motion.span
+                          layoutId="activeFacilitiesViewModePill"
+                          className="absolute inset-0 rounded-lg bg-active shadow-xs"
+                          transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                        />
+                      )}
+                      <Icon size={13} className="relative z-10" />
+                      <span className="relative z-10">{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </LayoutGroup>
           </div>
 
-          {/* Level Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
-            <span className="text-secondary font-bold text-[11px] uppercase tracking-wider mr-1 shrink-0 flex items-center gap-1">
-              <FiMapPin size={12} /> Campus Level:
-            </span>
-            {FLOOR_LEVELS.map((lvl) => {
-              const isSelected = selectedLevel === lvl.id;
-              return (
-                <button
-                  key={lvl.id}
-                  onClick={() => setSelectedLevel(lvl.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                    isSelected
-                      ? "bg-active text-white font-bold shadow-xs"
-                      : "bg-white dark:bg-[#121026]/50 border border-slate-200/90 dark:border-brand-500/15 text-slate-700 dark:text-secondary hover:text-foreground"
-                  }`}
-                >
-                  {lvl.label} ({lvl.count})
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Arena Category Tabs Bar */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            {CATEGORY_TABS.map((tab) => {
-              const Icon = tab.icon;
-              const isSelected = selectedCategory === tab.id;
-              const count =
-                tab.id === "all"
-                  ? FACILITY_ZONES.length
-                  : FACILITY_ZONES.filter((z) => z.categoryKey === tab.id).length;
-
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setSelectedCategory(tab.id)}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                    isSelected
-                      ? "bg-active text-btn-text font-bold shadow-sm ring-1 ring-active"
-                      : "bg-white dark:bg-[#121026]/70 border border-slate-200 dark:border-brand-500/20 text-slate-700 dark:text-secondary hover:text-foreground hover:bg-slate-100/80 dark:hover:bg-brand-500/10"
-                  }`}
-                >
-                  <Icon size={13} className={isSelected ? "text-white" : "text-active"} />
-                  <span>{tab.label}</span>
-                  <span
-                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+          {/* Level Filter Pills with Layout Animation */}
+          <LayoutGroup id="facilitiesLevelGroup">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
+              <span className="text-secondary font-bold text-[11px] uppercase tracking-wider mr-1 shrink-0 flex items-center gap-1">
+                <FiMapPin size={12} /> Campus Level:
+              </span>
+              {FLOOR_LEVELS.map((lvl) => {
+                const isSelected = selectedLevel === lvl.id;
+                return (
+                  <button
+                    key={lvl.id}
+                    onClick={() => setSelectedLevel(lvl.id)}
+                    className={`relative px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                       isSelected
-                        ? "bg-black/20 text-white"
-                        : "bg-slate-100 dark:bg-brand-500/15 text-secondary"
+                        ? "text-white font-bold"
+                        : "bg-white dark:bg-[#121026]/50 border border-slate-200/90 dark:border-brand-500/15 text-slate-700 dark:text-secondary hover:text-foreground"
                     }`}
                   >
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                    {isSelected && (
+                      <motion.span
+                        layoutId="activeFacilitiesLevelPill"
+                        className="absolute inset-0 rounded-lg bg-active shadow-xs"
+                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                      />
+                    )}
+                    <span className="relative z-10">{lvl.label} ({lvl.count})</span>
+                  </button>
+                );
+              })}
+            </div>
+          </LayoutGroup>
+
+          {/* Arena Category Tabs Bar with Layout Animation */}
+          <LayoutGroup id="facilitiesCategoryGroup">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+              {CATEGORY_TABS.map((tab) => {
+                const Icon = tab.icon;
+                const isSelected = selectedCategory === tab.id;
+                const count =
+                  tab.id === "all"
+                    ? FACILITY_ZONES.length
+                    : FACILITY_ZONES.filter((z) => z.categoryKey === tab.id).length;
+
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setSelectedCategory(tab.id)}
+                    className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+                      isSelected
+                        ? "text-btn-text font-bold"
+                        : "bg-white dark:bg-[#121026]/70 border border-slate-200 dark:border-brand-500/20 text-slate-700 dark:text-secondary hover:text-foreground hover:bg-slate-100/80 dark:hover:bg-brand-500/10"
+                    }`}
+                  >
+                    {isSelected && (
+                      <motion.span
+                        layoutId="activeFacilitiesCategoryPill"
+                        className="absolute inset-0 rounded-xl bg-active shadow-sm"
+                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                      />
+                    )}
+                    <Icon size={13} className={`relative z-10 ${isSelected ? "text-white" : "text-active"}`} />
+                    <span className="relative z-10">{tab.label}</span>
+                    <span
+                      className={`relative z-10 px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                        isSelected
+                          ? "bg-black/20 text-white"
+                          : "bg-slate-100 dark:bg-brand-500/15 text-secondary"
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </LayoutGroup>
         </div>
 
         {/* ============================================================== */}

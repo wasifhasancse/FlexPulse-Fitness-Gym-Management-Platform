@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
 import {
   FiCheck,
   FiX,
@@ -279,21 +281,17 @@ export default function PricingClient() {
       <div className="max-w-7xl mx-auto space-y-12 sm:space-y-16">
         
         {/* ============================================================== */}
-        {/* 1. HERO HEADER WITH GUARANTEES & ANNUAL BILLING TOGGLE         */}
+        {/* 1. HERO HEADER WITH EXIT ANIMATION & ANNUAL BILLING TOGGLE     */}
         {/* ============================================================== */}
         <div className="text-center space-y-4 max-w-3xl mx-auto relative pt-2">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-active/30 bg-active/10 text-active text-xs font-bold uppercase tracking-wider shadow-xs">
-            <FiZap size={13} />
-            <span>Transparent Membership Architecture</span>
-          </div>
-
-          <h1 className="font-['Outfit'] text-3xl sm:text-5xl lg:text-6xl font-black text-foreground tracking-tight leading-tight">
-            Invest in Your <span className="text-active">Health & Performance</span>
-          </h1>
-
-          <p className="font-['Inter'] text-xs sm:text-sm text-secondary max-w-xl mx-auto leading-relaxed">
-            No long-term lock-ins. No cancellation penalties. Choose the training tier that fuels your lifestyle and upgrade or pause anytime.
-          </p>
+          <AnimatedSectionTitle
+            kicker="Transparent Membership Architecture"
+            title="Invest in Your Health & Performance"
+            highlightText="Health & Performance"
+            subtitle="No long-term lock-ins. No cancellation penalties. Choose the training tier that fuels your lifestyle and upgrade or pause anytime."
+            align="center"
+            className="mb-2"
+          />
 
           {/* Billing Cycle Toggle */}
           <div className="flex items-center justify-center gap-3 pt-2">
@@ -323,7 +321,7 @@ export default function PricingClient() {
               }`}
             >
               Annual Billing
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-black uppercase tracking-wider">
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-black uppercase tracking-wider animate__animated animate__heartBeat animate__infinite animate__slower">
                 Save 20%
               </span>
             </span>
@@ -356,49 +354,64 @@ export default function PricingClient() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
-            {[
-              { id: "all", label: "View All 3 Tiers" },
-              { id: "solo", label: "Solo Gym Floor Lifter" },
-              { id: "classes", label: "Group Classes & HIIT" },
-              { id: "transformation", label: "Full Coaching & Spa" },
-            ].map((g) => (
-              <button
-                key={g.id}
-                onClick={() => setSelectedQuizGoal(g.id)}
-                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer text-center ${
-                  selectedQuizGoal === g.id
-                    ? "bg-active text-btn-text shadow-xs"
-                    : "bg-slate-100 dark:bg-brand-900/40 border border-slate-200 dark:border-brand-500/15 text-slate-700 dark:text-secondary hover:text-foreground"
-                }`}
-              >
-                {g.label}
-              </button>
-            ))}
-          </div>
+          <LayoutGroup id="pricingGoalGroup">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+              {[
+                { id: "all", label: "View All 3 Tiers" },
+                { id: "solo", label: "Solo Gym Floor Lifter" },
+                { id: "classes", label: "Group Classes & HIIT" },
+                { id: "transformation", label: "Full Coaching & Spa" },
+              ].map((g) => (
+                <button
+                  key={g.id}
+                  onClick={() => setSelectedQuizGoal(g.id)}
+                  className={`relative py-2 px-3 rounded-xl text-xs font-bold transition-colors cursor-pointer text-center ${
+                    selectedQuizGoal === g.id
+                      ? "text-btn-text"
+                      : "bg-slate-100 dark:bg-brand-900/40 border border-slate-200 dark:border-brand-500/15 text-slate-700 dark:text-secondary hover:text-foreground"
+                  }`}
+                >
+                  {selectedQuizGoal === g.id && (
+                    <motion.span
+                      layoutId="activePricingGoalPill"
+                      className="absolute inset-0 rounded-xl bg-active shadow-xs"
+                      transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                    />
+                  )}
+                  <span className="relative z-10">{g.label}</span>
+                </button>
+              ))}
+            </div>
+          </LayoutGroup>
         </div>
 
         {/* ============================================================== */}
-        {/* 3. PRICING CARDS GRID                                          */}
+        {/* 3. PRICING CARDS GRID WITH LAYOUT ANIMATION                    */}
         {/* ============================================================== */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-7 sm:gap-8 items-stretch">
-          {PLANS.map((plan) => {
-            const price = isAnnual ? plan.annualPrice : plan.monthlyPrice;
-            const isHighlightedByFilter =
-              selectedQuizGoal === "all" || selectedQuizGoal === plan.targetGoal;
+        <motion.div layout className="grid grid-cols-1 md:grid-cols-3 gap-7 sm:gap-8 items-stretch">
+          <AnimatePresence mode="popLayout">
+            {PLANS.map((plan) => {
+              const price = isAnnual ? plan.annualPrice : plan.monthlyPrice;
+              const isHighlightedByFilter =
+                selectedQuizGoal === "all" || selectedQuizGoal === plan.targetGoal;
 
-            return (
-              <div
-                key={plan.id}
-                className={`relative rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 ${
-                  plan.popular
-                    ? "bg-white dark:bg-[#15132d] border-2 border-active shadow-xl scale-[1.02] z-10"
-                    : "bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 hover:border-slate-300 dark:hover:border-brand-500/40 shadow-xs"
-                } ${!isHighlightedByFilter ? "opacity-60" : "opacity-100"}`}
-              >
+              return (
+                <motion.div
+                  key={plan.id}
+                  layout
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className={`relative rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 ${
+                    plan.popular
+                      ? "bg-white dark:bg-[#15132d] border-2 border-active shadow-xl scale-[1.02] z-10"
+                      : "bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 hover:border-slate-300 dark:hover:border-brand-500/40 shadow-xs"
+                  } ${!isHighlightedByFilter ? "opacity-60" : "opacity-100"}`}
+                >
                 {/* Popular Pill */}
                 {plan.popular && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-active text-btn-text text-[11px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1.5 whitespace-nowrap">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-active text-btn-text text-[11px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1.5 whitespace-nowrap animate__animated animate__pulse animate__infinite">
                     <FiStar className="fill-white" size={12} /> Most Popular Athlete Choice
                   </div>
                 )}
@@ -468,7 +481,7 @@ export default function PricingClient() {
                 <div className="pt-6 mt-6 border-t border-slate-100 dark:border-brand-500/15 space-y-2">
                   <Link
                     href={plan.stripePlan ? "/signin" : "/contact"}
-                    className={`w-full py-3 rounded-xl text-center text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    className={`w-full py-3 rounded-xl text-center text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer hover:animate__animated hover:animate__pulse ${
                       plan.popular
                         ? "bg-active text-btn-text hover:opacity-90 shadow-active/20"
                         : "bg-slate-900 text-white dark:bg-brand-800/40 dark:text-foreground border border-transparent dark:border-brand-500/30 hover:opacity-90"
@@ -485,10 +498,11 @@ export default function PricingClient() {
                     or try with a Free 1-Day Trial Pass &rarr;
                   </button>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </AnimatePresence>
+      </motion.div>
 
         {/* ============================================================== */}
         {/* 4. VALUE STACK & ROI CALCULATOR BREAKDOWN                      */}
