@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
-import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
+import { motion, AnimatePresence, LayoutGroup, useInView } from "framer-motion";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 import { 
   FiArrowRight, 
   FiActivity, 
@@ -20,6 +22,10 @@ import {
   FiShield
 } from "react-icons/fi";
 import { FaFire } from "react-icons/fa";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const TRANSITION_EASE = [0.16, 1, 0.3, 1];
 
@@ -79,6 +85,177 @@ const PRESET_TIERS = [
   }
 ];
 
+// Biometric Console Shell & Internal Elements (Universal Viewport Staged Delay)
+const consoleShellVariants = {
+  hidden: { opacity: 0, y: 32, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 1.6,
+      ease: [0.16, 1, 0.3, 1],
+      staggerChildren: 0.1,
+      delayChildren: 0.15,
+    },
+  },
+};
+
+const consoleHeaderVariants = {
+  hidden: { opacity: 0, y: 16, filter: "blur(3px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 1.4, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const unitSwitchVariants = {
+  hidden: { opacity: 0, x: 25, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 160, damping: 20 },
+  },
+};
+
+// Tab Content Container Variants with AnimatePresence
+const tabContainerVariants = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.45,
+      ease: [0.16, 1, 0.3, 1],
+      staggerChildren: 0.1,
+      delayChildren: 0.04,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -10,
+    scale: 0.98,
+    transition: {
+      duration: 0.22,
+      ease: "easeInOut",
+    },
+  },
+};
+
+// Tag-by-tag micro-motion variants for tab elements
+const tabItemSlideLeft = {
+  hidden: { opacity: 0, x: -28, filter: "blur(4px)" },
+  visible: {
+    opacity: 1,
+    x: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+  },
+  exit: { opacity: 0, x: -16, transition: { duration: 0.18 } },
+};
+
+const tabItemSlideRight = {
+  hidden: { opacity: 0, x: 28, filter: "blur(4px)" },
+  visible: {
+    opacity: 1,
+    x: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+  },
+  exit: { opacity: 0, x: 16, transition: { duration: 0.18 } },
+};
+
+const tabItemSlideUp = {
+  hidden: { opacity: 0, y: 16, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 200, damping: 20 },
+  },
+  exit: { opacity: 0, y: -8, scale: 0.96, transition: { duration: 0.18 } },
+};
+
+const tabItemSlideDown = {
+  hidden: { opacity: 0, y: -14 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" },
+  },
+  exit: { opacity: 0, y: 8, transition: { duration: 0.18 } },
+};
+
+const tabPillScale = {
+  hidden: { opacity: 0, scale: 0.75 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { type: "spring", stiffness: 260, damping: 18 },
+  },
+};
+
+const heightCardVariants = {
+  hidden: { opacity: 0, x: -25 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 1.3, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const weightCardVariants = {
+  hidden: { opacity: 0, x: 25 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 1.3, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const gaugeBarVariants = {
+  hidden: { opacity: 0, y: 18, scale: 0.98 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 1.4, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const recommendationVariants = {
+  hidden: { opacity: 0, scale: 0.92, y: 15 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 140, damping: 20 },
+  },
+};
+
+const metricItemVariants = {
+  hidden: { opacity: 0, y: 16, scale: 0.94 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 150, damping: 20 },
+  },
+};
+
+const consoleBtnVariants = {
+  hidden: { opacity: 0, y: 16, scale: 0.92 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 130, damping: 20 },
+  },
+};
+
 export default function HomeBmiQuickCalc() {
   const [unit, setUnit] = useState("metric"); // "metric" | "imperial"
   const [weight, setWeight] = useState(74);
@@ -86,6 +263,26 @@ export default function HomeBmiQuickCalc() {
   const [heightFt, setHeightFt] = useState(5);
   const [heightIn, setHeightIn] = useState(10);
   const [weightLbs, setWeightLbs] = useState(163);
+
+  const sectionRef = useRef(null);
+  const consoleRef = useRef(null);
+  const isConsoleInView = useInView(consoleRef, { once: true, amount: 0.1 });
+  const [cardsTriggered, setCardsTriggered] = useState(false);
+  const [hasAnimatedCount, setHasAnimatedCount] = useState(false);
+
+  // Counter Value Refs for dynamic 0 -> Target number count animation
+  const bmiDisplayRef = useRef(null);
+  const bmrDisplayRef = useRef(null);
+
+  // Universal Staged Viewport Delay: Trigger console transitions after 1.0s in screen viewport
+  useEffect(() => {
+    if (isConsoleInView) {
+      const timer = setTimeout(() => {
+        setCardsTriggered(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isConsoleInView]);
 
   // Synchronize metric and imperial upon tab toggle
   const handleUnitSwitch = (newUnit) => {
@@ -157,6 +354,92 @@ export default function HomeBmiQuickCalc() {
     const bmr = Math.round(10 * wKg + 6.25 * hCm - 5 * 28 + 5);
     return Math.max(1200, bmr);
   }, [unit, weight, heightCm, heightFt, heightIn, weightLbs]);
+
+  // GSAP Viewport-Triggered Timeline for Section Header & WHO Standards Box
+  useGSAP(
+    () => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 85%",
+          once: true,
+        },
+        defaults: { ease: "power3.out" },
+      });
+
+      // 1. Kicker Badge: Dignified downward entrance (Slowed to 1.6s)
+      tl.fromTo(
+        ".bmi-kicker",
+        { y: -30, opacity: 0, filter: "blur(6px)" },
+        { y: 0, opacity: 1, filter: "blur(0px)", duration: 1.6, ease: "power2.out" }
+      ).addLabel("kickerEnd");
+
+      // 2. Main Title: Majestic upward rising sweep with de-blur (Slowed to 2.2s)
+      tl.fromTo(
+        ".bmi-title",
+        { y: 45, opacity: 0, filter: "blur(8px)", scale: 0.96 },
+        { y: 0, opacity: 1, filter: "blur(0px)", scale: 1, duration: 2.2, ease: "power3.out" },
+        "kickerEnd-=0.4"
+      ).addLabel("titleEnd");
+
+      // 3. Section Description: Contrasting downward drop from above under title (Slowed to 1.8s)
+      tl.fromTo(
+        ".bmi-desc",
+        { y: -30, opacity: 0, filter: "blur(5px)" },
+        { y: 0, opacity: 1, filter: "blur(0px)", duration: 1.8, ease: "power2.out" },
+        "titleEnd-=0.3"
+      );
+
+      // 4. WHO Classification Standards Card: Slide & expand from left (Slowed to 1.6s)
+      tl.fromTo(
+        ".bmi-who-card",
+        { x: -35, opacity: 0, scale: 0.96 },
+        { x: 0, opacity: 1, scale: 1, duration: 1.6, ease: "back.out(1.2)" },
+        "titleEnd-=0.4"
+      );
+
+      // 5. Preset Tier Rows: Staggered spring slide
+      tl.fromTo(
+        ".bmi-preset-row",
+        { x: -20, opacity: 0 },
+        { x: 0, opacity: 1, duration: 1.2, ease: "power2.out", stagger: 0.08 },
+        "titleEnd-=0.1"
+      );
+
+      // 6. Direct Action Link to Macro & TDEE Calculator: Spring pop up from bottom
+      tl.fromTo(
+        ".bmi-macro-banner",
+        { y: 20, opacity: 0, scale: 0.96 },
+        { y: 0, opacity: 1, scale: 1, duration: 1.4, ease: "back.out(1.3)" },
+        "titleEnd+=0.1"
+      );
+    },
+    { scope: sectionRef }
+  );
+
+  // Number Counter 0 -> Target Count Animation when Console is Triggered
+  useEffect(() => {
+    if (cardsTriggered && !hasAnimatedCount) {
+      const counter = { bmiVal: 0, bmrVal: 0 };
+      gsap.to(counter, {
+        bmiVal: bmi,
+        bmrVal: estimatedBmr,
+        duration: 2.2,
+        ease: "power2.out",
+        onUpdate: () => {
+          if (bmiDisplayRef.current) {
+            bmiDisplayRef.current.textContent = counter.bmiVal.toFixed(1);
+          }
+          if (bmrDisplayRef.current) {
+            bmrDisplayRef.current.textContent = Math.round(counter.bmrVal).toLocaleString();
+          }
+        },
+        onComplete: () => {
+          setHasAnimatedCount(true);
+        },
+      });
+    }
+  }, [cardsTriggered, hasAnimatedCount, bmi, estimatedBmr]);
 
   // Clinical Details & Matched Class Logic
   const currentStatus = useMemo(() => {
@@ -258,7 +541,10 @@ export default function HomeBmiQuickCalc() {
   }, [currentStatus.targetCategory]);
 
   return (
-    <section className="py-20 lg:py-28 bg-linear-to-b from-background via-[#1B1A55]/10 to-background border-t border-brand-500/15 relative overflow-hidden transition-colors duration-300">
+    <section
+      ref={sectionRef}
+      className="py-20 lg:py-28 bg-background border-t border-brand-500/15 relative overflow-hidden transition-colors duration-300"
+    >
       {/* Background Ambient Lighting Mesh */}
       <div className="absolute top-1/4 left-1/10 w-96 sm:w-140 h-96 sm:h-140 bg-active/6 rounded-full blur-[140px] pointer-events-none -z-10" />
       <div className="absolute bottom-1/4 right-0 w-80 sm:w-120 h-80 sm:h-120 bg-brand-500/8 rounded-full blur-[130px] pointer-events-none -z-10" />
@@ -267,51 +553,72 @@ export default function HomeBmiQuickCalc() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 xl:gap-14 items-start">
           
           {/* Left Column: Interactive WHO Spectrum Matrix & Actionable Entrypoints (5 cols) */}
-          <motion.div layout className="lg:col-span-5 space-y-6">
-            <AnimatedSectionTitle
-              badge="Instant Health Gauge"
-              badgeDetail="Clinical Biometrics"
-              title="Know Your"
-              highlightText="BMI & Physical Baseline"
-              subtitle="Body Mass Index (BMI) is a clinical baseline utilized by master trainers to evaluate physical readiness, calibrate training volume, and formulate individualized nutrition protocols."
-              titleKey={`bmi-heading-${unit}-${currentStatus.key}`}
-            />
+          <div className="lg:col-span-5 space-y-6">
+            {/* Tag 1: Kicker Badge */}
+            <div className="bmi-kicker inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/25 mb-4 backdrop-blur-md">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-active" />
+              </span>
+              <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-widest text-foreground font-['Outfit']">
+                Instant Health Gauge
+              </span>
+              <span className="text-[11px] sm:text-xs text-brand-500/60 font-semibold">•</span>
+              <span className="text-[11px] sm:text-xs font-semibold text-secondary font-['Inter']">
+                Clinical Biometrics
+              </span>
+            </div>
 
-            {/* Interactive Clinical Spectrum Matrix with Clickable Presets */}
-            <div className="rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 p-5 shadow-lg space-y-2.5 font-['Inter']">
+            {/* Tag 2: Section Headline Title */}
+            <h2 className="bmi-title text-3xl sm:text-4xl md:text-5xl font-black font-['Outfit'] tracking-tight text-foreground leading-[1.15]">
+              Know Your{" "}
+              <span className="text-active inline-block hover:animate-[headShake_1s_ease-in-out]">
+                BMI & Physical Baseline
+              </span>
+            </h2>
+
+            {/* Tag 3: Description Paragraph */}
+            <p className="bmi-desc text-sm sm:text-base text-secondary font-['Inter'] leading-relaxed max-w-xl">
+              Body Mass Index (BMI) is a clinical baseline utilized by master trainers to evaluate physical readiness, calibrate training volume, and formulate individualized nutrition protocols.
+            </p>
+
+            {/* Tag 4: Interactive Clinical Spectrum Matrix with Clickable Presets */}
+            <div className="bmi-who-card rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 p-5 shadow-xs hover:shadow-md transition-all space-y-2.5 font-['Inter']">
               <div className="flex items-center justify-between pb-2.5 border-b border-brand-500/15">
                 <div>
                   <span className="text-xs font-extrabold uppercase tracking-wider text-foreground block">
                     WHO Classification Standards
                   </span>
-                  <span className="text-[10px] text-[#535C91] dark:text-[#9290C3]">
+                  <span className="text-[10px] text-secondary">
                     Click any tier to preview calibrated baseline
                   </span>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-[#535C91]/10 text-active uppercase tracking-wider">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-active/10 text-active uppercase tracking-wider">
                   Interactive
                 </span>
               </div>
 
-              {/* Preset Tier Rows */}
+              {/* Tag 5: Preset Tier Rows */}
               {PRESET_TIERS.map((tier) => {
                 const isSelected = currentStatus.key === tier.key;
                 return (
-                  <button
+                  <motion.button
                     key={tier.key}
                     type="button"
+                    whileHover={{ scale: 1.015, x: 3 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => handleApplyPreset(tier)}
-                    className={`w-full text-left p-3 rounded-2xl flex items-center justify-between text-xs transition-all duration-300 cursor-pointer ${
+                    className={`bmi-preset-row w-full text-left p-3 rounded-2xl flex items-center justify-between text-xs transition-all duration-300 cursor-pointer ${
                       isSelected
-                        ? `${tier.bgActive} shadow-sm scale-[1.01]`
-                        : "bg-[#535C91]/5 dark:bg-[#1B1A55]/30 hover:bg-[#535C91]/10 border border-transparent"
+                        ? `${tier.bgActive} shadow-xs scale-[1.01]`
+                        : "bg-searchbox-bg hover:bg-searchbox-hover border border-transparent"
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
                       <span className={`w-2.5 h-2.5 rounded-full ${isSelected ? `${tier.dot} animate-pulse` : `${tier.dot}/40`}`} />
                       <div>
                         <p className="font-bold text-foreground">{tier.range}</p>
-                        <p className={`text-[11px] ${isSelected ? tier.color : "text-[#535C91] dark:text-[#9290C3]"}`}>
+                        <p className={`text-[11px] ${isSelected ? tier.color : "text-secondary"}`}>
                           {tier.label}
                         </p>
                       </div>
@@ -323,44 +630,54 @@ export default function HomeBmiQuickCalc() {
                           Active Match
                         </span>
                       ) : (
-                        <span className="text-[10px] text-[#535C91] dark:text-[#9290C3] opacity-60">
+                        <span className="text-[10px] text-secondary opacity-60">
                           Try Preset →
                         </span>
                       )}
                     </div>
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
 
-            {/* Direct Action Link to Macro & TDEE Calculator */}
-            <div className="pt-1">
+            {/* Tag 6: Direct Action Link to Macro & TDEE Calculator */}
+            <div className="bmi-macro-banner pt-1">
               <Link
                 href={macroCalculatorUrl}
-                className="group p-4 rounded-2xl bg-linear-to-r from-active/10 via-[#1B1A55]/20 to-active/10 border border-brand-500/25 hover:border-active transition-all duration-300 flex items-center justify-between gap-4 shadow-sm hover:animate__animated hover:animate__pulse"
+                className="group p-4 rounded-2xl bg-white dark:bg-[#070F2B] border border-brand-500/25 hover:border-active/60 transition-all duration-300 flex items-center justify-between gap-4 shadow-xs hover:shadow-md cursor-pointer"
               >
                 <div className="space-y-0.5">
                   <span className="text-xs font-bold text-foreground block group-hover:text-active transition-colors">
                     Calculate Exact Macros, TDEE & Target Calorie Burn
                   </span>
-                  <span className="text-[11px] text-[#535C91] dark:text-[#9290C3] block">
+                  <span className="text-[11px] text-secondary block">
                     Pre-populated with your {unit === "metric" ? `${heightCm} cm & ${weight} kg` : `${heightFt}'${heightIn}" & ${weightLbs} lbs`} data →
                   </span>
                 </div>
-                <div className="w-8 h-8 rounded-xl bg-active text-white flex items-center justify-center shrink-0 group-hover:translate-x-1 transition-transform">
+                <div className="w-8 h-8 rounded-xl bg-active text-white flex items-center justify-center shrink-0 group-hover:translate-x-1 transition-transform shadow-2xs">
                   <FiArrowRight className="w-4 h-4" />
                 </div>
               </Link>
             </div>
 
-          </motion.div>
+          </div>
 
           {/* Right Column: Interactive Biometric Console & Real-time Action Matching (7 cols) */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="p-6 sm:p-8 lg:p-10 rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 shadow-2xl relative overflow-hidden">
+            <motion.div
+              ref={consoleRef}
+              layout
+              variants={consoleShellVariants}
+              initial="hidden"
+              animate={cardsTriggered ? "visible" : "hidden"}
+              className="p-6 sm:p-8 lg:p-10 rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 shadow-xs hover:shadow-md relative overflow-hidden transition-all duration-300"
+            >
               
               {/* Console Top Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-brand-500/15 gap-4">
+              <motion.div
+                variants={consoleHeaderVariants}
+                className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-brand-500/15 gap-4"
+              >
                 <div>
                   <h3 className="font-['Outfit'] text-2xl font-extrabold text-foreground">
                     Biometric Console
@@ -371,86 +688,118 @@ export default function HomeBmiQuickCalc() {
                 </div>
 
                 {/* Metric / Imperial Segmented Controller - Single Line Pill Design with Motion Layout Animation */}
-                <LayoutGroup id="bmiQuickCalcUnitGroup">
-                  <div className="inline-flex items-center p-1 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/80 border border-brand-500/20 font-['Inter'] text-xs font-extrabold shrink-0 whitespace-nowrap select-none shadow-xs">
-                    <button
-                      type="button"
-                      onClick={() => handleUnitSwitch("metric")}
-                      className="relative px-4 py-2 rounded-xl transition-colors duration-200 cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5"
-                    >
-                      {unit === "metric" && (
+                <motion.div variants={unitSwitchVariants}>
+                  <LayoutGroup id="bmiQuickCalcUnitGroup">
+                    <div className="inline-flex items-center p-1 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/80 border border-brand-500/20 font-['Inter'] text-xs font-extrabold shrink-0 whitespace-nowrap select-none shadow-xs">
+                      <motion.button
+                        type="button"
+                        whileHover={{ scale: 1.04 }}
+                        whileTap={{ scale: 0.94 }}
+                        onClick={() => handleUnitSwitch("metric")}
+                        className="relative px-4 py-2 rounded-xl transition-colors duration-200 cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5"
+                      >
+                        {unit === "metric" && (
+                          <motion.span
+                            layoutId="activeBmiUnitTab"
+                            className="absolute inset-0 bg-active rounded-xl shadow-xs"
+                            transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                          />
+                        )}
                         <motion.span
-                          layoutId="activeBmiUnitTab"
-                          className="absolute inset-0 bg-active rounded-xl shadow-xs"
-                          transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                        />
-                      )}
-                      <span className={`relative z-10 ${unit === "metric" ? "text-white font-black" : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"}`}>
-                        Metric
-                      </span>
-                      <span className={`relative z-10 text-[11px] font-semibold ${unit === "metric" ? "text-white/85" : "text-[#535C91]/70 dark:text-[#9290C3]/70"}`}>
-                        (kg/cm)
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleUnitSwitch("imperial")}
-                      className="relative px-4 py-2 rounded-xl transition-colors duration-200 cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5"
-                    >
-                      {unit === "imperial" && (
-                        <motion.span
-                          layoutId="activeBmiUnitTab"
-                          className="absolute inset-0 bg-active rounded-xl shadow-xs"
-                          transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                        />
-                      )}
-                      <span className={`relative z-10 ${unit === "imperial" ? "text-white font-black" : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"}`}>
-                        Imperial
-                      </span>
-                      <span className={`relative z-10 text-[11px] font-semibold ${unit === "imperial" ? "text-white/85" : "text-[#535C91]/70 dark:text-[#9290C3]/70"}`}>
-                        (lbs/ft)
-                      </span>
-                    </button>
-                  </div>
-                </LayoutGroup>
-              </div>
-
-              {/* Interactive Precision Sliders & Steppers (UX-focused) */}
-              <div className="space-y-6 font-['Inter'] mb-8">
-                {unit === "metric" ? (
-                  <>
-                    {/* Height Controller (Metric) */}
-                    <div className="space-y-2.5 p-4 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/25 border border-brand-500/15">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs uppercase font-extrabold tracking-wider text-foreground">
-                          Stature / Height
+                          animate={{ scale: unit === "metric" ? 1.04 : 1 }}
+                          transition={{ duration: 0.2 }}
+                          className={`relative z-10 ${unit === "metric" ? "text-white font-black" : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"}`}
+                        >
+                          Metric
+                        </motion.span>
+                        <span className={`relative z-10 text-[11px] font-semibold ${unit === "metric" ? "text-white/85" : "text-[#535C91]/70 dark:text-[#9290C3]/70"}`}>
+                          (kg/cm)
                         </span>
+                      </motion.button>
+                      <motion.button
+                        type="button"
+                        whileHover={{ scale: 1.04 }}
+                        whileTap={{ scale: 0.94 }}
+                        onClick={() => handleUnitSwitch("imperial")}
+                        className="relative px-4 py-2 rounded-xl transition-colors duration-200 cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5"
+                      >
+                        {unit === "imperial" && (
+                          <motion.span
+                            layoutId="activeBmiUnitTab"
+                            className="absolute inset-0 bg-active rounded-xl shadow-xs"
+                            transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                          />
+                        )}
+                        <motion.span
+                          animate={{ scale: unit === "imperial" ? 1.04 : 1 }}
+                          transition={{ duration: 0.2 }}
+                          className={`relative z-10 ${unit === "imperial" ? "text-white font-black" : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"}`}
+                        >
+                          Imperial
+                        </motion.span>
+                        <span className={`relative z-10 text-[11px] font-semibold ${unit === "imperial" ? "text-white/85" : "text-[#535C91]/70 dark:text-[#9290C3]/70"}`}>
+                          (lbs/ft)
+                        </span>
+                      </motion.button>
+                    </div>
+                  </LayoutGroup>
+                </motion.div>
+              </motion.div>
+
+              {/* Interactive Precision Sliders & Steppers (UX-focused with triggered transitions on tab switch) */}
+              <AnimatePresence mode="wait">
+                {unit === "metric" ? (
+                  <motion.div
+                    key="metric-tab-panel"
+                    variants={tabContainerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="space-y-6 font-['Inter'] mb-8"
+                  >
+                    {/* Height Controller (Metric) */}
+                    <motion.div
+                      variants={tabItemSlideLeft}
+                      className="space-y-2.5 p-4 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/25 border border-brand-500/15 shadow-xs"
+                    >
+                      <div className="flex justify-between items-center">
+                        <motion.span variants={tabItemSlideDown} className="text-xs uppercase font-extrabold tracking-wider text-foreground">
+                          Stature / Height
+                        </motion.span>
                         
                         {/* Stepper + Direct Display */}
                         <div className="flex items-center gap-2">
-                          <button
+                          <motion.button
                             type="button"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => setHeightCm((prev) => Math.max(120, prev - 1))}
-                            className="w-7 h-7 rounded-lg bg-background border border-brand-500/20 hover:border-active flex items-center justify-center text-foreground hover:text-active transition-colors cursor-pointer"
+                            className="w-7 h-7 rounded-lg bg-background border border-brand-500/20 hover:border-active flex items-center justify-center text-foreground hover:text-active transition-colors cursor-pointer shadow-2xs"
                             aria-label="Decrease height"
                           >
                             <FiMinus className="w-3.5 h-3.5" />
-                          </button>
-                          <div className="px-3 py-1 rounded-lg bg-background border border-brand-500/25 min-w-[75px] text-center font-['Outfit'] font-black text-active text-base">
+                          </motion.button>
+                          <motion.div
+                            variants={tabPillScale}
+                            className="px-3 py-1 rounded-lg bg-background border border-brand-500/25 min-w-[75px] text-center font-['Outfit'] font-black text-active text-base shadow-2xs"
+                          >
                             {heightCm} <span className="text-xs font-bold text-foreground">cm</span>
-                          </div>
-                          <button
+                          </motion.div>
+                          <motion.button
                             type="button"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => setHeightCm((prev) => Math.min(220, prev + 1))}
-                            className="w-7 h-7 rounded-lg bg-background border border-brand-500/20 hover:border-active flex items-center justify-center text-foreground hover:text-active transition-colors cursor-pointer"
+                            className="w-7 h-7 rounded-lg bg-background border border-brand-500/20 hover:border-active flex items-center justify-center text-foreground hover:text-active transition-colors cursor-pointer shadow-2xs"
                             aria-label="Increase height"
                           >
                             <FiPlus className="w-3.5 h-3.5" />
-                          </button>
+                          </motion.button>
                         </div>
                       </div>
 
-                      <input
+                      <motion.input
+                        variants={tabItemSlideUp}
                         type="range"
                         min="120"
                         max="220"
@@ -458,45 +807,56 @@ export default function HomeBmiQuickCalc() {
                         onChange={(e) => setHeightCm(Number(e.target.value))}
                         className="w-full h-2 bg-[#535C91]/25 rounded-lg appearance-none cursor-pointer accent-active"
                       />
-                      <div className="flex justify-between text-[10px] text-[#535C91] dark:text-[#9290C3] font-semibold">
+                      <motion.div variants={tabItemSlideUp} className="flex justify-between text-[10px] text-[#535C91] dark:text-[#9290C3] font-semibold">
                         <span>120 cm (Min)</span>
                         <span>170 cm (Avg)</span>
                         <span>220 cm (Max)</span>
-                      </div>
-                    </div>
+                      </motion.div>
+                    </motion.div>
 
                     {/* Weight Controller (Metric) */}
-                    <div className="space-y-2.5 p-4 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/25 border border-brand-500/15">
+                    <motion.div
+                      variants={tabItemSlideRight}
+                      className="space-y-2.5 p-4 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/25 border border-brand-500/15 shadow-xs"
+                    >
                       <div className="flex justify-between items-center">
-                        <span className="text-xs uppercase font-extrabold tracking-wider text-foreground">
+                        <motion.span variants={tabItemSlideDown} className="text-xs uppercase font-extrabold tracking-wider text-foreground">
                           Body Mass / Weight
-                        </span>
+                        </motion.span>
 
                         {/* Stepper + Direct Display */}
                         <div className="flex items-center gap-2">
-                          <button
+                          <motion.button
                             type="button"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => setWeight((prev) => Math.max(40, prev - 1))}
-                            className="w-7 h-7 rounded-lg bg-background border border-brand-500/20 hover:border-active flex items-center justify-center text-foreground hover:text-active transition-colors cursor-pointer"
+                            className="w-7 h-7 rounded-lg bg-background border border-brand-500/20 hover:border-active flex items-center justify-center text-foreground hover:text-active transition-colors cursor-pointer shadow-2xs"
                             aria-label="Decrease weight"
                           >
                             <FiMinus className="w-3.5 h-3.5" />
-                          </button>
-                          <div className="px-3 py-1 rounded-lg bg-background border border-brand-500/25 min-w-[75px] text-center font-['Outfit'] font-black text-active text-base">
+                          </motion.button>
+                          <motion.div
+                            variants={tabPillScale}
+                            className="px-3 py-1 rounded-lg bg-background border border-brand-500/25 min-w-[75px] text-center font-['Outfit'] font-black text-active text-base shadow-2xs"
+                          >
                             {weight} <span className="text-xs font-bold text-foreground">kg</span>
-                          </div>
-                          <button
+                          </motion.div>
+                          <motion.button
                             type="button"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => setWeight((prev) => Math.min(180, prev + 1))}
-                            className="w-7 h-7 rounded-lg bg-background border border-brand-500/20 hover:border-active flex items-center justify-center text-foreground hover:text-active transition-colors cursor-pointer"
+                            className="w-7 h-7 rounded-lg bg-background border border-brand-500/20 hover:border-active flex items-center justify-center text-foreground hover:text-active transition-colors cursor-pointer shadow-2xs"
                             aria-label="Increase weight"
                           >
                             <FiPlus className="w-3.5 h-3.5" />
-                          </button>
+                          </motion.button>
                         </div>
                       </div>
 
-                      <input
+                      <motion.input
+                        variants={tabItemSlideUp}
                         type="range"
                         min="40"
                         max="180"
@@ -504,24 +864,39 @@ export default function HomeBmiQuickCalc() {
                         onChange={(e) => setWeight(Number(e.target.value))}
                         className="w-full h-2 bg-[#535C91]/25 rounded-lg appearance-none cursor-pointer accent-active"
                       />
-                      <div className="flex justify-between text-[10px] text-[#535C91] dark:text-[#9290C3] font-semibold">
+                      <motion.div variants={tabItemSlideUp} className="flex justify-between text-[10px] text-[#535C91] dark:text-[#9290C3] font-semibold">
                         <span>40 kg (Min)</span>
                         <span>75 kg (Avg)</span>
                         <span>180 kg (Max)</span>
-                      </div>
-                    </div>
-                  </>
+                      </motion.div>
+                    </motion.div>
+                  </motion.div>
                 ) : (
-                  <>
+                  <motion.div
+                    key="imperial-tab-panel"
+                    variants={tabContainerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="space-y-6 font-['Inter'] mb-8"
+                  >
                     {/* Imperial Height Controllers */}
                     <div className="grid grid-cols-2 gap-4">
                       {/* Feet */}
-                      <div className="space-y-2 p-3.5 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/25 border border-brand-500/15">
+                      <motion.div
+                        variants={tabItemSlideLeft}
+                        className="space-y-2 p-3.5 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/25 border border-brand-500/15 shadow-xs"
+                      >
                         <div className="flex justify-between items-center text-xs font-bold">
-                          <span className="text-[#535C91] dark:text-[#9290C3] uppercase">Feet</span>
-                          <span className="text-base font-extrabold font-['Outfit'] text-active">{heightFt} ft</span>
+                          <motion.span variants={tabItemSlideDown} className="text-[#535C91] dark:text-[#9290C3] uppercase">
+                            Feet
+                          </motion.span>
+                          <motion.span variants={tabPillScale} className="text-base font-extrabold font-['Outfit'] text-active">
+                            {heightFt} ft
+                          </motion.span>
                         </div>
-                        <input
+                        <motion.input
+                          variants={tabItemSlideUp}
                           type="range"
                           min="4"
                           max="7"
@@ -529,19 +904,27 @@ export default function HomeBmiQuickCalc() {
                           onChange={(e) => setHeightFt(Number(e.target.value))}
                           className="w-full h-2 bg-[#535C91]/25 rounded-lg appearance-none cursor-pointer accent-active"
                         />
-                        <div className="flex justify-between text-[10px] text-[#535C91] dark:text-[#9290C3]">
+                        <motion.div variants={tabItemSlideUp} className="flex justify-between text-[10px] text-[#535C91] dark:text-[#9290C3]">
                           <span>4 ft</span>
                           <span>7 ft</span>
-                        </div>
-                      </div>
+                        </motion.div>
+                      </motion.div>
 
                       {/* Inches */}
-                      <div className="space-y-2 p-3.5 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/25 border border-brand-500/15">
+                      <motion.div
+                        variants={tabItemSlideRight}
+                        className="space-y-2 p-3.5 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/25 border border-brand-500/15 shadow-xs"
+                      >
                         <div className="flex justify-between items-center text-xs font-bold">
-                          <span className="text-[#535C91] dark:text-[#9290C3] uppercase">Inches</span>
-                          <span className="text-base font-extrabold font-['Outfit'] text-active">{heightIn} in</span>
+                          <motion.span variants={tabItemSlideDown} className="text-[#535C91] dark:text-[#9290C3] uppercase">
+                            Inches
+                          </motion.span>
+                          <motion.span variants={tabPillScale} className="text-base font-extrabold font-['Outfit'] text-active">
+                            {heightIn} in
+                          </motion.span>
                         </div>
-                        <input
+                        <motion.input
+                          variants={tabItemSlideUp}
                           type="range"
                           min="0"
                           max="11"
@@ -549,42 +932,55 @@ export default function HomeBmiQuickCalc() {
                           onChange={(e) => setHeightIn(Number(e.target.value))}
                           className="w-full h-2 bg-[#535C91]/25 rounded-lg appearance-none cursor-pointer accent-active"
                         />
-                        <div className="flex justify-between text-[10px] text-[#535C91] dark:text-[#9290C3]">
+                        <motion.div variants={tabItemSlideUp} className="flex justify-between text-[10px] text-[#535C91] dark:text-[#9290C3]">
                           <span>0 in</span>
                           <span>11 in</span>
-                        </div>
-                      </div>
+                        </motion.div>
+                      </motion.div>
                     </div>
 
                     {/* Weight Controller (Imperial) */}
-                    <div className="space-y-2.5 p-4 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/25 border border-brand-500/15">
+                    <motion.div
+                      variants={tabItemSlideUp}
+                      className="space-y-2.5 p-4 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/25 border border-brand-500/15 shadow-xs"
+                    >
                       <div className="flex justify-between items-center">
-                        <span className="text-xs uppercase font-extrabold tracking-wider text-foreground">
+                        <motion.span variants={tabItemSlideDown} className="text-xs uppercase font-extrabold tracking-wider text-foreground">
                           Body Mass / Weight
-                        </span>
+                        </motion.span>
 
                         <div className="flex items-center gap-2">
-                          <button
+                          <motion.button
                             type="button"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => setWeightLbs((prev) => Math.max(90, prev - 2))}
-                            className="w-7 h-7 rounded-lg bg-background border border-brand-500/20 hover:border-active flex items-center justify-center text-foreground hover:text-active transition-colors cursor-pointer"
+                            className="w-7 h-7 rounded-lg bg-background border border-brand-500/20 hover:border-active flex items-center justify-center text-foreground hover:text-active transition-colors cursor-pointer shadow-2xs"
+                            aria-label="Decrease weight"
                           >
                             <FiMinus className="w-3.5 h-3.5" />
-                          </button>
-                          <div className="px-3 py-1 rounded-lg bg-background border border-brand-500/25 min-w-[85px] text-center font-['Outfit'] font-black text-active text-base">
+                          </motion.button>
+                          <motion.div
+                            variants={tabPillScale}
+                            className="px-3 py-1 rounded-lg bg-background border border-brand-500/25 min-w-[85px] text-center font-['Outfit'] font-black text-active text-base shadow-2xs"
+                          >
                             {weightLbs} <span className="text-xs font-bold text-foreground">lbs</span>
-                          </div>
-                          <button
+                          </motion.div>
+                          <motion.button
                             type="button"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => setWeightLbs((prev) => Math.min(380, prev + 2))}
-                            className="w-7 h-7 rounded-lg bg-background border border-brand-500/20 hover:border-active flex items-center justify-center text-foreground hover:text-active transition-colors cursor-pointer"
+                            className="w-7 h-7 rounded-lg bg-background border border-brand-500/20 hover:border-active flex items-center justify-center text-foreground hover:text-active transition-colors cursor-pointer shadow-2xs"
+                            aria-label="Increase weight"
                           >
                             <FiPlus className="w-3.5 h-3.5" />
-                          </button>
+                          </motion.button>
                         </div>
                       </div>
 
-                      <input
+                      <motion.input
+                        variants={tabItemSlideUp}
                         type="range"
                         min="90"
                         max="380"
@@ -592,22 +988,25 @@ export default function HomeBmiQuickCalc() {
                         onChange={(e) => setWeightLbs(Number(e.target.value))}
                         className="w-full h-2 bg-[#535C91]/25 rounded-lg appearance-none cursor-pointer accent-active"
                       />
-                      <div className="flex justify-between text-[10px] text-[#535C91] dark:text-[#9290C3] font-semibold">
+                      <motion.div variants={tabItemSlideUp} className="flex justify-between text-[10px] text-[#535C91] dark:text-[#9290C3] font-semibold">
                         <span>90 lbs (Min)</span>
                         <span>165 lbs (Avg)</span>
                         <span>380 lbs (Max)</span>
-                      </div>
-                    </div>
-                  </>
+                      </motion.div>
+                    </motion.div>
+                  </motion.div>
                 )}
-              </div>
+              </AnimatePresence>
 
               {/* Dynamic Visual Gradient Spectrum Gauge Bar */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-[#535C91]/8 dark:bg-[#1B1A55]/40 border border-brand-500/20 mb-6">
+              <motion.div
+                variants={gaugeBarVariants}
+                className="p-4 sm:p-5 rounded-2xl bg-[#535C91]/8 dark:bg-[#1B1A55]/40 border border-brand-500/20 mb-6"
+              >
                 <div className="flex justify-between items-center text-xs font-bold mb-2">
                   <span className="text-foreground">Clinical Spectrum Barometer</span>
                   <span className="text-active font-extrabold font-['Outfit'] text-sm">
-                    BMI Score: {bmi}
+                    BMI Score: <span ref={bmiDisplayRef}>{hasAnimatedCount ? bmi : "0.0"}</span>
                   </span>
                 </div>
 
@@ -621,15 +1020,22 @@ export default function HomeBmiQuickCalc() {
 
                 {/* Sliding Needle Indicator with Dynamic Position */}
                 <div className="relative h-5 mt-1">
-                  <div
-                    className="absolute top-0 -translate-x-1/2 transition-all duration-300 ease-out flex flex-col items-center"
-                    style={{ left: `${gaugePercentage}%` }}
+                  <motion.div
+                    animate={{ left: `${gaugePercentage}%` }}
+                    transition={{ type: "spring", stiffness: 220, damping: 24 }}
+                    className="absolute top-0 -translate-x-1/2 flex flex-col items-center"
                   >
                     <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[7px] border-b-active"></div>
-                    <span className="text-[10px] font-black text-active font-['Outfit'] mt-0.5">
+                    <motion.span
+                      key={bmi}
+                      initial={{ scale: 0.7, opacity: 0.7 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 350, damping: 20 }}
+                      className="text-[10px] font-black text-active font-['Outfit'] mt-0.5"
+                    >
                       {bmi}
-                    </span>
-                  </div>
+                    </motion.span>
+                  </motion.div>
                 </div>
 
                 <div className="flex justify-between text-[10px] text-[#535C91] dark:text-[#9290C3] font-bold mt-1">
@@ -638,10 +1044,13 @@ export default function HomeBmiQuickCalc() {
                   <span>Over (25-29.9)</span>
                   <span>High (30+)</span>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Matched Training Recommendation Callout (Direct UX Fulfillment) */}
-              <div className={`p-4 sm:p-5 rounded-2xl border ${currentStatus.border} bg-[#535C91]/5 dark:bg-[#1B1A55]/30 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all duration-300 shadow-sm`}>
+              <motion.div
+                variants={recommendationVariants}
+                className={`p-4 sm:p-5 rounded-2xl border ${currentStatus.border} bg-[#535C91]/5 dark:bg-[#1B1A55]/30 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all duration-300 shadow-xs`}
+              >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider ${currentStatus.badgeBg} ${currentStatus.color}`}>
@@ -659,19 +1068,22 @@ export default function HomeBmiQuickCalc() {
                 {/* WORKABLE BUTTON 1: Matched Classes Button with Category Filter */}
                 <Link
                   href={matchedClassUrl}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-active text-white hover:opacity-95 font-extrabold text-xs tracking-tight shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 group cursor-pointer hover:animate__animated hover:animate__pulse"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-2xl bg-btn-bg text-btn-text hover:brightness-105 active:scale-95 font-extrabold text-xs tracking-tight shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 group cursor-pointer border border-white/20"
                 >
                   <FiZap className="w-3.5 h-3.5" />
                   <span>Find Matched Classes ({currentStatus.targetCategory})</span>
                   <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </Link>
-              </div>
+              </motion.div>
 
               {/* 3 Key Diagnostic Metrics Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mb-6 text-center sm:text-left">
                 
                 {/* Metric 1: Healthy Weight Range */}
-                <div className="p-3.5 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/25 border border-brand-500/15">
+                <motion.div
+                  variants={metricItemVariants}
+                  className="p-3.5 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/25 border border-brand-500/15 shadow-xs"
+                >
                   <p className="text-[10px] text-[#535C91] dark:text-[#9290C3] uppercase font-bold tracking-wider">
                     Target Healthy Weight
                   </p>
@@ -681,23 +1093,30 @@ export default function HomeBmiQuickCalc() {
                   <p className="text-[10px] text-emerald-500 font-semibold mt-0.5">
                     Normal BMI (18.5–24.9)
                   </p>
-                </div>
+                </motion.div>
 
                 {/* Metric 2: Estimated BMR */}
-                <div className="p-3.5 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/25 border border-brand-500/15">
+                <motion.div
+                  variants={metricItemVariants}
+                  className="p-3.5 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/25 border border-brand-500/15 shadow-xs"
+                >
                   <p className="text-[10px] text-[#535C91] dark:text-[#9290C3] uppercase font-bold tracking-wider">
                     Estimated BMR
                   </p>
                   <p className="text-base sm:text-lg font-black font-['Outfit'] text-foreground mt-0.5">
-                    {estimatedBmr} <span className="text-xs font-bold text-active">kcal/day</span>
+                    <span ref={bmrDisplayRef}>{hasAnimatedCount ? estimatedBmr.toLocaleString() : "0"}</span>{" "}
+                    <span className="text-xs font-bold text-active">kcal/day</span>
                   </p>
                   <p className="text-[10px] text-[#535C91] dark:text-[#9290C3] mt-0.5">
                     Resting metabolic expenditure
                   </p>
-                </div>
+                </motion.div>
 
                 {/* Metric 3: Target Training Strategy */}
-                <div className="p-3.5 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/25 border border-brand-500/15">
+                <motion.div
+                  variants={metricItemVariants}
+                  className="p-3.5 rounded-2xl bg-[#535C91]/5 dark:bg-[#1B1A55]/25 border border-brand-500/15 shadow-xs"
+                >
                   <p className="text-[10px] text-[#535C91] dark:text-[#9290C3] uppercase font-bold tracking-wider">
                     Caloric Strategy
                   </p>
@@ -707,17 +1126,20 @@ export default function HomeBmiQuickCalc() {
                   <p className="text-[10px] text-[#535C91] dark:text-[#9290C3] mt-0.5">
                     {currentStatus.targetSplit}
                   </p>
-                </div>
+                </motion.div>
 
               </div>
 
               {/* Action Buttons Row (Fulfilling Workable Requirement) */}
-              <div className="flex flex-col sm:flex-row items-center gap-3 pt-2 border-t border-brand-500/15">
+              <motion.div
+                variants={consoleBtnVariants}
+                className="flex flex-col sm:flex-row items-center gap-3 pt-2 border-t border-brand-500/15"
+              >
                 
                 {/* WORKABLE BUTTON 2: Find Matched Classes */}
                 <Link
                   href={matchedClassUrl}
-                  className="w-full sm:flex-1 py-3.5 px-5 rounded-xl bg-btn-bg text-btn-text hover:opacity-95 font-extrabold text-xs sm:text-sm text-center shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full sm:flex-1 py-3 px-5 rounded-2xl bg-btn-bg text-btn-text hover:brightness-105 active:scale-95 font-extrabold text-xs sm:text-sm text-center shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 border border-white/20"
                 >
                   <FiActivity className="w-4 h-4 text-btn-text" />
                   <span>Find Matched Classes</span>
@@ -726,15 +1148,15 @@ export default function HomeBmiQuickCalc() {
                 {/* WORKABLE BUTTON 3: Advanced Macro Calculator with Pre-filled Data */}
                 <Link
                   href={macroCalculatorUrl}
-                  className="w-full sm:flex-1 py-3.5 px-5 rounded-xl bg-background dark:bg-[#1B1A55]/70 hover:bg-[#535C91]/15 text-foreground font-bold text-xs sm:text-sm text-center border border-brand-500/25 hover:border-active/50 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group"
+                  className="w-full sm:flex-1 py-3 px-5 rounded-2xl bg-searchbox-bg hover:bg-searchbox-hover text-foreground font-bold text-xs sm:text-sm text-center border border-brand-500/25 hover:border-active/50 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group shadow-xs"
                 >
                   <span>Advanced Macro Calculator</span>
                   <FiArrowRight className="w-4 h-4 text-active group-hover:translate-x-1 transition-transform" />
                 </Link>
 
-              </div>
+              </motion.div>
 
-            </div>
+            </motion.div>
           </div>
 
         </div>

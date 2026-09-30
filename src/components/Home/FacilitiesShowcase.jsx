@@ -668,18 +668,21 @@ export default function FacilitiesShowcase() {
           </AnimatePresence>
         </motion.div>
 
-        {/* Bottom Callout Banner: Triggered Element-by-Element Conversion Section */}
+        {/* Bottom Callout Banner: Clean, high-contrast, theme-harmonious conversion card */}
         <motion.div
           variants={calloutContainerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
-          className="rounded-3xl p-6 sm:p-8 bg-linear-to-r from-brand-800/30 via-[#1B1A55]/40 to-brand-800/30 border border-brand-500/25 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs"
+          className="rounded-3xl p-6 sm:p-8 bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/40 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs transition-colors duration-300 relative overflow-hidden"
         >
-          <div className="flex items-center gap-4">
+          {/* Subtle Ambient Accent Shimmer */}
+          <div className="absolute inset-0 bg-linear-to-r from-brand-500/5 via-transparent to-active/5 pointer-events-none" />
+
+          <div className="flex items-center gap-4 relative z-10">
             <motion.div
               variants={calloutIconVariants}
-              className="w-12 h-12 rounded-2xl bg-active/20 flex items-center justify-center text-active shrink-0 border border-brand-500/30"
+              className="w-12 h-12 rounded-2xl bg-active/10 dark:bg-active/20 flex items-center justify-center text-active shrink-0 border border-active/25 shadow-2xs"
             >
               <FiMaximize2 className="w-6 h-6 text-active" />
             </motion.div>
@@ -701,11 +704,11 @@ export default function FacilitiesShowcase() {
 
           <motion.div
             variants={calloutBtnVariants}
-            className="flex items-center gap-3 shrink-0 font-['Inter']"
+            className="flex items-center gap-3 shrink-0 font-['Inter'] relative z-10"
           >
             <Link
               href="/facilities"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-btn-bg text-btn-text font-bold text-xs sm:text-sm whitespace-nowrap shadow-xs hover:shadow-md hover:opacity-90 active:scale-95 transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-btn-bg text-btn-text font-extrabold text-xs sm:text-sm whitespace-nowrap shadow-sm hover:shadow-md hover:brightness-105 active:scale-95 transition-all cursor-pointer border border-white/20"
             >
               <span>View Full Facilities Directory</span>
               <FiArrowRight className="w-4 h-4" />
