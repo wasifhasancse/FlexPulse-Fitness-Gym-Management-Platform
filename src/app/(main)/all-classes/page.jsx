@@ -1,5 +1,6 @@
 import ClassCard from "@/components/AllClasses/ClassCard";
 import SearchingClasses from "@/components/AllClasses/SearchingClasses";
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
 import { getAllClasses } from "@/lib/api/getClasses";
 import Link from "next/link";
 import {
@@ -75,25 +76,15 @@ export default async function AllClassesPage({ searchParams }) {
       <section className="relative overflow-hidden pt-10 pb-8 sm:pt-12 sm:pb-10 border-b border-slate-200/80 dark:border-white/[0.06] bg-gradient-to-b from-slate-100/40 via-background to-background dark:from-[#110e24]/50 dark:via-background dark:to-background">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-64 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-active/10 via-rose-600/5 to-transparent blur-3xl pointer-events-none -z-10" />
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-3.5">
-          {/* Eyebrow Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-active/10 dark:bg-active/15 border border-active/30 text-active text-xs font-bold tracking-wider uppercase shadow-xs">
-            <FiZap className="w-3.5 h-3.5 text-active" />
-            <span>Curated Performance Curriculum</span>
-          </div>
-
-          {/* Headline */}
-          <h1 className="font-['Outfit'] text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-tight">
-            Master Every Discipline.{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-active via-rose-500 to-amber-500">
-              Redefine Your Limit.
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="font-['Inter'] text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-xl mx-auto leading-relaxed">
-            Scientifically calibrated athletic training sessions led by certified master coaches. Filter by discipline, difficulty level, and schedule.
-          </p>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <AnimatedSectionTitle
+            kicker="Curated Performance Curriculum"
+            title="Master Every Discipline. Redefine Your Limit."
+            highlightText="Redefine Your Limit."
+            subtitle="Scientifically calibrated athletic training sessions led by certified master coaches. Filter by discipline, difficulty level, and schedule."
+            align="center"
+            className="mb-0"
+          />
         </div>
       </section>
 

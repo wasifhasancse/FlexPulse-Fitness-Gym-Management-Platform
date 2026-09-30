@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
+import { motion, LayoutGroup, AnimatePresence } from "framer-motion";
 import {
   FiSearch,
   FiX,
@@ -179,30 +180,39 @@ export default function SearchingClasses({ totalClasses = 0 }) {
           </div>
 
           {/* Intensity Selector */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider hidden lg:inline mr-1">
-              Level:
-            </span>
-            {DIFFICULTY_LEVELS.map((lvl) => {
-              const isSelected = urlDifficulty === lvl.id;
-              return (
-                <button
-                  key={lvl.id}
-                  onClick={() => handleDifficultySelect(lvl.id)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                    isSelected
-                      ? "bg-active text-white shadow-xs font-bold ring-1 ring-active"
-                      : "bg-slate-100/90 dark:bg-white/[0.04] text-slate-600 dark:text-slate-300 hover:text-foreground hover:bg-slate-200/70 dark:hover:bg-white/[0.08] border border-slate-200/80 dark:border-white/[0.06]"
-                  }`}
-                >
-                  {lvl.dotColor && !isSelected && (
-                    <span className={`w-1.5 h-1.5 rounded-full ${lvl.dotColor}`} />
-                  )}
-                  <span>{lvl.label}</span>
-                </button>
-              );
-            })}
-          </div>
+          <LayoutGroup id="allClassesDifficultyGroup">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider hidden lg:inline mr-1">
+                Level:
+              </span>
+              {DIFFICULTY_LEVELS.map((lvl) => {
+                const isSelected = urlDifficulty === lvl.id;
+                return (
+                  <button
+                    key={lvl.id}
+                    onClick={() => handleDifficultySelect(lvl.id)}
+                    className={`relative inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+                      isSelected
+                        ? "text-white font-bold"
+                        : "bg-slate-100/90 dark:bg-white/[0.04] text-slate-600 dark:text-slate-300 hover:text-foreground hover:bg-slate-200/70 dark:hover:bg-white/[0.08] border border-slate-200/80 dark:border-white/[0.06]"
+                    }`}
+                  >
+                    {isSelected && (
+                      <motion.span
+                        layoutId="activeAllClassesDifficultyPill"
+                        className="absolute inset-0 rounded-xl bg-active shadow-xs"
+                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                      />
+                    )}
+                    {lvl.dotColor && !isSelected && (
+                      <span className={`w-1.5 h-1.5 rounded-full ${lvl.dotColor} relative z-10`} />
+                    )}
+                    <span className="relative z-10">{lvl.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </LayoutGroup>
 
           {/* Sort Dropdown */}
           <div className="relative min-w-[170px]">
@@ -229,30 +239,39 @@ export default function SearchingClasses({ totalClasses = 0 }) {
 
         {/* Row 2: Category Tabs with Icons */}
         <div className="pt-3 border-t border-slate-200/80 dark:border-white/[0.08]">
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none no-scrollbar">
-            {CATEGORIES.map((cat) => {
-              const Icon = cat.icon;
-              const isSelected =
-                urlCategory === cat.name ||
-                (cat.name === "All Categories" &&
-                  (!urlCategory || urlCategory === "All Categories" || urlCategory === "All"));
+          <LayoutGroup id="allClassesCategoryGroup">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none no-scrollbar">
+              {CATEGORIES.map((cat) => {
+                const Icon = cat.icon;
+                const isSelected =
+                  urlCategory === cat.name ||
+                  (cat.name === "All Categories" &&
+                    (!urlCategory || urlCategory === "All Categories" || urlCategory === "All"));
 
-              return (
-                <button
-                  key={cat.name}
-                  onClick={() => handleCategorySelect(cat.name)}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-['Inter'] text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer shrink-0 ${
-                    isSelected
-                      ? "bg-active text-white shadow-sm font-bold ring-1 ring-active"
-                      : "bg-slate-100/80 dark:bg-white/[0.04] text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-white/[0.06] hover:border-active/40 hover:text-foreground hover:bg-slate-200/60 dark:hover:bg-white/[0.08]"
-                  }`}
-                >
-                  <Icon className={`w-3 h-3 ${isSelected ? "text-white" : "text-active"}`} />
-                  <span>{cat.label}</span>
-                </button>
-              );
-            })}
-          </div>
+                return (
+                  <button
+                    key={cat.name}
+                    onClick={() => handleCategorySelect(cat.name)}
+                    className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl font-['Inter'] text-xs font-semibold whitespace-nowrap transition-colors duration-200 cursor-pointer shrink-0 ${
+                      isSelected
+                        ? "text-white font-bold"
+                        : "bg-slate-100/80 dark:bg-white/[0.04] text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-white/[0.06] hover:border-active/40 hover:text-foreground hover:bg-slate-200/60 dark:hover:bg-white/[0.08]"
+                    }`}
+                  >
+                    {isSelected && (
+                      <motion.span
+                        layoutId="activeAllClassesCategoryPill"
+                        className="absolute inset-0 rounded-xl bg-active shadow-sm"
+                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                      />
+                    )}
+                    <Icon className={`w-3 h-3 relative z-10 ${isSelected ? "text-white" : "text-active"}`} />
+                    <span className="relative z-10">{cat.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </LayoutGroup>
         </div>
 
         {/* Row 3: Status Summary & Active Filter Tags */}

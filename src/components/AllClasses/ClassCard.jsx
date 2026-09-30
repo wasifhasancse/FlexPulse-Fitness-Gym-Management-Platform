@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   FiClock,
   FiCalendar,
@@ -12,6 +13,7 @@ import {
   FiCheckCircle,
 } from "react-icons/fi";
 import { FaFire } from "react-icons/fa";
+import ScrollAnimate from "@/components/common/ScrollAnimate";
 
 export default function ClassCard({ cls }) {
   if (!cls) return null;
@@ -88,7 +90,15 @@ export default function ClassCard({ cls }) {
   const fallbackImg = getFallbackImage(category);
 
   return (
-    <div className="group relative flex flex-col h-full rounded-[26px] bg-white dark:bg-[#121124]/90 border border-slate-200/90 dark:border-white/10 hover:border-active/60 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] hover:shadow-[0_20px_45px_-12px_rgba(255,24,68,0.22)] transition-all duration-300 hover:-translate-y-1.5 overflow-hidden">
+    <ScrollAnimate className="h-full" speed="animate__faster">
+      <motion.div
+        layout
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className="group relative flex flex-col h-full rounded-[26px] bg-white dark:bg-[#121124]/90 border border-slate-200/90 dark:border-white/10 hover:border-active/60 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] hover:shadow-[0_20px_45px_-12px_rgba(255,24,68,0.22)] transition-all duration-300 hover:-translate-y-1.5 overflow-hidden"
+      >
       
       {/* Top Media Banner */}
       <div className="relative h-56 w-full overflow-hidden bg-slate-900">
@@ -111,12 +121,12 @@ export default function ClassCard({ cls }) {
               category
             )} shadow-sm`}
           >
-            <FaFire className="w-3 h-3" />
+            <FaFire className="w-3 h-3 group-hover:animate__animated group-hover:animate__bounce" />
             {category}
           </span>
 
           {/* Price Tag with Glow */}
-          <span className="inline-flex items-center px-3 py-1 rounded-xl bg-gradient-to-r from-active to-rose-600 text-white font-['Outfit'] font-black text-sm shadow-md shadow-active/30 border border-white/20">
+          <span className="inline-flex items-center px-3 py-1 rounded-xl bg-gradient-to-r from-active to-rose-600 text-white font-['Outfit'] font-black text-sm shadow-md shadow-active/30 border border-white/20 animate__animated group-hover:animate__pulse">
             ${price}
           </span>
         </div>
@@ -142,7 +152,7 @@ export default function ClassCard({ cls }) {
       {/* Card Content Body */}
       <div className="p-5 sm:p-6 flex flex-col flex-1">
         {/* Title */}
-        <h3 className="font-['Outfit'] text-xl font-extrabold text-foreground group-hover:text-active transition-colors duration-200 line-clamp-1 leading-snug">
+        <h3 className="font-['Outfit'] text-xl font-extrabold text-foreground group-hover:text-active transition-colors duration-200 line-clamp-1 leading-snug group-hover:animate__animated group-hover:animate__headShake">
           {className}
         </h3>
 
@@ -166,7 +176,7 @@ export default function ClassCard({ cls }) {
           <div className="min-w-0">
             <div className="flex items-center gap-1 text-xs font-bold text-foreground truncate">
               <span className="truncate">{coachName}</span>
-              <FiCheckCircle className="w-3.5 h-3.5 text-active shrink-0" title="Verified Master Coach" />
+              <FiCheckCircle className="w-3.5 h-3.5 text-active shrink-0 animate__animated animate__bounceIn" title="Verified Master Coach" />
             </div>
             <p className="text-[11px] text-slate-400 dark:text-slate-400">
               Master Athletic Coach
@@ -214,7 +224,7 @@ export default function ClassCard({ cls }) {
           <Link href={`/all-classes/${_id}`} className="shrink-0">
             <button
               type="button"
-              className="group/btn relative inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-active dark:hover:bg-active dark:hover:text-white text-xs font-bold transition-all duration-300 shadow-md hover:shadow-active/30 cursor-pointer"
+              className="group/btn relative inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-active dark:hover:bg-active dark:hover:text-white text-xs font-bold transition-all duration-300 shadow-md hover:shadow-active/30 cursor-pointer hover:animate__animated hover:animate__pulse"
             >
               <span>View Details</span>
               <FiArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform duration-200" />
@@ -222,6 +232,7 @@ export default function ClassCard({ cls }) {
           </Link>
         </div>
       </div>
-    </div>
+    </motion.div>
+  </ScrollAnimate>
   );
 }
