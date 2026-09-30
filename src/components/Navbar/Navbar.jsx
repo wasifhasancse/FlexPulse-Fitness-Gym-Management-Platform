@@ -265,10 +265,10 @@ export default function Navbar() {
                             className={`flex items-start gap-3 p-2.5 rounded-2xl transition-all ${
                               active
                                 ? "bg-active/15 text-active"
-                                : "hover:bg-[#535C91]/10 dark:hover:bg-[#1B1A55]/50 text-foreground"
+                                : "hover:bg-searchbox-hover text-foreground"
                             }`}
                           >
-                            <div className={`p-2 rounded-xl shrink-0 mt-0.5 ${active ? "bg-active text-white" : "bg-[#535C91]/10 dark:bg-[#1B1A55] text-active"}`}>
+                            <div className={`p-2 rounded-xl shrink-0 mt-0.5 ${active ? "bg-active text-white" : "bg-searchbox-bg text-active"}`}>
                               <Icon className="w-4 h-4" />
                             </div>
                             <div>
@@ -324,10 +324,10 @@ export default function Navbar() {
               {/* Interactive Search Bar Trigger */}
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/60 hover:bg-[#535C91]/20 dark:hover:bg-[#1B1A55] border border-brand-500/20 text-xs font-semibold text-[#535C91] dark:text-[#9290C3] transition-all cursor-pointer shadow-xs hover:border-active/40 group"
+                className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-searchbox-bg hover:bg-searchbox-hover border border-brand-500/20 text-xs font-semibold text-secondary hover:text-foreground transition-all cursor-pointer shadow-xs hover:border-active/50 hover:shadow-sm hover:shadow-active/10 group"
                 title="Search classes, trainers, tools"
               >
-                <FiSearch className="w-4 h-4 text-active group-hover:animate__animated group-hover:animate__headShake" />
+                <FiSearch className="w-4 h-4 text-active group-hover:animate__animated group-hover:animate__headShake transition-transform" />
                 <span className="hidden xl:inline">Search...</span>
                 <kbd className="inline-flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-md bg-background border border-brand-500/20 text-[10px] font-mono font-bold text-foreground/70 select-none shadow-2xs">
                   <span className="text-[11px] leading-none">⌘</span>
@@ -343,7 +343,7 @@ export default function Navbar() {
                   {/* Profile Pill Trigger */}
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full bg-[#535C91]/15 dark:bg-[#1B1A55]/80 text-foreground font-semibold text-xs transition-all hover:bg-[#535C91]/25 dark:hover:bg-[#1B1A55] cursor-pointer border border-[#535C91]/20 dark:border-brand-500/20 shrink-0"
+                    className="flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full bg-searchbox-bg text-foreground font-semibold text-xs transition-all hover:bg-searchbox-hover cursor-pointer border border-brand-500/20 hover:border-active/40 shrink-0"
                   >
                     {user.image ? (
                       <Image
@@ -369,7 +369,7 @@ export default function Navbar() {
                   {/* Profile Dropdown Menu */}
                   {isProfileOpen && (
                     <div className="absolute right-0 mt-2.5 w-76 bg-white dark:bg-[#070F2B] border border-brand-500/20 dark:border-brand-500/30 rounded-3xl shadow-2xl z-50 overflow-hidden py-1 transition-all">
-                      <div className="bg-[#535C91]/5 dark:bg-[#1B1A55]/40 m-2.5 p-3.5 rounded-2xl flex items-center gap-3">
+                      <div className="bg-searchbox-bg m-2.5 p-3.5 rounded-2xl flex items-center gap-3">
                         {user.image ? (
                           <Image
                             src={user.image}
@@ -445,7 +445,7 @@ export default function Navbar() {
             <div className="lg:hidden flex items-center space-x-2">
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className="p-2 rounded-xl bg-[#535C91]/10 dark:bg-[#1B1A55]/60 text-active"
+                className="p-2 rounded-xl bg-searchbox-bg hover:bg-searchbox-hover text-active transition-all"
                 aria-label="Search site"
               >
                 <FiSearch size={18} />
@@ -474,7 +474,7 @@ export default function Navbar() {
                 setIsOpen(false);
                 setIsSearchOpen(true);
               }}
-              className="w-full flex items-center justify-between p-3 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/50 border border-brand-500/20 text-xs text-[#535C91] dark:text-[#9290C3] mb-3"
+              className="w-full flex items-center justify-between p-3 rounded-2xl bg-searchbox-bg hover:bg-searchbox-hover border border-brand-500/20 text-xs text-secondary hover:text-foreground mb-3 transition-all cursor-pointer"
             >
               <span className="flex items-center gap-2">
                 <FiSearch className="w-4 h-4 text-active" /> Search classes, coaches, tools...
@@ -527,7 +527,7 @@ export default function Navbar() {
                 />
               </button>
               {isMobileProgramsOpen && (
-                <div className="p-2 space-y-1 bg-[#535C91]/5 dark:bg-[#1B1A55]/30 border-t border-brand-500/10">
+                <div className="p-2 space-y-1 bg-searchbox-bg border-t border-brand-500/10">
                   {programDropdownItems.map((item) => {
                     const Icon = item.icon;
                     return (
@@ -598,7 +598,7 @@ export default function Navbar() {
                     <Link
                       href={`/dashboard/${user?.role}`}
                       onClick={() => setIsOpen(false)}
-                      className="py-2.5 px-3 rounded-xl bg-[#535C91]/10 text-center text-xs font-bold text-foreground hover:text-active"
+                      className="py-2.5 px-3 rounded-xl bg-searchbox-bg hover:bg-searchbox-hover text-center text-xs font-bold text-foreground hover:text-active transition-all"
                     >
                       Dashboard
                     </Link>

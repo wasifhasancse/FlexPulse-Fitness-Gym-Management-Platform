@@ -27,8 +27,11 @@
   --color-btn-bg: var(--btn-bg);
   --color-btn-text: var(--btn-text);
 
+  --color-searchbox-bg: var(--searchbox-bg);
+  --color-searchbox-hover: var(--searchbox-hover);
+
   --shadow-glow: 0 0 20px var(--active-color);
-  --shadow-card: 0 4px 20px -4px rgba(83, 92, 145, 0.15);
+  --shadow-card: 0 4px 20px -4px rgba(225, 29, 72, 0.12);
 }
 
 :root {
@@ -45,6 +48,10 @@
   --active-color: #ff1844;
   --btn-bg: #ff1844;
   --btn-text: #ffffff;
+
+  /* Elevated micro-surfaces & searchbox body (Crisp athletic rose-tinted canvas in light mode) */
+  --searchbox-bg: rgba(225, 29, 72, 0.04);
+  --searchbox-hover: rgba(225, 29, 72, 0.09);
 
   /* Brand color scales for light mode */
   --brand-900: #ffffff;
@@ -67,6 +74,10 @@
   --active-color: #ff2a55;
   --btn-bg: #ff2a55;
   --btn-text: #ffffff;
+
+  /* Elevated micro-surfaces & searchbox body (Deep athletic obsidian with neon crimson undertone in dark mode) */
+  --searchbox-bg: rgba(255, 42, 85, 0.08);
+  --searchbox-hover: rgba(255, 42, 85, 0.16);
 
   /* Brand color scales for dark mode */
   --brand-900: #090814;

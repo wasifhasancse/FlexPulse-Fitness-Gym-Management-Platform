@@ -324,24 +324,26 @@ export default function HeroSection() {
               Welcome to <strong className="text-foreground font-semibold inline-block hover:animate__animated hover:animate__headShake cursor-default">FlexPulse</strong> — where certified master coaches, tailored functional regimens, and state-of-the-art facilities empower you to surpass your physical peak.
             </p>
 
-            {/* Action Buttons with Distinct Transition Styles */}
+            {/* Action Buttons with Strict Shadow Standards (sm/md only) & Kinetic Hover Styles */}
             <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-1">
+              {/* Type 1: Primary High-Voltage Athletic CTA */}
               <Link
                 href="/all-classes"
-                className="hero-btn-primary opacity-0 transform-gpu will-change-transform relative overflow-hidden inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 bg-btn-bg text-btn-text font-extrabold rounded-2xl shadow-lg hover:shadow-xl hover:opacity-95 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-sm sm:text-base border border-brand-500/20 group hover:animate__animated hover:animate__pulse"
+                className="hero-btn-primary opacity-0 transform-gpu will-change-transform relative overflow-hidden inline-flex items-center justify-center gap-2.5 px-6 py-3.5 sm:px-7 sm:py-4 bg-btn-bg text-btn-text font-extrabold rounded-2xl shadow-sm hover:shadow-md transform hover:-translate-y-0.5 hover:brightness-105 active:translate-y-0 active:scale-95 transition-all duration-300 ease-out text-sm sm:text-base border border-white/25 hover:border-white/40 cursor-pointer group"
               >
-                {/* Subtle Button Shimmer Sweep */}
-                <span className="absolute inset-0 w-1/2 h-full bg-linear-to-r from-transparent via-white/15 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-[250%] transition-transform duration-1000 ease-in-out pointer-events-none" />
-                <FaDumbbell className="w-4 h-4 sm:w-5 sm:h-5 text-btn-text group-hover:rotate-12 transition-transform duration-300" />
+                {/* Athletic Kinetic Shimmer Beam Sweep */}
+                <span className="absolute inset-0 w-1/2 h-full bg-linear-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-[250%] transition-transform duration-700 ease-out pointer-events-none" />
+                <FaDumbbell className="w-4 h-4 sm:w-5 sm:h-5 text-btn-text group-hover:rotate-[-12deg] group-hover:scale-110 transition-transform duration-300 ease-out shrink-0" />
                 <span>Explore Classes</span>
               </Link>
               
+              {/* Type 2: Secondary / Glass Athletic CTA (Searchbox Body/Hover Tokens) */}
               <Link
                 href="/calculator#trial-pass"
-                className="hero-btn-secondary opacity-0 transform-gpu will-change-transform inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 bg-background dark:bg-[#1B1A55]/80 hover:bg-[#535C91]/15 text-foreground font-bold rounded-2xl border border-brand-500/25 transition-all duration-200 text-sm sm:text-base hover:border-active/40 group hover:-translate-y-0.5"
+                className="hero-btn-secondary opacity-0 transform-gpu will-change-transform inline-flex items-center justify-center gap-2.5 px-5 py-3.5 sm:px-6 sm:py-4 bg-searchbox-bg hover:bg-searchbox-hover text-foreground font-bold rounded-2xl border border-brand-500/25 hover:border-active/60 shadow-xs hover:shadow-md transform hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-300 ease-out text-sm sm:text-base cursor-pointer group"
               >
-                <span>Claim VIP Pass</span>
-                <FiArrowRight className="w-4 h-4 text-active group-hover:translate-x-1.5 transition-transform duration-200 group-hover:animate__animated group-hover:animate__headShake" />
+                <span className="group-hover:text-active transition-colors duration-200">Claim VIP Pass</span>
+                <FiArrowRight className="w-4 h-4 text-active group-hover:translate-x-1 group-hover:scale-105 transition-transform duration-300 ease-out shrink-0" />
               </Link>
             </div>
 

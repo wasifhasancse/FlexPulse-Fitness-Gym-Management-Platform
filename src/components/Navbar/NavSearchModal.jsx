@@ -226,7 +226,7 @@ export default function NavSearchModal({ isOpen, onClose }) {
         </div>
 
         {/* Quick Filter Suggestions Row with Generous Spacing and Hidden Scrollbar */}
-        <div className="px-3 sm:px-5 py-3 bg-[#535C91]/5 dark:bg-[#1B1A55]/30 border-b border-brand-500/10 flex items-center gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <div className="px-3 sm:px-5 py-3 bg-searchbox-bg border-b border-brand-500/10 flex items-center gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <span className="text-[11px] uppercase tracking-wider font-bold text-[#535C91] dark:text-[#9290C3] shrink-0">
             Quick:
           </span>
@@ -262,11 +262,11 @@ export default function NavSearchModal({ isOpen, onClose }) {
                   className={`p-3 sm:p-3.5 rounded-2xl flex items-center justify-between gap-3 cursor-pointer transition-all duration-150 ${
                     isSelected
                       ? "bg-active/10 dark:bg-active/15 border border-active/40 translate-x-1"
-                      : "hover:bg-[#535C91]/5 dark:hover:bg-[#1B1A55]/40 border border-transparent"
+                      : "hover:bg-searchbox-hover border border-transparent"
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div className={`p-2.5 rounded-xl shrink-0 ${isSelected ? "bg-active text-white" : "bg-[#535C91]/10 dark:bg-[#1B1A55] text-active"}`}>
+                    <div className={`p-2.5 rounded-xl shrink-0 ${isSelected ? "bg-active text-white" : "bg-searchbox-bg text-active"}`}>
                       <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -292,7 +292,7 @@ export default function NavSearchModal({ isOpen, onClose }) {
         </div>
 
         {/* Modal Footer */}
-        <div className="px-4 sm:px-5 py-3 bg-[#535C91]/5 dark:bg-[#1B1A55]/20 border-t border-brand-500/10 flex items-center justify-between text-[11px] text-[#535C91] dark:text-[#9290C3] font-['Inter']">
+        <div className="px-4 sm:px-5 py-3 bg-searchbox-bg border-t border-brand-500/10 flex items-center justify-between text-[11px] text-secondary font-['Inter']">
           <div className="hidden sm:flex items-center gap-3">
             <span><kbd className="px-1.5 py-0.5 rounded bg-background border border-brand-500/20 font-mono text-[10px]">↑↓</kbd> Navigate</span>
             <span><kbd className="px-1.5 py-0.5 rounded bg-background border border-brand-500/20 font-mono text-[10px]">↵</kbd> Select</span>

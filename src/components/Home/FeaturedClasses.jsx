@@ -1,25 +1,24 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
-import { 
-  FiArrowRight, 
-  FiClock, 
-  FiCalendar, 
-  FiUsers, 
-  FiZap, 
-  FiTag, 
-  FiActivity,
-  FiCheckCircle 
+import {
+  FiArrowRight,
+  FiClock,
+  FiCalendar,
+  FiUsers,
+  FiTag,
+  FiActivity
 } from "react-icons/fi";
-import { FaFire, FaStar } from "react-icons/fa";
-import ScrollAnimate from "@/components/common/ScrollAnimate";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 
-// Easing curve for high-performance animations
-const TRANSITION_EASE = [0.16, 1, 0.3, 1];
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 // Fallback high-performance featured classes in case API has no records
 const FALLBACK_CLASSES = [
@@ -121,77 +120,375 @@ const FALLBACK_CLASSES = [
   }
 ];
 
+// Outer Grid Container with Universal Staged Viewport Delay (Triggered After a Certain Time)
+const classesGridContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      delayChildren: 1.25, // Staged delay after entering screen viewport
+      staggerChildren: 0.18, // Stagger each card separately
+    },
+  },
+};
+
+// Card Element-by-Element Slow Cinematic Motion Variants (per rule.md & animation.md)
+const classCardVariants = {
+  hidden: { opacity: 0, y: 32, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 1.2,
+      ease: [0.16, 1, 0.3, 1],
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const classImgVariants = {
+  hidden: { scale: 1.15, filter: "blur(4px)" },
+  visible: {
+    scale: 1,
+    filter: "blur(0px)",
+    transition: { duration: 1.4, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const classCategoryVariants = {
+  hidden: { opacity: 0, x: -25 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { type: "spring", stiffness: 180, damping: 22 },
+  },
+};
+
+const classDiffVariants = {
+  hidden: { opacity: 0, y: -20, x: 15 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    x: 0,
+    transition: { type: "spring", stiffness: 200, damping: 22 },
+  },
+};
+
+const classScheduleVariants = {
+  hidden: { opacity: 0, y: 20, x: -10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    x: 0,
+    transition: { duration: 0.95, ease: "easeOut" },
+  },
+};
+
+const classPriceVariants = {
+  hidden: { opacity: 0, y: 20, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 220, damping: 20 },
+  },
+};
+
+const classTitleVariants = {
+  hidden: { opacity: 0, y: 22, filter: "blur(3px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 1.15, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const classDescVariants = {
+  hidden: { opacity: 0, y: -16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 1.05, ease: "easeOut" },
+  },
+};
+
+const classSpecsVariants = {
+  hidden: { opacity: 0, scaleX: 0.95 },
+  visible: {
+    opacity: 1,
+    scaleX: 1,
+    transition: { duration: 0.95, ease: "easeOut" },
+  },
+};
+
+const classMetricVariants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.95, ease: "easeOut" },
+  },
+};
+
+const classBtnVariants = {
+  hidden: { opacity: 0, y: 18, scale: 0.92 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 190, damping: 20 },
+  },
+};
+
+// Filter Options Staggered Motion Variants
+const filterContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.07,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const filterItemVariants = {
+  hidden: { opacity: 0, y: 18, scale: 0.92 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 280,
+      damping: 22,
+    },
+  },
+};
+
+// Bottom Callout Banner Motion Variants
+const calloutContainerVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.98 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 1.0,
+      ease: [0.16, 1, 0.3, 1],
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const calloutIconVariants = {
+  hidden: { opacity: 0, scale: 0, rotate: -20 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    rotate: 0,
+    transition: { type: "spring", stiffness: 240, damping: 20 },
+  },
+};
+
+const calloutTextVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 1.0, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const calloutBtnVariants = {
+  hidden: { opacity: 0, x: 25 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.95, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
 export default function FeaturedClasses({ classes }) {
-  // Use real backend classes if available, otherwise use fallback data
-  const rawClasses = Array.isArray(classes) && classes.length > 0 ? classes : FALLBACK_CLASSES;
+  const sectionRef = useRef(null);
+
+  // Normalize incoming classes from props (handles array, {data:[]}, {items:[]}, etc.)
+  const initialClasses = useMemo(() => {
+    let list = [];
+    if (Array.isArray(classes) && classes.length > 0) {
+      list = classes;
+    } else if (classes && Array.isArray(classes?.data) && classes.data.length > 0) {
+      list = classes.data;
+    } else if (classes && Array.isArray(classes?.items) && classes.items.length > 0) {
+      list = classes.items;
+    } else if (classes && Array.isArray(classes?.classes) && classes.classes.length > 0) {
+      list = classes.classes;
+    }
+    return list.length > 0 ? list : FALLBACK_CLASSES;
+  }, [classes]);
 
   const [activeCategory, setActiveCategory] = useState("All Classes");
+  const [loadedClasses, setLoadedClasses] = useState(initialClasses);
+
+  // Background client-side fetch if server passed empty classes
+  useEffect(() => {
+    if (Array.isArray(classes) && classes.length > 0) {
+      setLoadedClasses(classes);
+      return;
+    }
+    fetch("/api/all-class?limit=6&sort=popular")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        const items = Array.isArray(data) ? data : data?.items || data?.data;
+        if (Array.isArray(items) && items.length > 0) {
+          setLoadedClasses(items);
+        }
+      })
+      .catch(() => {
+        // Fallback already assigned in initialClasses
+      });
+  }, [classes]);
 
   // Dynamically compute unique categories from available classes
   const categories = useMemo(() => {
     const set = new Set();
-    rawClasses.forEach((cls) => {
+    loadedClasses.forEach((cls) => {
       if (cls.category) set.add(cls.category);
     });
     return ["All Classes", ...Array.from(set)];
-  }, [rawClasses]);
+  }, [loadedClasses]);
 
   // Filter classes smoothly by category
   const filteredClasses = useMemo(() => {
-    if (activeCategory === "All Classes") return rawClasses;
-    return rawClasses.filter(
+    if (activeCategory === "All Classes") return loadedClasses;
+    return loadedClasses.filter(
       (c) => (c.category || "").toLowerCase() === activeCategory.toLowerCase()
     );
-  }, [activeCategory, rawClasses]);
+  }, [activeCategory, loadedClasses]);
+
+  // GSAP Viewport-Triggered Timeline for Section Header
+  useGSAP(
+    () => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 85%",
+          once: true,
+        },
+        defaults: { ease: "power3.out" },
+      });
+
+      // 1. Kicker Badge: Dignified downward entrance
+      tl.fromTo(
+        ".featured-classes-kicker",
+        { y: -30, opacity: 0, filter: "blur(6px)" },
+        { y: 0, opacity: 1, filter: "blur(0px)", duration: 1.0, ease: "power2.out" }
+      ).addLabel("kickerEnd");
+
+      // 2. Main Title: Majestic upward rising sweep with de-blur
+      tl.fromTo(
+        ".featured-classes-title",
+        { y: 45, opacity: 0, filter: "blur(8px)", scale: 0.96 },
+        { y: 0, opacity: 1, filter: "blur(0px)", scale: 1, duration: 1.25, ease: "power3.out" },
+        "kickerEnd-=0.2"
+      ).addLabel("titleEnd");
+
+      // 3. Section Description: Contrasting downward drop from above under the title edge
+      tl.fromTo(
+        ".featured-classes-desc",
+        { y: -30, opacity: 0, filter: "blur(5px)" },
+        { y: 0, opacity: 1, filter: "blur(0px)", duration: 1.1, ease: "power2.out" },
+        "titleEnd-=0.15"
+      );
+
+      // 4. Header Explore CTA Button: Slide from right with soft back bounce
+      tl.fromTo(
+        ".featured-classes-header-btn",
+        { x: 35, opacity: 0 },
+        { x: 0, opacity: 1, duration: 1.05, ease: "back.out(1.4)" },
+        "titleEnd-=0.2"
+      );
+    },
+    { scope: sectionRef }
+  );
 
   return (
-    <section className="py-20 lg:py-28 bg-background transition-colors duration-300 relative overflow-hidden border-t border-brand-500/15">
+    <section
+      ref={sectionRef}
+      className="py-20 lg:py-28 bg-background transition-colors duration-300 relative overflow-hidden border-t border-brand-500/15"
+    >
       {/* Ambient Lighting Mesh */}
       <div className="absolute top-1/3 right-0 w-96 sm:w-130 h-96 sm:h-130 bg-active/6 rounded-full blur-[140px] pointer-events-none -z-10" />
       <div className="absolute bottom-10 left-0 w-80 sm:w-110 h-80 sm:h-110 bg-brand-500/8 rounded-full blur-[130px] pointer-events-none -z-10" />
 
       <div className="w-11/12 mx-auto relative z-10">
-        
-        {/* Section Header with Motion Exit & Layout Animation */}
+
+        {/* Section Header with Independent Element-by-Element Triggered Transitions */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 sm:mb-16 gap-6 border-b border-brand-500/15 pb-8">
           <div className="max-w-2xl">
-            <AnimatedSectionTitle
-              badge="High Demand Sessions"
-              badgeDetail="100% Certified Master Instructors"
-              title="Our Featured"
-              highlightText="Classes"
-              subtitle="Top-rated athletic sessions engineered with biometric heart-rate tracking, structured progressive overload, and capped capacity for tailored coaching attention."
-              titleKey={`featured-classes-heading-${activeCategory}`}
-            />
+            {/* Kicker Badge: Triggered downward arrival */}
+            <div className="featured-classes-kicker inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-active/30 bg-active/5 dark:bg-active/10 mb-4 shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-active animate-pulse"></span>
+              <span className="text-[11px] font-black uppercase tracking-wider text-active">
+                High Demand Sessions
+              </span>
+              <span className="text-[11px] text-secondary/60 font-bold">•</span>
+              <span className="text-[11px] font-bold text-secondary">
+                100% Certified Master Instructors
+              </span>
+            </div>
+
+            {/* Section Headline: Triggered upward sweep */}
+            <h2 className="featured-classes-title text-4xl sm:text-5xl lg:text-6xl font-black font-['Outfit'] tracking-tight text-foreground leading-[1.08] mb-4">
+              Our Featured{" "}
+              <span className="text-active inline-block">Classes</span>
+            </h2>
+
+            {/* Description: Contrasting downward drop from above under the title edge */}
+            <p className="featured-classes-desc text-sm sm:text-base text-secondary font-['Inter'] leading-relaxed max-w-xl">
+              Top-rated athletic sessions engineered with biometric heart-rate tracking, structured progressive overload, and capped capacity for tailored coaching attention.
+            </p>
           </div>
 
-          {/* Quick Schedule Navigation CTA */}
-          <motion.div layout className="flex items-center gap-4 shrink-0">
+          {/* Quick Schedule Navigation CTA: Slide from right */}
+          <div className="featured-classes-header-btn shrink-0">
             <Link
               href="/all-classes"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/70 hover:bg-active hover:text-white text-foreground font-bold text-xs sm:text-sm border border-brand-500/25 hover:border-active transition-all duration-300 group shadow-xs cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-searchbox-bg hover:bg-searchbox-hover text-foreground hover:text-active font-bold text-xs sm:text-sm border border-brand-500/25 hover:border-active/60 transition-all duration-300 group shadow-xs hover:shadow-md cursor-pointer active:scale-95"
             >
               <span>Explore All Classes</span>
-              <FiArrowRight className="w-4 h-4 text-active group-hover:text-white group-hover:translate-x-1 transition-all duration-200" />
+              <FiArrowRight className="w-4 h-4 text-active group-hover:translate-x-1 transition-transform duration-200" />
             </Link>
-          </motion.div>
+          </div>
         </div>
 
-        {/* Interactive Filter Pills with Motion Layout Animation */}
+        {/* Interactive Discipline Category Filter Tabs with Triggered Entrance & Layout Animation */}
         <LayoutGroup id="featuredClassesFiltersGroup">
-          <motion.div layout className="flex items-center gap-2 overflow-x-auto pb-4 mb-10 no-scrollbar select-none">
+          <motion.div
+            variants={filterContainerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            className="flex items-center gap-2 overflow-x-auto pb-4 mb-10 no-scrollbar select-none"
+          >
             {categories.map((cat) => {
               const isActive = activeCategory === cat;
               return (
-                <button
+                <motion.button
                   key={cat}
+                  variants={filterItemVariants}
+                  whileHover={{ y: -2, scale: 1.02 }}
+                  whileTap={{ scale: 0.96 }}
                   onClick={() => setActiveCategory(cat)}
                   className="relative px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-tight whitespace-nowrap cursor-pointer transition-colors duration-200"
                 >
                   {isActive && (
                     <motion.span
                       layoutId="activeFeaturedClassTabPill"
-                      className="absolute inset-0 bg-active rounded-xl shadow-md shadow-active/20"
+                      className="absolute inset-0 bg-active rounded-xl shadow-xs"
                       transition={{ type: "spring", stiffness: 450, damping: 35 }}
                     />
                   )}
@@ -199,20 +496,24 @@ export default function FeaturedClasses({ classes }) {
                     className={`relative z-10 ${
                       isActive
                         ? "text-white"
-                        : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"
+                        : "text-secondary hover:text-foreground"
                     }`}
                   >
                     {cat}
                   </span>
-                </button>
+                </motion.button>
               );
             })}
           </motion.div>
         </LayoutGroup>
 
-        {/* Classes Grid with FLIP Layout Animation */}
-        <motion.div 
+        {/* Classes Grid with Element-by-Element Triggered Transition Animation */}
+        <motion.div
           layout
+          variants={classesGridContainerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
         >
           <AnimatePresence mode="popLayout">
@@ -238,7 +539,7 @@ export default function FeaturedClasses({ classes }) {
 
               const coachName = authorName || author || "Master Coach";
               const difficulty = difficultyLevel || level || "All Levels";
-              
+
               // Level badge colors
               const getLevelColor = (lvl) => {
                 const normalized = (lvl || "").toLowerCase();
@@ -255,83 +556,108 @@ export default function FeaturedClasses({ classes }) {
               const bookedSafe = Number(bookingCount) || 0;
               const slotSafe = Number(slot) || 30;
               const capacityPct = Math.min(Math.round((bookedSafe / slotSafe) * 100), 100);
-
               const formattedDuration = typeof duration === "number" ? `${duration} Mins` : duration;
 
               return (
-                <ScrollAnimate key={_id || idx} className="w-full h-full">
-                  <motion.div
-                    layout
-                    initial={{ opacity: 0, y: 18 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 18 }}
-                    transition={{ duration: 0.35, ease: TRANSITION_EASE }}
-                    className="w-full h-full"
-                  >
-                    <div className="group relative rounded-3xl overflow-hidden bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1.5 flex flex-col h-full shadow-lg hover:shadow-2xl">
-                    
+                <motion.div
+                  key={`${activeCategory}-${_id || idx}`}
+                  layout
+                  initial="hidden"
+                  animate="visible"
+                  exit={{
+                    opacity: 0,
+                    scale: 0.92,
+                    y: 18,
+                    transition: { duration: 0.35, ease: "easeOut" }
+                  }}
+                  variants={classCardVariants}
+                  className="w-full h-full"
+                >
+                  <div className="group relative rounded-3xl overflow-hidden bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1.5 flex flex-col h-full shadow-sm hover:shadow-md">
+
                     {/* Visual Card Image Banner */}
                     <div className="relative h-56 sm:h-60 overflow-hidden bg-brand-800/10">
-                      <Image
-                        src={classImage || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1200&auto=format&fit=crop"}
-                        alt={className || "FlexPulse Class"}
-                        fill
-                        unoptimized
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover group-hover:scale-106 transition-transform duration-500 ease-out"
-                      />
-                      
-                      {/* Gradient Dark Vignette */}
-                      <div className="absolute inset-0 bg-linear-to-t from-[#070F2B] via-[#070F2B]/40 to-transparent" />
+                      <motion.div variants={classImgVariants} className="w-full h-full relative">
+                        <Image
+                          src={classImage || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1200&auto=format&fit=crop"}
+                          alt={className || "FlexPulse Class"}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          className="object-cover group-hover:scale-106 transition-transform duration-500 ease-out"
+                        />
+                        {/* Gradient Dark Vignette */}
+                        <div className="absolute inset-0 bg-linear-to-t from-[#070F2B] via-[#070F2B]/40 to-transparent" />
+                      </motion.div>
 
                       {/* Top Badges: Category & Level */}
-                      <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2 z-10">
-                        <div className="bg-background/90 dark:bg-[#1B1A55]/90 backdrop-blur-md px-3 py-1 rounded-full border border-brand-500/25 flex items-center gap-1.5 shadow-sm">
+                      <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2 z-10 pointer-events-none">
+                        <motion.div
+                          variants={classCategoryVariants}
+                          className="bg-background/90 dark:bg-[#1B1A55]/90 backdrop-blur-md px-3 py-1 rounded-full border border-brand-500/25 flex items-center gap-1.5 shadow-2xs pointer-events-auto"
+                        >
                           <FiTag className="w-3 h-3 text-active" />
                           <span className="text-[11px] font-extrabold uppercase tracking-wide text-foreground">
                             {category}
                           </span>
-                        </div>
+                        </motion.div>
 
-                        <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full border backdrop-blur-md uppercase tracking-wider ${getLevelColor(difficulty)}`}>
+                        <motion.span
+                          variants={classDiffVariants}
+                          className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full border backdrop-blur-md uppercase tracking-wider shadow-2xs pointer-events-auto ${getLevelColor(difficulty)}`}
+                        >
                           {difficulty}
-                        </span>
+                        </motion.span>
                       </div>
 
                       {/* Bottom Banner Info: Schedule & Real-Time Price */}
-                      <div className="absolute bottom-3 left-3.5 right-3.5 flex items-center justify-between z-10">
-                        <div className="bg-[#1B1A55]/85 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/10 flex items-center gap-1.5 text-white text-[11px] font-medium">
+                      <div className="absolute bottom-3 left-3.5 right-3.5 flex items-center justify-between z-10 pointer-events-none">
+                        <motion.div
+                          variants={classScheduleVariants}
+                          className="bg-[#1B1A55]/85 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/10 flex items-center gap-1.5 text-white text-[11px] font-medium shadow-2xs pointer-events-auto"
+                        >
                           <FiCalendar className="w-3 h-3 text-active" />
                           <span className="truncate max-w-[170px] sm:max-w-[200px]">
                             {classSchedule || "Weekly Schedule"} {time ? `• ${time}` : ""}
                           </span>
-                        </div>
+                        </motion.div>
 
-                        <div className="bg-active text-white text-xs font-black px-3 py-1 rounded-xl shadow-md border border-white/15">
+                        <motion.div
+                          variants={classPriceVariants}
+                          className="bg-active text-white text-xs font-black px-3 py-1 rounded-xl shadow-xs border border-white/15 pointer-events-auto"
+                        >
                           ${price}
-                        </div>
+                        </motion.div>
                       </div>
                     </div>
 
                     {/* Card Content Details */}
                     <div className="p-6 flex flex-col flex-1 justify-between gap-4">
-                      
-                      <div className="space-y-2">
-                        {/* Class Title */}
-                        <h3 className="font-['Outfit'] text-xl font-bold text-foreground leading-snug line-clamp-1 group-hover:text-active transition-colors group-hover:animate__animated group-hover:animate__headShake">
-                          {className}
-                        </h3>
 
-                        {/* Class Description */}
+                      <div className="space-y-2">
+                        {/* Class Title: Upward sweep with de-blur */}
+                        <motion.h3
+                          variants={classTitleVariants}
+                          className="font-['Outfit'] text-xl font-bold text-foreground leading-snug line-clamp-1 group-hover:text-active transition-colors"
+                        >
+                          {className}
+                        </motion.h3>
+
+                        {/* Class Description: Contrasting downward glide */}
                         {description && (
-                          <p className="font-['Inter'] text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3] line-clamp-2 leading-relaxed">
+                          <motion.p
+                            variants={classDescVariants}
+                            className="font-['Inter'] text-xs sm:text-sm text-secondary line-clamp-2 leading-relaxed"
+                          >
                             {description}
-                          </p>
+                          </motion.p>
                         )}
                       </div>
 
                       {/* Instructor & Duration Spec Strip */}
-                      <div className="flex items-center justify-between py-2 border-y border-brand-500/15 text-xs font-['Inter']">
+                      <motion.div
+                        variants={classSpecsVariants}
+                        className="flex items-center justify-between py-2 border-y border-brand-500/15 text-xs font-['Inter']"
+                      >
                         <div className="flex items-center gap-2">
                           {authorImage ? (
                             <img
@@ -345,21 +671,24 @@ export default function FeaturedClasses({ classes }) {
                             </div>
                           )}
                           <div className="leading-tight">
-                            <p className="text-[10px] text-[#535C91] dark:text-[#9290C3] font-medium uppercase tracking-wider">Coach</p>
+                            <p className="text-[10px] text-secondary font-medium uppercase tracking-wider">Coach</p>
                             <p className="font-bold text-foreground text-xs">{coachName}</p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5 bg-[#535C91]/10 dark:bg-[#1B1A55]/50 px-2.5 py-1 rounded-lg text-[#535C91] dark:text-[#9290C3] font-bold text-[11px]">
+                        <div className="flex items-center gap-1.5 bg-searchbox-bg px-2.5 py-1 rounded-lg text-secondary font-bold text-[11px] border border-brand-500/20">
                           <FiClock className="w-3.5 h-3.5 text-active" />
                           <span>{formattedDuration}</span>
                         </div>
-                      </div>
+                      </motion.div>
 
                       {/* Capacity / Booking Metric Bar */}
-                      <div className="space-y-1.5 font-['Inter']">
+                      <motion.div
+                        variants={classMetricVariants}
+                        className="space-y-1.5 font-['Inter']"
+                      >
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-[#535C91] dark:text-[#9290C3] flex items-center gap-1">
+                          <span className="text-secondary flex items-center gap-1">
                             <FiUsers className="w-3 h-3 text-active" />
                             <span>{bookedSafe} athletes enrolled</span>
                           </span>
@@ -369,13 +698,13 @@ export default function FeaturedClasses({ classes }) {
                         </div>
 
                         {/* Progress Bar */}
-                        <div className="w-full h-1.5 bg-[#535C91]/15 dark:bg-[#1B1A55]/80 rounded-full overflow-hidden">
+                        <div className="w-full h-1.5 bg-brand-500/15 dark:bg-[#1B1A55]/80 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-linear-to-r from-brand-500 to-active rounded-full transition-all duration-500"
                             style={{ width: `${Math.max(capacityPct, 12)}%` }}
                           />
                         </div>
-                      </div>
+                      </motion.div>
 
                       {/* Footer Price & Booking CTA */}
                       <div className="flex items-center justify-between pt-1">
@@ -384,7 +713,7 @@ export default function FeaturedClasses({ classes }) {
                             <span className="font-['Outfit'] text-2xl font-black text-active">
                               ${price}
                             </span>
-                            <span className="text-[11px] text-[#535C91] dark:text-[#9290C3] font-medium">
+                            <span className="text-[11px] text-secondary font-medium">
                               / session
                             </span>
                           </div>
@@ -393,46 +722,59 @@ export default function FeaturedClasses({ classes }) {
                           </span>
                         </div>
 
-                        <Link href={`/all-classes/${_id}`}>
-                          <button className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-btn-bg text-btn-text hover:opacity-95 font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer group-hover:scale-102">
-                            <span>Book Session</span>
-                            <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                          </button>
-                        </Link>
+                        {/* Type 1 CTA Button: Book Session */}
+                        <motion.div variants={classBtnVariants}>
+                          <Link href={`/all-classes/${_id}`}>
+                            <button className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-btn-bg text-btn-text hover:brightness-105 font-extrabold text-xs sm:text-sm shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer active:scale-95">
+                              <span>Book Session</span>
+                              <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                            </button>
+                          </Link>
+                        </motion.div>
                       </div>
 
                     </div>
                   </div>
                 </motion.div>
-              </ScrollAnimate>
               );
             })}
           </AnimatePresence>
         </motion.div>
 
-        {/* Section Diagnostic Trust Banner */}
-        <div className="mt-14 sm:mt-18 p-6 sm:p-8 rounded-3xl bg-linear-to-r from-brand-800/30 via-[#1B1A55]/40 to-brand-800/30 border border-brand-500/25 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+        {/* Section Diagnostic Trust Banner with Directional Triggered Transitions */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={calloutContainerVariants}
+          className="mt-14 sm:mt-18 p-6 sm:p-8 rounded-3xl bg-linear-to-r from-brand-800/30 via-background to-brand-800/30 border border-brand-500/25 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs"
+        >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-active/20 flex items-center justify-center text-active shrink-0 border border-brand-500/30">
+            <motion.div
+              variants={calloutIconVariants}
+              className="w-12 h-12 rounded-2xl bg-active/20 flex items-center justify-center text-active shrink-0 border border-brand-500/30 shadow-xs"
+            >
               <FiActivity className="w-6 h-6 text-active" />
-            </div>
-            <div>
+            </motion.div>
+            <motion.div variants={calloutTextVariants}>
               <h4 className="font-['Outfit'] text-lg sm:text-xl font-extrabold text-foreground">
                 First Time at FlexPulse? Claim Your Complimentary Diagnostic Session
               </h4>
-              <p className="font-['Inter'] text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3] mt-0.5">
+              <p className="font-['Inter'] text-xs sm:text-sm text-secondary mt-0.5">
                 Every new athlete receives a complimentary 3D movement assessment and biometric metabolic consultation before their first class.
               </p>
-            </div>
+            </motion.div>
           </div>
-          <Link
-            href="/calculator#trial-pass"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-btn-bg text-btn-text font-bold text-xs sm:text-sm whitespace-nowrap shadow-md hover:opacity-90 transition-all cursor-pointer shrink-0"
-          >
-            <span>Claim Free Pass</span>
-            <FiArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
+          <motion.div variants={calloutBtnVariants} className="shrink-0">
+            <Link
+              href="/calculator#trial-pass"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-btn-bg text-btn-text font-bold text-xs sm:text-sm whitespace-nowrap shadow-sm hover:shadow-md hover:brightness-105 transition-all cursor-pointer active:scale-95"
+            >
+              <span>Claim Free Pass</span>
+              <FiArrowRight className="w-4 h-4" />
+            </Link>
+          </motion.div>
+        </motion.div>
 
       </div>
     </section>

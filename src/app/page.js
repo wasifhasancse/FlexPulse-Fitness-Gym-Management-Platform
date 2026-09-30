@@ -26,7 +26,15 @@ export default async function Home() {
 
   try {
     const classData = await getFeaturedClass();
-    featuredClasses = Array.isArray(classData) ? classData : [];
+    if (Array.isArray(classData)) {
+      featuredClasses = classData;
+    } else if (classData?.data && Array.isArray(classData.data)) {
+      featuredClasses = classData.data;
+    } else if (classData?.items && Array.isArray(classData.items)) {
+      featuredClasses = classData.items;
+    } else if (classData?.classes && Array.isArray(classData.classes)) {
+      featuredClasses = classData.classes;
+    }
   } catch (err) {
     console.error("Failed to load featured classes for homepage", err);
   }

@@ -59,6 +59,89 @@ const VALUE_PILLARS = [
   "Capped session capacity for direct personalized coaching"
 ];
 
+// Universal Viewport Staged Delay & Element-by-Element Motion Variants (Family 5: Bento Feature Cards)
+const bentoGridContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      delayChildren: 1.2, // Staged delay after entering screen viewport
+      staggerChildren: 0.18, // Stagger each card separately
+    },
+  },
+};
+
+const bentoCardVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 1.4,
+      ease: [0.16, 1, 0.3, 1],
+      staggerChildren: 0.12,
+      delayChildren: 0.15,
+    },
+  },
+};
+
+const bentoWatermarkVariants = {
+  hidden: { opacity: 0, x: 20, y: -15, rotate: 6 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    rotate: 0,
+    transition: { duration: 1.3, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const bentoIconVariants = {
+  hidden: { opacity: 0, scale: 0.7 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { type: "spring", stiffness: 140, damping: 20 },
+  },
+};
+
+const bentoBadgeVariants = {
+  hidden: { opacity: 0, y: -12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 1.2, ease: "easeOut" },
+  },
+};
+
+const bentoTitleVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 1.4, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const bentoDescVariants = {
+  hidden: { opacity: 0, y: -15 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 1.3, ease: "easeOut" },
+  },
+};
+
+const bentoBarVariants = {
+  hidden: { opacity: 0, scaleX: 0 },
+  visible: {
+    opacity: 1,
+    scaleX: 1,
+    transition: { duration: 1.2, ease: "easeOut" },
+  },
+};
+
 export default function WhyChooseUs() {
   return (
     <section className="py-20 lg:py-28 bg-background transition-colors duration-300 relative overflow-hidden border-t border-brand-500/15">
@@ -87,7 +170,7 @@ export default function WhyChooseUs() {
                   <div className="p-0.5 rounded-full bg-active/10 text-active shrink-0 mt-0.5">
                     <FiCheckCircle className="w-4 h-4 text-active" />
                   </div>
-                  <span className="leading-snug text-[#535C91] dark:text-[#9290C3] font-medium">
+                  <span className="leading-snug text-secondary font-medium">
                     {pillar}
                   </span>
                 </div>
@@ -98,19 +181,19 @@ export default function WhyChooseUs() {
             <motion.div layout className="grid grid-cols-3 gap-4 pt-6 border-t border-brand-500/15 font-['Outfit']">
               <div>
                 <p className="text-2xl sm:text-3xl font-black text-active tracking-tight">98.4%</p>
-                <p className="text-[10px] sm:text-xs text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider mt-0.5">
+                <p className="text-[10px] sm:text-xs text-secondary font-bold uppercase tracking-wider mt-0.5">
                   Retention Rate
                 </p>
               </div>
               <div>
                 <p className="text-2xl sm:text-3xl font-black text-active tracking-tight">45+</p>
-                <p className="text-[10px] sm:text-xs text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider mt-0.5">
+                <p className="text-[10px] sm:text-xs text-secondary font-bold uppercase tracking-wider mt-0.5">
                   Weekly Classes
                 </p>
               </div>
               <div>
                 <p className="text-2xl sm:text-3xl font-black text-active tracking-tight">24/7</p>
-                <p className="text-[10px] sm:text-xs text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider mt-0.5">
+                <p className="text-[10px] sm:text-xs text-secondary font-bold uppercase tracking-wider mt-0.5">
                   Facility Access
                 </p>
               </div>
@@ -135,52 +218,76 @@ export default function WhyChooseUs() {
 
           </motion.div>
 
-          {/* Right Column: 4-Card Bento Grid Architecture (7 cols) */}
-          <motion.div layout className="lg:col-span-7">
+          {/* Right Column: 4-Card Bento Grid with Universal Viewport Delay & Element Transitions (7 cols) */}
+          <motion.div
+            layout
+            variants={bentoGridContainerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            className="lg:col-span-7"
+          >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-              {FEATURES.map((feature, i) => {
+              {FEATURES.map((feature) => {
                 const Icon = feature.icon;
                 return (
                   <motion.div
                     key={feature.index}
                     layout
-                    initial={{ opacity: 0, y: 22 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-40px" }}
-                    transition={{ duration: 0.55, delay: i * 0.12, ease: TRANSITION_EASE }}
+                    variants={bentoCardVariants}
+                    className="h-full"
                   >
-                    <div className="group relative p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1.5 flex flex-col justify-between h-full shadow-lg hover:shadow-2xl overflow-hidden cursor-pointer">
+                    <div className="group relative p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1.5 flex flex-col justify-between h-full shadow-xs hover:shadow-md overflow-hidden cursor-pointer">
 
                       {/* Watermark Index Number in Top Right */}
-                      <span className="absolute top-4 right-5 font-['Outfit'] font-black text-4xl sm:text-5xl text-foreground/5 dark:text-white/10 group-hover:text-active/30 transition-colors duration-300 select-none pointer-events-none">
+                      <motion.span
+                        variants={bentoWatermarkVariants}
+                        className="absolute top-4 right-5 font-['Outfit'] font-black text-4xl sm:text-5xl text-foreground/5 dark:text-white/10 group-hover:text-active/30 transition-colors duration-300 select-none pointer-events-none"
+                      >
                         {feature.index}
-                      </span>
+                      </motion.span>
 
                       <div>
                         {/* Icon & Category Pill */}
                         <div className="flex items-center justify-between gap-3 mb-5">
-                          <div className="w-12 h-12 rounded-2xl bg-btn-bg/10 dark:bg-active/10 flex items-center justify-center text-active group-hover:scale-110 group-hover:bg-active group-hover:text-white transition-all duration-300 shadow-inner group-hover:animate__animated group-hover:animate__bounceIn">
+                          <motion.div
+                            variants={bentoIconVariants}
+                            className="w-12 h-12 rounded-2xl bg-btn-bg/10 dark:bg-active/10 flex items-center justify-center text-active group-hover:scale-110 group-hover:bg-active group-hover:text-white transition-all duration-300 shadow-inner group-hover:animate__animated group-hover:animate__bounceIn"
+                          >
                             <Icon className="w-5 h-5 transition-transform" />
-                          </div>
+                          </motion.div>
 
-                          <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full border ${feature.badgeColor}`}>
+                          <motion.span
+                            variants={bentoBadgeVariants}
+                            className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full border ${feature.badgeColor}`}
+                          >
                             {feature.tag}
-                          </span>
+                          </motion.span>
                         </div>
 
                         {/* Title */}
-                        <h3 className="font-['Outfit'] text-lg sm:text-xl font-bold text-foreground mb-2.5 leading-snug group-hover:text-active transition-colors group-hover:animate__animated group-hover:animate__headShake">
+                        <motion.h3
+                          variants={bentoTitleVariants}
+                          className="font-['Outfit'] text-lg sm:text-xl font-bold text-foreground mb-2.5 leading-snug group-hover:text-active transition-colors group-hover:animate__animated group-hover:animate__headShake"
+                        >
                           {feature.title}
-                        </h3>
+                        </motion.h3>
 
                         {/* Description */}
-                        <p className="font-['Inter'] text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3] leading-relaxed">
+                        <motion.p
+                          variants={bentoDescVariants}
+                          className="font-['Inter'] text-xs sm:text-sm text-secondary leading-relaxed"
+                        >
                           {feature.description}
-                        </p>
+                        </motion.p>
                       </div>
 
                       {/* Micro Corner Accent Bar */}
-                      <div className="w-10 h-0.5 bg-brand-500/20 group-hover:w-full group-hover:bg-active transition-all duration-500 rounded-full mt-6" />
+                      <motion.div
+                        variants={bentoBarVariants}
+                        style={{ transformOrigin: "left" }}
+                        className="w-10 h-0.5 bg-brand-500/20 group-hover:w-full group-hover:bg-active transition-all duration-500 rounded-full mt-6"
+                      />
 
                     </div>
                   </motion.div>
@@ -192,7 +299,7 @@ export default function WhyChooseUs() {
         </div>
 
         {/* Section Diagnostic Trust Banner */}
-        <div className="mt-14 sm:mt-18 p-6 sm:p-8 rounded-3xl bg-linear-to-r from-brand-800/30 via-[#1B1A55]/40 to-brand-800/30 border border-brand-500/25 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+        <div className="mt-14 sm:mt-18 p-6 sm:p-8 rounded-3xl bg-linear-to-r from-brand-800/30 via-[#1B1A55]/40 to-brand-800/30 border border-brand-500/25 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-active/20 flex items-center justify-center text-active shrink-0 border border-brand-500/30">
               <FiAward className="w-6 h-6 text-active" />
@@ -201,7 +308,7 @@ export default function WhyChooseUs() {
               <h4 className="font-['Outfit'] text-lg sm:text-xl font-extrabold text-foreground">
                 Experience the FlexPulse Standard in Person
               </h4>
-              <p className="font-['Inter'] text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3] mt-0.5">
+              <p className="font-['Inter'] text-xs sm:text-sm text-secondary mt-0.5">
                 Tour our Olympic weight halls, recovery plunge suites, and turf tracks with a master coach.
               </p>
             </div>

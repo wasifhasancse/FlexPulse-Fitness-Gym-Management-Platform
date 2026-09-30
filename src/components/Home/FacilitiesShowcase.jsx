@@ -99,6 +99,108 @@ const FACILITIES = [
   }
 ];
 
+// Universal Viewport Staged Delay & Element-by-Element Motion Variants (Family 4: Facility Cards)
+const facilityGridContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      delayChildren: 1.2, // Staged delay after entering screen viewport
+      staggerChildren: 0.18, // Stagger each card separately
+    },
+  },
+};
+
+const facilityCardVariants = {
+  hidden: { opacity: 0, y: 32, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 1.4,
+      ease: [0.16, 1, 0.3, 1],
+      staggerChildren: 0.12,
+      delayChildren: 0.15,
+    },
+  },
+};
+
+const facilityImgVariants = {
+  hidden: { scale: 1.15, filter: "blur(4px)" },
+  visible: {
+    scale: 1,
+    filter: "blur(0px)",
+    transition: { duration: 1.5, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const facilityBadgeVariants = {
+  hidden: { opacity: 0, x: -25 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { type: "spring", stiffness: 140, damping: 20 },
+  },
+};
+
+const facilityCategoryVariants = {
+  hidden: { opacity: 0, x: 25 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const facilitySpecVariants = {
+  hidden: { opacity: 0, y: 16, scale: 0.85 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 150, damping: 20 },
+  },
+};
+
+const facilityTitleVariants = {
+  hidden: { opacity: 0, y: 20, filter: "blur(3px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 1.5, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const facilityDescVariants = {
+  hidden: { opacity: 0, y: -16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 1.3, ease: "easeOut" },
+  },
+};
+
+const facilityFeatureListVariants = {
+  hidden: { opacity: 0, x: -12 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 1.2, ease: "easeOut" },
+  },
+};
+
+const facilityBtnVariants = {
+  hidden: { opacity: 0, y: 16, scale: 0.92 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 130, damping: 20 },
+  },
+};
+
 export default function FacilitiesShowcase() {
   const [activeCategory, setActiveCategory] = useState("All Amenities");
 
@@ -132,21 +234,21 @@ export default function FacilitiesShowcase() {
           <motion.div layout className="flex items-center gap-4 sm:gap-6 bg-[#535C91]/5 dark:bg-[#1B1A55]/50 p-4 rounded-2xl border border-brand-500/20 shrink-0 font-['Outfit'] self-start lg:self-end">
             <div>
               <p className="text-2xl font-black text-active tracking-tight">4</p>
-              <p className="text-[10px] sm:text-xs text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider">
+              <p className="text-[10px] sm:text-xs text-secondary font-bold uppercase tracking-wider">
                 Flagship Hubs
               </p>
             </div>
             <div className="h-8 w-px bg-brand-500/20" />
             <div>
               <p className="text-2xl font-black text-active tracking-tight">24/7</p>
-              <p className="text-[10px] sm:text-xs text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider">
+              <p className="text-[10px] sm:text-xs text-secondary font-bold uppercase tracking-wider">
                 Keyless Access
               </p>
             </div>
             <div className="h-8 w-px bg-brand-500/20" />
             <div>
               <p className="text-2xl font-black text-active tracking-tight">100%</p>
-              <p className="text-[10px] sm:text-xs text-[#535C91] dark:text-[#9290C3] font-bold uppercase tracking-wider">
+              <p className="text-[10px] sm:text-xs text-secondary font-bold uppercase tracking-wider">
                 Sanitized Daily
               </p>
             </div>
@@ -175,7 +277,7 @@ export default function FacilitiesShowcase() {
                   <span
                     className={`relative z-10 ${isActive
                         ? "text-white"
-                        : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"
+                        : "text-secondary hover:text-foreground"
                       }`}
                   >
                     {category}
@@ -187,9 +289,13 @@ export default function FacilitiesShowcase() {
         </LayoutGroup>
 
         {/* Facilities Grid */}
-        {/* Facilities Grid with Motion FLIP Layout Transitions */}
+        {/* Facilities Grid with Universal Viewport Delay & Element-by-Element Transitions */}
         <motion.div
           layout
+          variants={facilityGridContainerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16"
         >
           <AnimatePresence mode="popLayout">
@@ -197,69 +303,95 @@ export default function FacilitiesShowcase() {
               <motion.div
                 key={fac.id}
                 layout
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 18 }}
-                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="group relative rounded-3xl overflow-hidden bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1.5 flex flex-col shadow-lg hover:shadow-2xl"
+                initial="hidden"
+                animate="visible"
+                exit={{ opacity: 0, scale: 0.94, y: 18, transition: { duration: 0.3 } }}
+                variants={facilityCardVariants}
+                className="group relative rounded-3xl overflow-hidden bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1.5 flex flex-col shadow-xs hover:shadow-md"
               >
                 {/* Image Banner */}
                 <div className="relative h-60 sm:h-64 overflow-hidden">
-                  <Image
-                    src={fac.image}
-                    alt={fac.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
-                  />
+                  <motion.div variants={facilityImgVariants} className="w-full h-full relative">
+                    <Image
+                      src={fac.image}
+                      alt={fac.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+                    />
+                  </motion.div>
                   <div className="absolute inset-0 bg-linear-to-t from-[#070F2B] via-[#070F2B]/40 to-transparent" />
 
-                  {/* Top Badge & Category */}
+                  {/* Top Badge & Category: Triggered from left and right */}
                   <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2">
-                    <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full border backdrop-blur-md ${fac.badgeColor}`}>
+                    <motion.span
+                      variants={facilityBadgeVariants}
+                      className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full border backdrop-blur-md ${fac.badgeColor}`}
+                    >
                       {fac.badge}
-                    </span>
-                    <span className="px-2.5 py-1 rounded-full bg-background/85 dark:bg-[#1B1A55]/90 backdrop-blur-md border border-brand-500/20 text-foreground text-[10px] font-bold uppercase tracking-wider">
+                    </motion.span>
+                    <motion.span
+                      variants={facilityCategoryVariants}
+                      className="px-2.5 py-1 rounded-full bg-background/85 dark:bg-[#1B1A55]/90 backdrop-blur-md border border-brand-500/20 text-foreground text-[10px] font-bold uppercase tracking-wider"
+                    >
                       {fac.category}
-                    </span>
+                    </motion.span>
                   </div>
 
-                  {/* Bottom Image Specs */}
+                  {/* Bottom Image Specs: Triggered upward pop */}
                   <div className="absolute bottom-3 left-3.5 right-3.5 flex items-center justify-between text-xs font-['Inter']">
-                    <span className="px-2.5 py-1 rounded-lg bg-active text-white font-extrabold text-[10px] uppercase tracking-wide shadow-sm">
+                    <motion.span
+                      variants={facilitySpecVariants}
+                      className="px-2.5 py-1 rounded-lg bg-active text-white font-extrabold text-[10px] uppercase tracking-wide shadow-2xs"
+                    >
                       {fac.spec}
-                    </span>
-                    <span className="px-2.5 py-1 rounded-lg bg-background/85 dark:bg-[#1B1A55]/90 backdrop-blur-md border border-brand-500/20 text-foreground text-[10px] font-semibold">
+                    </motion.span>
+                    <motion.span
+                      variants={facilitySpecVariants}
+                      className="px-2.5 py-1 rounded-lg bg-background/85 dark:bg-[#1B1A55]/90 backdrop-blur-md border border-brand-500/20 text-foreground text-[10px] font-semibold"
+                    >
                       {fac.temp}
-                    </span>
+                    </motion.span>
                   </div>
                 </div>
 
                 {/* Body Content */}
                 <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between space-y-5">
                   <div>
-                    <h3 className="font-['Outfit'] text-lg sm:text-xl font-bold text-foreground group-hover:text-active transition-colors leading-tight">
+                    <motion.h3
+                      variants={facilityTitleVariants}
+                      className="font-['Outfit'] text-lg sm:text-xl font-bold text-foreground group-hover:text-active transition-colors leading-tight"
+                    >
                       {fac.title}
-                    </h3>
+                    </motion.h3>
 
-                    <p className="mt-2.5 font-['Inter'] text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3] leading-relaxed line-clamp-3">
+                    <motion.p
+                      variants={facilityDescVariants}
+                      className="mt-2.5 font-['Inter'] text-xs sm:text-sm text-secondary leading-relaxed line-clamp-3"
+                    >
                       {fac.desc}
-                    </p>
+                    </motion.p>
 
-                    {/* Bullet Highlights */}
-                    <div className="mt-4 pt-3.5 border-t border-brand-500/15 space-y-1.5 font-['Inter']">
+                    {/* Bullet Highlights: Staggered horizontal slide */}
+                    <motion.div
+                      variants={facilityFeatureListVariants}
+                      className="mt-4 pt-3.5 border-t border-brand-500/15 space-y-1.5 font-['Inter']"
+                    >
                       {fac.features.map((feature, i) => (
                         <div key={i} className="flex items-center gap-2 text-xs text-foreground/90 font-medium">
                           <FiCheckCircle className="w-3.5 h-3.5 text-active shrink-0" />
                           <span>{feature}</span>
                         </div>
                       ))}
-                    </div>
+                    </motion.div>
                   </div>
 
-                  {/* Card Action Link */}
-                  <div className="pt-4 border-t border-brand-500/15 flex items-center justify-between text-xs font-['Inter']">
-                    <span className="text-[#535C91] dark:text-[#9290C3] font-semibold text-[11px]">
+                  {/* Card Action Link: Triggered spring pop */}
+                  <motion.div
+                    variants={facilityBtnVariants}
+                    className="pt-4 border-t border-brand-500/15 flex items-center justify-between text-xs font-['Inter']"
+                  >
+                    <span className="text-secondary font-semibold text-[11px]">
                       Included in All Full Tiers
                     </span>
                     <Link
@@ -269,7 +401,7 @@ export default function FacilitiesShowcase() {
                       <span>Explore Space</span>
                       <FiArrowRight className="w-3.5 h-3.5" />
                     </Link>
-                  </div>
+                  </motion.div>
                 </div>
               </motion.div>
             ))}
@@ -277,7 +409,7 @@ export default function FacilitiesShowcase() {
         </motion.div>
 
         {/* Bottom CTA Banner */}
-        <div className="rounded-3xl p-6 sm:p-8 bg-linear-to-r from-brand-800/30 via-[#1B1A55]/40 to-brand-800/30 border border-brand-500/25 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+        <div className="rounded-3xl p-6 sm:p-8 bg-linear-to-r from-brand-800/30 via-[#1B1A55]/40 to-brand-800/30 border border-brand-500/25 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-active/20 flex items-center justify-center text-active shrink-0 border border-brand-500/30">
               <FiMaximize2 className="w-6 h-6 text-active" />
@@ -286,7 +418,7 @@ export default function FacilitiesShowcase() {
               <h4 className="font-['Outfit'] text-lg sm:text-xl font-extrabold text-foreground">
                 Want to Experience Our Facilities in Person?
               </h4>
-              <p className="font-['Inter'] text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3] mt-0.5">
+              <p className="font-['Inter'] text-xs sm:text-sm text-secondary mt-0.5">
                 Book a complimentary guided walkthrough with a coach or check real-time facility floorplans.
               </p>
             </div>
