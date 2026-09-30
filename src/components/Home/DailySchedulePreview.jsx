@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo, useRef } from "react";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { motion, AnimatePresence, LayoutGroup, useInView } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
@@ -511,6 +511,17 @@ export default function DailySchedulePreview() {
   const [selectedPeriod, setSelectedPeriod] = useState("all");
   const [cardsTriggered, setCardsTriggered] = useState(false);
   const sectionRef = useRef(null);
+  const scheduleListRef = useRef(null);
+  const isScheduleInView = useInView(scheduleListRef, { once: true, amount: 0.15 });
+
+  useEffect(() => {
+    if (isScheduleInView) {
+      const timer = setTimeout(() => {
+        setCardsTriggered(true);
+      }, 1250);
+      return () => clearTimeout(timer);
+    }
+  }, [isScheduleInView]);
 
   // Counter Value Refs for dynamic 0 -> Target number count animation
   const scheduleClassesValRef = useRef(null);
@@ -772,6 +783,7 @@ export default function DailySchedulePreview() {
 
         {/* Class Rows Container with Staged Delay & Tag-by-Tag Slow Transitions */}
         <motion.div
+          ref={scheduleListRef}
           layout
           variants={scheduleListContainerVariants}
           initial="hidden"
@@ -807,6 +819,8 @@ export default function DailySchedulePreview() {
                     key={`${selectedDay}-${selectedPeriod}-${item.id}`}
                     layout
                     variants={scheduleRowVariants}
+                    initial="hidden"
+                    animate={cardsTriggered ? "visible" : "hidden"}
                     exit={{ opacity: 0, scale: 0.94, y: 16, transition: { duration: 0.3 } }}
                     className="group relative rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1 flex flex-col lg:flex-row lg:items-center justify-between gap-5 shadow-xs hover:shadow-md"
                   >

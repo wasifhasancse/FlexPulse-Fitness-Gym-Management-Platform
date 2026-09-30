@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo, useRef } from "react";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { motion, AnimatePresence, LayoutGroup, useInView } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -329,6 +329,18 @@ const calloutBtn2Variants = {
 
 export default function ProgramsGrid() {
   const [activeCategory, setActiveCategory] = useState("All Disciplines");
+  const gridRef = useRef(null);
+  const isGridInView = useInView(gridRef, { once: true, amount: 0.15 });
+  const [cardsTriggered, setCardsTriggered] = useState(false);
+
+  useEffect(() => {
+    if (isGridInView) {
+      const timer = setTimeout(() => {
+        setCardsTriggered(true);
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [isGridInView]);
   const sectionRef = useRef(null);
 
   // Counter Value Refs for dynamic 0 -> Target number count animation
@@ -540,11 +552,11 @@ export default function ProgramsGrid() {
 
         {/* Programs Grid with Element-by-Element Triggered Transition Animation */}
         <motion.div
+          ref={gridRef}
           layout
           variants={programGridContainerVariants}
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.15 }}
+          animate={cardsTriggered ? "visible" : "hidden"}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
         >
           <AnimatePresence mode="popLayout">
@@ -555,7 +567,7 @@ export default function ProgramsGrid() {
                   key={`${activeCategory}-${prog.title}`}
                   layout
                   initial="hidden"
-                  animate="visible"
+                  animate={cardsTriggered ? "visible" : "hidden"}
                   exit={{
                     opacity: 0,
                     scale: 0.92,

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { motion, AnimatePresence, LayoutGroup, useInView } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
@@ -203,6 +203,18 @@ const facilityBtnVariants = {
 
 export default function FacilitiesShowcase() {
   const [activeCategory, setActiveCategory] = useState("All Amenities");
+  const facilitiesGridRef = useRef(null);
+  const isFacilitiesInView = useInView(facilitiesGridRef, { once: true, amount: 0.15 });
+  const [cardsTriggered, setCardsTriggered] = useState(false);
+
+  useEffect(() => {
+    if (isFacilitiesInView) {
+      const timer = setTimeout(() => {
+        setCardsTriggered(true);
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [isFacilitiesInView]);
 
   const filteredFacilities = useMemo(() => {
     if (activeCategory === "All Amenities") return FACILITIES;
@@ -291,11 +303,11 @@ export default function FacilitiesShowcase() {
         {/* Facilities Grid */}
         {/* Facilities Grid with Universal Viewport Delay & Element-by-Element Transitions */}
         <motion.div
+          ref={facilitiesGridRef}
           layout
           variants={facilityGridContainerVariants}
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.15 }}
+          animate={cardsTriggered ? "visible" : "hidden"}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16"
         >
           <AnimatePresence mode="popLayout">
@@ -304,7 +316,7 @@ export default function FacilitiesShowcase() {
                 key={fac.id}
                 layout
                 initial="hidden"
-                animate="visible"
+                animate={cardsTriggered ? "visible" : "hidden"}
                 exit={{ opacity: 0, scale: 0.94, y: 18, transition: { duration: 0.3 } }}
                 variants={facilityCardVariants}
                 className="group relative rounded-3xl overflow-hidden bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1.5 flex flex-col shadow-xs hover:shadow-md"

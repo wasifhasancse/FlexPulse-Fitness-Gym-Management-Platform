@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { motion, useInView } from "framer-motion";
 import Link from "next/link";
 import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
 import {
@@ -143,6 +144,19 @@ const bentoBarVariants = {
 };
 
 export default function WhyChooseUs() {
+  const bentoGridRef = useRef(null);
+  const isBentoInView = useInView(bentoGridRef, { once: true, amount: 0.15 });
+  const [cardsTriggered, setCardsTriggered] = useState(false);
+
+  useEffect(() => {
+    if (isBentoInView) {
+      const timer = setTimeout(() => {
+        setCardsTriggered(true);
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [isBentoInView]);
+
   return (
     <section className="py-20 lg:py-28 bg-background transition-colors duration-300 relative overflow-hidden border-t border-brand-500/15">
       {/* Background Ambient Lighting Mesh */}
@@ -220,11 +234,11 @@ export default function WhyChooseUs() {
 
           {/* Right Column: 4-Card Bento Grid with Universal Viewport Delay & Element Transitions (7 cols) */}
           <motion.div
+            ref={bentoGridRef}
             layout
             variants={bentoGridContainerVariants}
             initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
+            animate={cardsTriggered ? "visible" : "hidden"}
             className="lg:col-span-7"
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
@@ -234,6 +248,8 @@ export default function WhyChooseUs() {
                   <motion.div
                     key={feature.index}
                     layout
+                    initial="hidden"
+                    animate={cardsTriggered ? "visible" : "hidden"}
                     variants={bentoCardVariants}
                     className="h-full"
                   >
