@@ -1,7 +1,8 @@
 "use client";
 
 import { submitContact, submitTrialPass } from "@/lib/api/getClasses";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, LayoutGroup } from "framer-motion";
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
 import Image from "next/image";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -199,40 +200,15 @@ export default function ContactClient() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          {/* Live Status Pill */}
-          <motion.div
-            initial={{ opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/70 dark:bg-[#1B1A55]/70 border border-brand-500/25 text-xs font-bold tracking-wider uppercase mb-6 shadow-sm backdrop-blur-md"
-          >
-            <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-active font-extrabold">Concierge Desk: Open</span>
-            <span className="text-[#535C91] dark:text-[#9290C3] hidden sm:inline">• Average Reply Time &lt; 2.4 Hours</span>
-          </motion.div>
-
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl sm:text-5xl lg:text-6xl font-black font-['Outfit'] tracking-tight mb-5 leading-[1.08]"
-          >
-            Connect With{" "}
-            <span className="text-active drop-shadow-[0_0_25px_var(--active-color)/0.2]">
-              FlexPulse Athletic HQ
-            </span>
-          </motion.h1>
-
-          {/* Subtitle */}
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-base sm:text-lg text-[#535C91] dark:text-[#9290C3] max-w-2xl mx-auto font-['Inter'] leading-relaxed mb-8"
-          >
-            Whether you&apos;re scheduling a private facility walkthrough, requesting a trainer assessment, or claiming your 1-Day VIP Pass — our team is dedicated to supporting your fitness journey.
-          </motion.p>
+          {/* Hero Header with Exit Animation */}
+          <AnimatedSectionTitle
+            kicker="Concierge Desk: Open • Average Reply Time < 2.4 Hours"
+            title="Connect With FlexPulse Athletic HQ"
+            highlightText="FlexPulse Athletic HQ"
+            subtitle="Whether you're scheduling a private facility walkthrough, requesting a trainer assessment, or claiming your 1-Day VIP Pass — our team is dedicated to supporting your fitness journey."
+            align="center"
+            className="mb-8"
+          />
 
           {/* Quick Jump Action Pills */}
           <motion.div
@@ -679,17 +655,14 @@ export default function ContactClient() {
 
       {/* 3. Dedicated Concierge & Admissions Coordinators Showcase (Full-Width) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20" id="concierge-team">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-brand-500/10 text-active text-xs font-black uppercase tracking-wider mb-3">
-            <FaUserGraduate className="w-3.5 h-3.5" /> Personal Concierge Care
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-black font-['Outfit'] tracking-tight">
-            Meet Your Dedicated Admissions &amp; Coaching Team
-          </h2>
-          <p className="text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3] mt-2 font-['Inter'] leading-relaxed">
-            Real certified coaches and wellness coordinators ready to guide your membership, arrange VIP facility walkthroughs, or structure corporate team packages.
-          </p>
-        </div>
+        <AnimatedSectionTitle
+          kicker="Personal Concierge Care"
+          title="Meet Your Dedicated Admissions & Coaching Team"
+          highlightText="Admissions & Coaching Team"
+          subtitle="Real certified coaches and wellness coordinators ready to guide your membership, arrange VIP facility walkthroughs, or structure corporate team packages."
+          align="center"
+          className="mb-12"
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {CONCIERGE_TEAM.map((member, i) => (
@@ -807,34 +780,43 @@ export default function ContactClient() {
 
       {/* 4. Frequently Asked Questions (FAQ) Section */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-24" id="faqs-section">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 text-active text-xs font-bold uppercase tracking-wider mb-3">
-            <FiHelpCircle className="w-4 h-4" /> Got Questions?
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-black font-['Outfit'] tracking-tight">
-            Frequently Asked Questions
-          </h2>
-          <p className="text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3] mt-2 font-['Inter']">
-            Clear answers about memberships, trial passes, club access, and personal training.
-          </p>
-        </div>
+        <AnimatedSectionTitle
+          kicker="Got Questions?"
+          title="Frequently Asked Questions"
+          highlightText="Asked Questions"
+          subtitle="Clear answers about memberships, trial passes, club access, and personal training."
+          align="center"
+          className="mb-8"
+        />
 
-        {/* FAQ Category Pills */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
-          {["All", "Memberships & Passes", "Facilities & Hours", "Coaching & Assessments"].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setFaqCategory(cat)}
-              className={`px-4 py-2 rounded-full text-xs font-['Inter'] font-bold transition-all cursor-pointer ${
-                faqCategory === cat
-                  ? "bg-active text-btn-text shadow-md scale-105"
-                  : "bg-white/60 dark:bg-[#1B1A55]/30 text-foreground border border-brand-500/20 hover:border-active/40"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+        {/* FAQ Category Pills with Layout Animation */}
+        <LayoutGroup id="contactFaqPillsGroup">
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
+            {["All", "Memberships & Passes", "Facilities & Hours", "Coaching & Assessments"].map((cat) => {
+              const isActive = faqCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setFaqCategory(cat)}
+                  className={`relative px-4 py-2 rounded-full text-xs font-['Inter'] font-bold transition-colors cursor-pointer ${
+                    isActive
+                      ? "text-btn-text"
+                      : "bg-white/60 dark:bg-[#1B1A55]/30 text-foreground border border-brand-500/20 hover:border-active/40"
+                  }`}
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="activeContactFaqPill"
+                      className="absolute inset-0 rounded-full bg-active shadow-md"
+                      transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                    />
+                  )}
+                  <span className="relative z-10">{cat}</span>
+                </button>
+              );
+            })}
+          </div>
+        </LayoutGroup>
 
         {/* FAQ Accordion */}
         <div className="space-y-3 font-['Inter']">

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
 import {
   FaBolt,
   FaCheckCircle,
@@ -84,19 +85,14 @@ export default function ForumHero({ totalPosts = 12 }) {
             </div>
           </div>
 
-          {/* Headline */}
-          <h1 className="font-['Outfit'] text-4xl sm:text-5xl lg:text-6xl font-black text-foreground leading-[1.08] tracking-tight mb-5">
-            Community{" "}
-            <span className="text-active drop-shadow-[0_0_25px_var(--active-color)/0.2]">
-              Training Grounds
-            </span>{" "}
-            &amp; Forum
-          </h1>
-
-          {/* Subtitle */}
-          <p className="font-['Inter'] text-sm sm:text-base text-[#535C91] dark:text-[#9290C3] max-w-xl leading-relaxed mb-6">
-            Exchange science-backed training splits, request movement form critiques from certified coaches, and dial in precision nutrition protocols with competitive athletes.
-          </p>
+          <AnimatedSectionTitle
+            kicker="Live Athlete Hub • 2,480+ Members Active"
+            title="Community Training Grounds & Forum"
+            highlightText="Training Grounds"
+            subtitle="Exchange science-backed training splits, request movement form critiques from certified coaches, and dial in precision nutrition protocols with competitive athletes."
+            align="left"
+            className="mb-4"
+          />
 
           {/* Hero Quick Search Bar */}
           <form

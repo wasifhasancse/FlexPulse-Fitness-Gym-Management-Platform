@@ -4,6 +4,8 @@ import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
 import {
   FiActivity,
   FiArrowRight,
@@ -304,60 +306,52 @@ export default function FitnessCalculatorClient() {
       <div className="max-w-6xl mx-auto space-y-10 sm:space-y-14">
         
         {/* ============================================================== */}
-        {/* 1. HERO HEADER WITH ATHLETIC BADGE & COMPACT TITLE            */}
+        {/* 1. HERO HEADER WITH EXIT ANIMATION & COMPACT TITLE             */}
         {/* ============================================================== */}
         <div className="text-center space-y-3.5 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-active/30 bg-active/10 text-active text-xs font-bold uppercase tracking-wider shadow-xs">
-            <FiActivity size={13} />
-            <span>Biometric Body & Nutrition Suite</span>
-          </div>
+          <AnimatedSectionTitle
+            kicker="Biometric Body & Nutrition Suite"
+            title="Calculate Your Fitness Index"
+            highlightText="Fitness Index"
+            subtitle="Gain clinical clarity into your Body Mass Index (BMI), Basal Metabolic Rate (BMR), Daily Caloric Burn (TDEE), and precision macronutrient targets."
+            align="center"
+            className="mb-2"
+          />
 
-          <h1 className="font-['Outfit'] text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-tight">
-            Calculate Your <span className="text-active">Fitness Index</span>
-          </h1>
-
-          <p className="font-['Inter'] text-xs sm:text-sm text-secondary max-w-xl mx-auto leading-relaxed">
-            Gain clinical clarity into your Body Mass Index (BMI), Basal Metabolic Rate (BMR), Daily Caloric Burn (TDEE), and precision macronutrient targets.
-          </p>
-
-          {/* Mode Switcher Tabs */}
-          <div className="inline-flex p-1 rounded-2xl bg-slate-100 dark:bg-[#121026] border border-slate-200 dark:border-brand-500/20 shadow-xs mt-1">
-            <button
-              onClick={() => setActiveTab("bmi")}
-              className={`flex items-center gap-2 px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                activeTab === "bmi"
-                  ? "bg-active text-btn-text shadow-sm"
-                  : "text-slate-600 dark:text-secondary hover:text-foreground"
-              }`}
-            >
-              <FaHeartbeat size={13} />
-              <span>BMI Calculator</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("macros")}
-              className={`flex items-center gap-2 px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                activeTab === "macros"
-                  ? "bg-active text-btn-text shadow-sm"
-                  : "text-slate-600 dark:text-secondary hover:text-foreground"
-              }`}
-            >
-              <FiPieChart size={13} />
-              <span>Calorie & Macros</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("hydration")}
-              className={`flex items-center gap-2 px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                activeTab === "hydration"
-                  ? "bg-active text-btn-text shadow-sm"
-                  : "text-slate-600 dark:text-secondary hover:text-foreground"
-              }`}
-            >
-              <FaTint size={12} />
-              <span>Hydration Tracker</span>
-            </button>
-          </div>
+          {/* Mode Switcher Tabs with Layout Animation */}
+          <LayoutGroup id="calculatorModeGroup">
+            <div className="inline-flex p-1 rounded-2xl bg-slate-100 dark:bg-[#121026] border border-slate-200 dark:border-brand-500/20 shadow-xs mt-1">
+              {[
+                { id: "bmi", label: "BMI Calculator", icon: FaHeartbeat, size: 13 },
+                { id: "macros", label: "Calorie & Macros", icon: FiPieChart, size: 13 },
+                { id: "hydration", label: "Hydration Tracker", icon: FaTint, size: 12 },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`relative flex items-center gap-2 px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-bold transition-colors cursor-pointer ${
+                      isActive
+                        ? "text-btn-text"
+                        : "text-slate-600 dark:text-secondary hover:text-foreground"
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.span
+                        layoutId="activeCalculatorModePill"
+                        className="absolute inset-0 rounded-xl bg-active shadow-sm"
+                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                      />
+                    )}
+                    <Icon size={tab.size} className="relative z-10" />
+                    <span className="relative z-10">{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </LayoutGroup>
         </div>
 
         {/* ============================================================== */}
@@ -379,31 +373,47 @@ export default function FitnessCalculatorClient() {
                     </p>
                   </div>
 
-                  {/* Unit toggle */}
-                  <div className="inline-flex items-center gap-1 bg-slate-100 dark:bg-background/80 border border-slate-200 dark:border-brand-500/20 rounded-xl p-1 shrink-0 select-none">
-                    <button
-                      type="button"
-                      onClick={() => setUnitSystem("metric")}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                        unitSystem === "metric"
-                          ? "bg-active text-btn-text shadow-xs"
-                          : "text-secondary hover:text-foreground"
-                      }`}
-                    >
-                      Metric
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setUnitSystem("imperial")}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                        unitSystem === "imperial"
-                          ? "bg-active text-btn-text shadow-xs"
-                          : "text-secondary hover:text-foreground"
-                      }`}
-                    >
-                      Imperial
-                    </button>
-                  </div>
+                  {/* Unit toggle with Layout Animation */}
+                  <LayoutGroup id="calculatorBmiUnitGroup">
+                    <div className="inline-flex items-center gap-1 bg-slate-100 dark:bg-background/80 border border-slate-200 dark:border-brand-500/20 rounded-xl p-1 shrink-0 select-none">
+                      <button
+                        type="button"
+                        onClick={() => setUnitSystem("metric")}
+                        className={`relative px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                          unitSystem === "metric"
+                            ? "text-btn-text"
+                            : "text-secondary hover:text-foreground"
+                        }`}
+                      >
+                        {unitSystem === "metric" && (
+                          <motion.span
+                            layoutId="activeCalculatorBmiUnitPill"
+                            className="absolute inset-0 rounded-lg bg-active shadow-xs"
+                            transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                          />
+                        )}
+                        <span className="relative z-10">Metric</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setUnitSystem("imperial")}
+                        className={`relative px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                          unitSystem === "imperial"
+                            ? "text-btn-text"
+                            : "text-secondary hover:text-foreground"
+                        }`}
+                      >
+                        {unitSystem === "imperial" && (
+                          <motion.span
+                            layoutId="activeCalculatorBmiUnitPill"
+                            className="absolute inset-0 rounded-lg bg-active shadow-xs"
+                            transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                          />
+                        )}
+                        <span className="relative z-10">Imperial</span>
+                      </button>
+                    </div>
+                  </LayoutGroup>
                 </div>
 
                 {/* Gender Select */}
