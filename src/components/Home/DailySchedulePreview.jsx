@@ -365,7 +365,16 @@ const timeBlockVariants = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { type: "spring", stiffness: 110, damping: 20 },
+    transition: { type: "spring", stiffness: 120, damping: 20 },
+  },
+};
+
+const timeDurationVariants = {
+  hidden: { opacity: 0, y: 6 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 1.2, ease: "easeOut" },
   },
 };
 
@@ -422,6 +431,24 @@ const capacityBarVariants = {
     opacity: 1,
     y: 0,
     transition: { duration: 1.5, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const capacityFillVariants = {
+  hidden: { scaleX: 0, opacity: 0 },
+  visible: {
+    scaleX: 1,
+    opacity: 1,
+    transition: { duration: 1.4, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const statusBadgeVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { type: "spring", stiffness: 160, damping: 20 },
   },
 };
 
@@ -603,11 +630,6 @@ export default function DailySchedulePreview() {
         },
         "titleEnd"
       );
-
-      // 6. Staged Card Entrance Trigger: Card transition will start after a certain time of this section
-      tl.call(() => {
-        setCardsTriggered(true);
-      }, null, 1.25);
     },
     { scope: sectionRef }
   );
@@ -834,9 +856,12 @@ export default function DailySchedulePreview() {
                         <span className="block text-base sm:text-lg font-black font-['Outfit'] text-foreground group-hover:text-active transition-colors leading-tight">
                           {item.time}
                         </span>
-                        <span className="block text-[11px] font-bold text-secondary mt-0.5">
+                        <motion.span
+                          variants={timeDurationVariants}
+                          className="block text-[11px] font-bold text-secondary mt-0.5"
+                        >
                           {item.duration}
-                        </span>
+                        </motion.span>
                       </motion.div>
 
                       <div className="space-y-1">
@@ -906,7 +931,8 @@ export default function DailySchedulePreview() {
                           <span className="font-semibold text-secondary">
                             {item.enrolled}/{item.capacity} Spots
                           </span>
-                          <span
+                          <motion.span
+                            variants={statusBadgeVariants}
                             className={`font-bold text-[10px] uppercase px-1.5 py-0.5 rounded shadow-2xs ${
                               isWaitlist
                                 ? "bg-rose-500/10 text-rose-500 border border-rose-500/20"
@@ -916,14 +942,15 @@ export default function DailySchedulePreview() {
                             }`}
                           >
                             {item.status}
-                          </span>
+                          </motion.span>
                         </div>
                         <div className="w-full h-1.5 rounded-full bg-brand-500/15 dark:bg-[#1B1A55] overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${
+                          <motion.div
+                            variants={capacityFillVariants}
+                            className={`h-full rounded-full transition-colors duration-500 ${
                               isWaitlist ? "bg-rose-500" : isFillingFast ? "bg-amber-400" : "bg-active"
                             }`}
-                            style={{ width: `${occupancy}%` }}
+                            style={{ width: `${occupancy}%`, originX: 0 }}
                           />
                         </div>
                       </motion.div>
