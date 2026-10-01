@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -278,197 +279,182 @@ export default function TrialPassBanner() {
     <>
       <section
         ref={sectionRef}
-        className="py-20 lg:py-24 bg-background border-t border-b border-brand-500/15 relative overflow-hidden transition-colors duration-300"
+        className="py-10 sm:py-14 lg:py-18 bg-background border-t border-brand-500/15 relative overflow-hidden transition-colors duration-300"
       >
-        {/* Layered Ambient Mesh Glow */}
-        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 sm:w-140 h-96 sm:h-140 bg-active/8 rounded-full blur-[140px] pointer-events-none -z-10" />
-        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-80 sm:w-120 h-80 sm:h-120 bg-brand-500/10 rounded-full blur-[130px] pointer-events-none -z-10" />
-
+        {/* ── Standard w-11/12 mx-auto Container (matches hero, nav, and other sections) ── */}
         <div className="w-11/12 mx-auto relative z-10">
+          <div className="trial-card-shell relative flex flex-col lg:flex-row min-h-[420px] overflow-hidden rounded-3xl border border-brand-500/20 bg-card-bg shadow-sm">
 
-          {/* High-Impact Athletic VIP Banner Card */}
-          <div className="trial-card-shell relative rounded-3xl sm:rounded-4xl p-8 sm:p-12 lg:p-16 bg-linear-to-br from-white dark:from-[#070F2B] via-[#535C91]/5 dark:via-[#1B1A55]/40 to-white dark:to-[#070F2B] border border-brand-500/25 shadow-sm overflow-hidden">
+          {/* ══ Column 1: Full-Bleed Photo (LEFT ~35%) ══ */}
+          <div className="relative w-full lg:w-[35%] min-h-[260px] lg:min-h-full overflow-hidden flex-shrink-0">
+            <Image
+              src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=900&auto=format&fit=crop"
+              alt="FlexPulse VIP training experience"
+              fill
+              sizes="(max-width: 1024px) 100vw, 35vw"
+              className="object-cover"
+              priority
+            />
+            {/* Gradient right-edge bleed — seamless into content column */}
+            <div className="absolute inset-0 bg-linear-to-r from-black/20 via-black/10 to-white dark:to-[#070F2B]" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent lg:hidden" />
 
-            {/* Watermark Kinetic Typography Background — gentle x-slide + blur clear */}
+            {/* Floating kicker on image */}
             <motion.div
-              variants={watermarkVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.1 }}
-              className="absolute right-0 bottom-0 select-none pointer-events-none text-[90px] sm:text-[140px] lg:text-[180px] font-black font-['Outfit'] tracking-tighter leading-none whitespace-nowrap -z-10"
+              initial={{ opacity: 0, y: -14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.2, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute top-6 left-5"
             >
-              FLEXPULSE VIP
+              <div className="trial-kicker inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/15 text-[10px] font-extrabold uppercase tracking-widest text-white shadow-xs">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-active" />
+                </span>
+                VIP Day Pass • Free
+              </div>
             </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-
-              {/* ── Left Column: Accreditation, Headline, Perks & Social Proof (7 cols) ── */}
-              <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
-
-                {/* Kicker Badge — GSAP downward drop (class: trial-kicker) */}
-                <div className="trial-kicker inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-800/25 dark:bg-[#1B1A55]/70 border border-brand-500/25 text-xs font-bold tracking-wide shadow-xs">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-active" />
-                  </span>
-                  <span className="text-active uppercase tracking-wider font-extrabold text-[11px]">
-                    No Credit Card Required
-                  </span>
-                  <span className="text-[#535C91] dark:text-[#9290C3]">
-                    • 100% Free 1-Day VIP Pass
-                  </span>
-                </div>
-
-                {/* Headline — GSAP upward sweep + blur (class: trial-headline) */}
-                <div className="space-y-1">
-                  <h2 className="trial-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold font-['Outfit'] text-foreground tracking-tight leading-[1.12]">
-                    Ready to Experience{" "}
-                    <span className="text-active inline-block whitespace-nowrap hover:animate-[headShake_1s_ease-in-out]">
-                      FlexPulse?
-                    </span>
-                  </h2>
-                </div>
-
-                {/* Subtitle — GSAP downward drop (class: trial-subtitle) */}
-                <p className="trial-subtitle text-sm sm:text-base text-[#535C91] dark:text-[#9290C3] max-w-xl font-['Inter'] leading-relaxed mx-auto lg:mx-0">
-                  Step inside our flagship training facility. Experience an Olympic lifting session, join a high-tempo class, and recover in our infrared saunas — completely complimentary with zero commitment.
-                </p>
-
-                {/* Perks Checklist — GSAP x-slide from left (class: trial-perks), then each row staggers via Framer */}
-                <motion.div
-                  variants={perksContainerVariants}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.3 }}
-                  className="trial-perks grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-left font-['Inter']"
-                >
-                  {VIP_PERKS.map((perk, idx) => (
-                    <motion.div
-                      key={idx}
-                      variants={perkRowVariants}
-                      className="flex items-center gap-2.5"
-                    >
-                      <div className="p-0.5 rounded-full bg-active/15 text-active shrink-0">
-                        <FiCheckCircle className="w-4 h-4 text-active" />
-                      </div>
-                      <span className="text-xs font-medium text-foreground">
-                        {perk}
-                      </span>
-                    </motion.div>
+            {/* Social proof chips bottom of image */}
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.3, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute bottom-6 left-5 right-5 trial-social-proof"
+            >
+              <div className="flex items-center gap-2 bg-black/55 backdrop-blur-md rounded-2xl px-3 py-2.5 border border-white/10">
+                <div className="flex -space-x-1.5 shrink-0">
+                  {["photo-1534528741775-53994a69daeb","photo-1507003211169-0a1dd7228f2d","photo-1517838277536-f5f99be501cd"].map((id, i) => (
+                    <img key={i} className="h-6 w-6 rounded-full ring-1 ring-white/20 object-cover" src={`https://images.unsplash.com/${id}?w=80&auto=format&fit=crop`} alt="" />
                   ))}
-                </motion.div>
-
-                {/* Social Proof Strip — GSAP upward spring (class: trial-social-proof) */}
-                <div className="trial-social-proof flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-3 border-t border-brand-500/15">
-                  <div className="flex -space-x-2 overflow-hidden shrink-0">
-                    <img
-                      className="inline-block h-7 w-7 rounded-full ring-2 ring-background object-cover"
-                      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop"
-                      alt="FlexPulse Athlete"
-                    />
-                    <img
-                      className="inline-block h-7 w-7 rounded-full ring-2 ring-background object-cover"
-                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop"
-                      alt="FlexPulse Athlete"
-                    />
-                    <img
-                      className="inline-block h-7 w-7 rounded-full ring-2 ring-background object-cover"
-                      src="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=100&auto=format&fit=crop"
-                      alt="FlexPulse Athlete"
-                    />
-                    <div className="inline-flex items-center justify-center h-7 w-7 rounded-full ring-2 ring-background bg-active text-white text-[9px] font-bold">
-                      +1.2k
-                    </div>
-                  </div>
-                  <div className="text-xs text-[#535C91] dark:text-[#9290C3] font-['Inter'] flex items-center gap-1.5">
-                    <div className="flex items-center text-amber-400">
-                      {[...Array(5)].map((_, i) => (
-                        <FiStar key={i} className="w-3 h-3 fill-amber-400" />
-                      ))}
-                    </div>
-                    <span className="font-semibold text-foreground text-xs">
-                      1,200+ VIP Passes Activated This Month
-                    </span>
-                  </div>
+                  <div className="h-6 w-6 rounded-full ring-1 ring-white/20 bg-active flex items-center justify-center text-white text-[8px] font-bold">+1k</div>
                 </div>
-
+                <div>
+                  <div className="flex text-amber-400 mb-0.5">{[...Array(5)].map((_,i)=><FiStar key={i} className="w-2.5 h-2.5 fill-amber-400"/>)}</div>
+                  <p className="text-[9px] text-white/70 font-semibold">1,200+ passes this month</p>
+                </div>
               </div>
+            </motion.div>
+          </div>
 
-              {/* ── Right Column: High-Energy Action Box (5 cols) — Framer viewport-gated ── */}
-              <div
-                ref={actionBoxRef}
-                className="lg:col-span-5 flex flex-col items-center lg:items-end justify-center"
-              >
-                <motion.div
-                  variants={actionBoxVariants}
-                  initial="hidden"
-                  animate={actionBoxTriggered ? "visible" : "hidden"}
-                  className="w-full max-w-sm p-6 sm:p-7 rounded-3xl bg-white/70 dark:bg-[#121026]/80 backdrop-blur-xl border border-brand-500/25 shadow-sm space-y-4 text-center"
-                >
-                  {/* Zap Icon — spring scale pop with rotation */}
-                  <motion.div
-                    variants={actionIconVariants}
-                    className="w-12 h-12 rounded-2xl bg-active/10 text-active flex items-center justify-center mx-auto shadow-inner animate__animated animate__pulse animate__infinite animate__slower"
-                  >
-                    <FiZap className="w-6 h-6 text-active" />
-                  </motion.div>
+          {/* ══ Column 2: Content — Headline, Desc, Perks (CENTER ~40%) ══ */}
+          <div className="flex-1 bg-white dark:bg-[#070F2B] px-8 sm:px-10 lg:px-12 py-14 lg:py-16 flex flex-col justify-center space-y-6">
 
-                  {/* Card Title — upward sweep + blur clear */}
-                  <motion.div variants={actionTitleVariants}>
-                    <h3 className="font-['Outfit'] text-xl font-bold text-foreground">
-                      Instant VIP Access
-                    </h3>
-                  </motion.div>
+            {/* Headline — GSAP upward sweep + blur (class: trial-headline) */}
+            <h2 className="trial-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold font-['Outfit'] text-foreground tracking-tight leading-[1.12]">
+              Ready to Experience{" "}
+              <span className="text-active inline-block whitespace-nowrap hover:animate-[headShake_1s_ease-in-out]">
+                FlexPulse?
+              </span>
+            </h2>
 
-                  {/* Card Description — contrasting downward drop */}
-                  <motion.p
-                    variants={actionDescVariants}
-                    className="text-xs text-[#535C91] dark:text-[#9290C3] font-['Inter']"
-                  >
-                    Digital pass code generated instantly upon request
-                  </motion.p>
+            {/* Subtitle — GSAP downward drop (class: trial-subtitle) */}
+            <p className="trial-subtitle text-sm sm:text-base text-[#535C91] dark:text-[#9290C3] font-['Inter'] leading-relaxed max-w-md">
+              Step inside our flagship training facility. Experience an Olympic lifting session, join a high-tempo class, and recover in our infrared saunas — completely complimentary.
+            </p>
 
-                  {/* Primary CTA — diagonal spring pop from bottom-right */}
-                  <motion.button
-                    variants={primaryCtaVariants}
-                    type="button"
-                    onClick={() => {
-                      setPassCode(null);
-                      setIsOpen(true);
-                    }}
-                    whileHover={{ scale: 1.02, y: -1 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="w-full py-4 px-6 bg-btn-bg text-btn-text hover:opacity-95 font-extrabold rounded-2xl shadow-sm hover:shadow-md active:scale-[0.98] transition-all text-sm sm:text-base cursor-pointer flex items-center justify-center gap-2 group"
-                  >
-                    <FiZap className="w-4 h-4 text-btn-text group-hover:scale-110 transition-transform" />
-                    <span>Claim Free Day Pass</span>
-                  </motion.button>
-
-                  {/* Secondary CTA — x-slide from right */}
-                  <motion.div variants={secondaryCtaVariants}>
-                    <Link
-                      href="/schedule"
-                      className="w-full py-3.5 px-5 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/70 hover:bg-[#535C91]/15 text-foreground font-bold text-xs sm:text-sm border border-brand-500/25 hover:border-active/40 transition-all cursor-pointer flex items-center justify-center gap-2 group"
-                    >
-                      <span>Inspect Class Schedule</span>
-                      <FiArrowRight className="w-3.5 h-3.5 text-active group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                  </motion.div>
-
-                  {/* Fine Print — gentle upward fade */}
-                  <motion.p
-                    variants={finePrintVariants}
-                    className="text-[11px] text-[#535C91] dark:text-[#9290C3] font-['Inter'] pt-1"
-                  >
-                    🔒 No payment info needed • Valid for 7 days
-                  </motion.p>
+            {/* Perks Checklist */}
+            <motion.div
+              variants={perksContainerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
+              className="trial-perks grid grid-cols-1 sm:grid-cols-2 gap-2.5 font-['Inter']"
+            >
+              {VIP_PERKS.map((perk, idx) => (
+                <motion.div key={idx} variants={perkRowVariants} className="flex items-start gap-2">
+                  <div className="mt-0.5 p-0.5 rounded-full bg-active/15 shrink-0">
+                    <FiCheckCircle className="w-3.5 h-3.5 text-active" />
+                  </div>
+                  <span className="text-xs font-medium text-secondary leading-snug">{perk}</span>
                 </motion.div>
-              </div>
+              ))}
+            </motion.div>
 
-            </div>
+            {/* Quick trust tags */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.1, delay: 0.5 }}
+              className="flex flex-wrap gap-2 pt-1"
+            >
+              {["No credit card needed", "Valid 7 days", "All facilities included"].map((tag, i) => (
+                <span key={i} className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-brand-500/8 dark:bg-[#1B1A55]/50 border border-brand-500/15 text-secondary">
+                  {tag}
+                </span>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* ══ Column 3: Action Box (RIGHT ~25%) ══ */}
+          {/* Subtle tinted bg differentiates without a hard border */}
+          <div
+            ref={actionBoxRef}
+            className="w-full lg:w-[28%] flex-shrink-0 bg-[#535C91]/5 dark:bg-[#1B1A55]/30 px-8 py-14 lg:py-16 flex flex-col items-stretch justify-center"
+          >
+            <motion.div
+              variants={actionBoxVariants}
+              initial="hidden"
+              animate={actionBoxTriggered ? "visible" : "hidden"}
+              className="space-y-4"
+            >
+              {/* Icon */}
+              <motion.div
+                variants={actionIconVariants}
+                className="w-12 h-12 rounded-2xl bg-active/10 text-active flex items-center justify-center shadow-inner animate__animated animate__pulse animate__infinite animate__slower"
+              >
+                <FiZap className="w-6 h-6 text-active" />
+              </motion.div>
+
+              {/* Title */}
+              <motion.div variants={actionTitleVariants}>
+                <h3 className="font-['Outfit'] text-xl font-bold text-foreground leading-snug">
+                  Claim Your Free VIP Day Pass
+                </h3>
+              </motion.div>
+
+              {/* Desc */}
+              <motion.p variants={actionDescVariants} className="text-xs text-secondary font-['Inter'] leading-relaxed">
+                Digital pass code generated instantly — no payment info required.
+              </motion.p>
+
+              {/* Primary CTA */}
+              <motion.button
+                variants={primaryCtaVariants}
+                type="button"
+                onClick={() => { setPassCode(null); setIsOpen(true); }}
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.97 }}
+                className="w-full py-4 px-6 bg-btn-bg text-btn-text hover:opacity-95 font-extrabold rounded-2xl shadow-sm hover:shadow-md active:scale-[0.98] transition-all text-sm cursor-pointer flex items-center justify-center gap-2 group border border-white/20"
+              >
+                <FiZap className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                <span>Claim Free Day Pass</span>
+              </motion.button>
+
+              {/* Secondary CTA */}
+              <motion.div variants={secondaryCtaVariants}>
+                <Link
+                  href="/schedule"
+                  className="w-full py-3 px-5 rounded-2xl bg-white/60 dark:bg-[#070F2B]/60 hover:bg-white dark:hover:bg-[#070F2B] text-foreground font-bold text-xs border border-brand-500/20 hover:border-active/40 transition-all cursor-pointer flex items-center justify-center gap-2 group"
+                >
+                  <span>View Class Schedule</span>
+                  <FiArrowRight className="w-3.5 h-3.5 text-active group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </motion.div>
+
+              {/* Fine print */}
+              <motion.p variants={finePrintVariants} className="text-[11px] text-secondary font-['Inter'] text-center pt-1">
+                🔒 No payment info needed • Valid for 7 days
+              </motion.p>
+            </motion.div>
           </div>
 
         </div>
+        </div>
+
       </section>
 
       {/* VIP Trial Pass Modal — existing AnimatePresence spring (unchanged) */}

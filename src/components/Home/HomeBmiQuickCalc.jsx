@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence, LayoutGroup, useInView } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -540,214 +541,187 @@ export default function HomeBmiQuickCalc() {
     return `/all-classes?category=${encodeURIComponent(currentStatus.targetCategory)}`;
   }, [currentStatus.targetCategory]);
 
+
   return (
     <section
       ref={sectionRef}
-      className="py-20 lg:py-28 bg-background border-t border-brand-500/15 relative overflow-hidden transition-colors duration-300"
+      className="py-16 sm:py-20 lg:py-24 bg-background border-t border-brand-500/15 relative overflow-hidden transition-colors duration-300"
     >
-      {/* Background Ambient Lighting Mesh */}
-      <div className="absolute top-1/4 left-1/10 w-96 sm:w-140 h-96 sm:h-140 bg-active/6 rounded-full blur-[140px] pointer-events-none -z-10" />
-      <div className="absolute bottom-1/4 right-0 w-80 sm:w-120 h-80 sm:h-120 bg-brand-500/8 rounded-full blur-[130px] pointer-events-none -z-10" />
-
       <div className="w-11/12 mx-auto relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 xl:gap-14 items-start">
-          
-          {/* Left Column: Interactive WHO Spectrum Matrix & Actionable Entrypoints (5 cols) */}
-          <div className="lg:col-span-5 space-y-6">
-            {/* Tag 1: Kicker Badge */}
-            <div className="bmi-kicker inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/25 mb-4 backdrop-blur-md">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-active" />
-              </span>
-              <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-widest text-foreground font-['Outfit']">
-                Instant Health Gauge
-              </span>
-              <span className="text-[11px] sm:text-xs text-brand-500/60 font-semibold">•</span>
-              <span className="text-[11px] sm:text-xs font-semibold text-secondary font-['Inter']">
-                Clinical Biometrics
-              </span>
-            </div>
+        {/* Contained Laboratory Biometric Console Deck */}
+        <div className="rounded-3xl border border-brand-500/20 bg-card-bg/95 dark:bg-[#070F2B]/95 backdrop-blur-xl shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 items-stretch">
 
-            {/* Tag 2: Section Headline Title */}
-            <h2 className="bmi-title text-3xl sm:text-4xl md:text-5xl font-black font-['Outfit'] tracking-tight text-foreground leading-[1.15]">
-              Know Your{" "}
-              <span className="text-active inline-block hover:animate-[headShake_1s_ease-in-out]">
-                BMI & Physical Baseline
-              </span>
-            </h2>
+          {/* ══ Column 1: Content — Kicker / Title / Desc / WHO Matrix / Link (LEFT 5 cols) ══ */}
+          <div className="lg:col-span-5 bg-white dark:bg-[#070F2B] p-8 sm:p-10 lg:p-12 flex flex-col justify-between space-y-6 border-b lg:border-b-0 lg:border-r border-brand-500/15">
 
-            {/* Tag 3: Description Paragraph */}
-            <p className="bmi-desc text-sm sm:text-base text-secondary font-['Inter'] leading-relaxed max-w-xl">
-              Body Mass Index (BMI) is a clinical baseline utilized by master trainers to evaluate physical readiness, calibrate training volume, and formulate individualized nutrition protocols.
-            </p>
-
-            {/* Tag 4: Interactive Clinical Spectrum Matrix with Clickable Presets */}
-            <div className="bmi-who-card rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 p-5 shadow-xs hover:shadow-md transition-all space-y-2.5 font-['Inter']">
-              <div className="flex items-center justify-between pb-2.5 border-b border-brand-500/15">
-                <div>
-                  <span className="text-xs font-extrabold uppercase tracking-wider text-foreground block">
-                    WHO Classification Standards
-                  </span>
-                  <span className="text-[10px] text-secondary">
-                    Click any tier to preview calibrated baseline
-                  </span>
-                </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-active/10 text-active uppercase tracking-wider">
-                  Interactive
-                </span>
-              </div>
-
-              {/* Tag 5: Preset Tier Rows */}
-              {PRESET_TIERS.map((tier) => {
-                const isSelected = currentStatus.key === tier.key;
-                return (
-                  <motion.button
-                    key={tier.key}
-                    type="button"
-                    whileHover={{ scale: 1.015, x: 3 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => handleApplyPreset(tier)}
-                    className={`bmi-preset-row w-full text-left p-3 rounded-2xl flex items-center justify-between text-xs transition-all duration-300 cursor-pointer ${
-                      isSelected
-                        ? `${tier.bgActive} shadow-xs scale-[1.01]`
-                        : "bg-searchbox-bg hover:bg-searchbox-hover border border-transparent"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className={`w-2.5 h-2.5 rounded-full ${isSelected ? `${tier.dot} animate-pulse` : `${tier.dot}/40`}`} />
-                      <div>
-                        <p className="font-bold text-foreground">{tier.range}</p>
-                        <p className={`text-[11px] ${isSelected ? tier.color : "text-secondary"}`}>
-                          {tier.label}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {isSelected ? (
-                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wide bg-background/80 ${tier.color}`}>
-                          Active Match
-                        </span>
-                      ) : (
-                        <span className="text-[10px] text-secondary opacity-60">
-                          Try Preset →
-                        </span>
-                      )}
-                    </div>
-                  </motion.button>
-                );
-              })}
-            </div>
-
-            {/* Tag 6: Direct Action Link to Macro & TDEE Calculator */}
-            <div className="bmi-macro-banner pt-1">
-              <Link
-                href={macroCalculatorUrl}
-                className="group p-4 rounded-2xl bg-white dark:bg-[#070F2B] border border-brand-500/25 hover:border-active/60 transition-all duration-300 flex items-center justify-between gap-4 shadow-xs hover:shadow-md cursor-pointer"
-              >
-                <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-foreground block group-hover:text-active transition-colors">
-                    Calculate Exact Macros, TDEE & Target Calorie Burn
-                  </span>
-                  <span className="text-[11px] text-secondary block">
-                    Pre-populated with your {unit === "metric" ? `${heightCm} cm & ${weight} kg` : `${heightFt}'${heightIn}" & ${weightLbs} lbs`} data →
-                  </span>
-                </div>
-                <div className="w-8 h-8 rounded-xl bg-active text-white flex items-center justify-center shrink-0 group-hover:translate-x-1 transition-transform shadow-2xs">
-                  <FiArrowRight className="w-4 h-4" />
-                </div>
-              </Link>
-            </div>
-
+          {/* Kicker Badge */}
+          <div className="bmi-kicker inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/25 backdrop-blur-md w-fit">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-active" />
+            </span>
+            <span className="text-[11px] font-extrabold uppercase tracking-widest text-foreground font-['Outfit']">
+              Instant Health Gauge
+            </span>
+            <span className="text-[11px] text-brand-500/60 font-semibold">•</span>
+            <span className="text-[11px] font-semibold text-secondary font-['Inter']">
+              Clinical BMI
+            </span>
           </div>
 
-          {/* Right Column: Interactive Biometric Console & Real-time Action Matching (7 cols) */}
-          <div className="lg:col-span-7 space-y-6">
-            <motion.div
-              ref={consoleRef}
-              layout
-              variants={consoleShellVariants}
-              initial="hidden"
-              animate={cardsTriggered ? "visible" : "hidden"}
-              className="p-6 sm:p-8 lg:p-10 rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 shadow-xs hover:shadow-md relative overflow-hidden transition-all duration-300"
-            >
-              
-              {/* Console Top Header */}
-              <motion.div
-                variants={consoleHeaderVariants}
-                className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-brand-500/15 gap-4"
-              >
-                <div>
-                  <h3 className="font-['Outfit'] text-2xl font-extrabold text-foreground">
-                    Biometric Console
-                  </h3>
-                  <p className="text-xs text-[#535C91] dark:text-[#9290C3] mt-0.5">
-                    Adjust biometric parameters to view immediate physiological classification
-                  </p>
-                </div>
+          {/* Headline */}
+          <h2 className="bmi-title text-3xl sm:text-4xl font-black font-['Outfit'] tracking-tight text-foreground leading-[1.15]">
+            Know Your{" "}
+            <span className="text-active inline-block hover:animate-[headShake_1s_ease-in-out]">
+              BMI &amp; Physical Baseline
+            </span>
+          </h2>
 
-                {/* Metric / Imperial Segmented Controller - Single Line Pill Design with Motion Layout Animation */}
-                <motion.div variants={unitSwitchVariants}>
-                  <LayoutGroup id="bmiQuickCalcUnitGroup">
-                    <div className="inline-flex items-center p-1 rounded-2xl bg-[#535C91]/10 dark:bg-[#1B1A55]/80 border border-brand-500/20 font-['Inter'] text-xs font-extrabold shrink-0 whitespace-nowrap select-none shadow-xs">
-                      <motion.button
-                        type="button"
-                        whileHover={{ scale: 1.04 }}
-                        whileTap={{ scale: 0.94 }}
-                        onClick={() => handleUnitSwitch("metric")}
-                        className="relative px-4 py-2 rounded-xl transition-colors duration-200 cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5"
-                      >
-                        {unit === "metric" && (
-                          <motion.span
-                            layoutId="activeBmiUnitTab"
-                            className="absolute inset-0 bg-active rounded-xl shadow-xs"
-                            transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                          />
-                        )}
-                        <motion.span
-                          animate={{ scale: unit === "metric" ? 1.04 : 1 }}
-                          transition={{ duration: 0.2 }}
-                          className={`relative z-10 ${unit === "metric" ? "text-white font-black" : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"}`}
-                        >
-                          Metric
-                        </motion.span>
-                        <span className={`relative z-10 text-[11px] font-semibold ${unit === "metric" ? "text-white/85" : "text-[#535C91]/70 dark:text-[#9290C3]/70"}`}>
-                          (kg/cm)
-                        </span>
-                      </motion.button>
-                      <motion.button
-                        type="button"
-                        whileHover={{ scale: 1.04 }}
-                        whileTap={{ scale: 0.94 }}
-                        onClick={() => handleUnitSwitch("imperial")}
-                        className="relative px-4 py-2 rounded-xl transition-colors duration-200 cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5"
-                      >
-                        {unit === "imperial" && (
-                          <motion.span
-                            layoutId="activeBmiUnitTab"
-                            className="absolute inset-0 bg-active rounded-xl shadow-xs"
-                            transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                          />
-                        )}
-                        <motion.span
-                          animate={{ scale: unit === "imperial" ? 1.04 : 1 }}
-                          transition={{ duration: 0.2 }}
-                          className={`relative z-10 ${unit === "imperial" ? "text-white font-black" : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"}`}
-                        >
-                          Imperial
-                        </motion.span>
-                        <span className={`relative z-10 text-[11px] font-semibold ${unit === "imperial" ? "text-white/85" : "text-[#535C91]/70 dark:text-[#9290C3]/70"}`}>
-                          (lbs/ft)
-                        </span>
-                      </motion.button>
+          {/* Description */}
+          <p className="bmi-desc text-sm text-secondary font-['Inter'] leading-relaxed">
+            Body Mass Index (BMI) is a clinical baseline used by master trainers to evaluate physical readiness, calibrate training volume, and formulate individualized nutrition protocols.
+          </p>
+
+          {/* WHO Classification Matrix */}
+          <div className="bmi-who-card rounded-2xl bg-brand-500/5 dark:bg-[#1B1A55]/30 p-4 space-y-2 font-['Inter']">
+            <div className="flex items-center justify-between pb-2 border-b border-brand-500/10">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-foreground">
+                WHO Classification
+              </span>
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-active/10 text-active uppercase">
+                Click to Preview
+              </span>
+            </div>
+            {PRESET_TIERS.map((tier) => {
+              const isSelected = currentStatus.key === tier.key;
+              return (
+                <motion.button
+                  key={tier.key}
+                  type="button"
+                  whileHover={{ scale: 1.015, x: 3 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleApplyPreset(tier)}
+                  className={`bmi-preset-row w-full text-left p-2.5 rounded-xl flex items-center justify-between text-xs transition-all duration-300 cursor-pointer ${
+                    isSelected
+                      ? `${tier.bgActive} shadow-xs`
+                      : "bg-white/60 dark:bg-[#070F2B]/60 hover:bg-white dark:hover:bg-[#070F2B] border border-transparent"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full ${isSelected ? `${tier.dot} animate-pulse` : `${tier.dot}/40`}`} />
+                    <div>
+                      <p className="font-bold text-foreground text-[11px]">{tier.range}</p>
+                      <p className={`text-[10px] ${isSelected ? tier.color : "text-secondary"}`}>{tier.label}</p>
                     </div>
-                  </LayoutGroup>
-                </motion.div>
-              </motion.div>
+                  </div>
+                  {isSelected && (
+                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-background/80 ${tier.color}`}>
+                      Active
+                    </span>
+                  )}
+                </motion.button>
+              );
+            })}
+          </div>
 
-              {/* Interactive Precision Sliders & Steppers (UX-focused with triggered transitions on tab switch) */}
-              <AnimatePresence mode="wait">
+          {/* Macro Link */}
+          <div className="bmi-macro-banner">
+            <Link
+              href={macroCalculatorUrl}
+              className="group p-3.5 rounded-2xl bg-brand-500/5 dark:bg-[#1B1A55]/30 hover:bg-brand-500/10 border border-brand-500/15 hover:border-active/40 transition-all duration-300 flex items-center justify-between gap-3 cursor-pointer"
+            >
+              <div className="space-y-0.5">
+                <span className="text-[11px] font-bold text-foreground block group-hover:text-active transition-colors">
+                  Calculate Macros, TDEE &amp; Calorie Burn
+                </span>
+                <span className="text-[10px] text-secondary block">
+                  Pre-filled with your {unit === "metric" ? `${heightCm} cm & ${weight} kg` : `${heightFt}'${heightIn}" & ${weightLbs} lbs`} →
+                </span>
+              </div>
+              <div className="w-7 h-7 rounded-lg bg-active text-white flex items-center justify-center shrink-0 group-hover:translate-x-1 transition-transform">
+                <FiArrowRight className="w-3.5 h-3.5" />
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        {/* ══ Column 2: Interactive Biometric Console (RIGHT 7 cols) ══ */}
+        <div className="lg:col-span-7 bg-[#535C91]/5 dark:bg-[#1B1A55]/20 p-8 sm:p-10 lg:p-12 flex flex-col justify-between">
+          <motion.div
+            ref={consoleRef}
+            layout
+            variants={consoleShellVariants}
+            initial="hidden"
+            animate={cardsTriggered ? "visible" : "hidden"}
+            className="relative overflow-hidden space-y-0"
+          >
+            {/* Console Header */}
+            <motion.div
+              variants={consoleHeaderVariants}
+              className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-5 border-b border-brand-500/15 gap-4"
+            >
+              <div>
+                <h3 className="font-['Outfit'] text-xl font-extrabold text-foreground">
+                  Biometric Console
+                </h3>
+                <p className="text-[11px] text-secondary mt-0.5">
+                  Adjust parameters for instant classification
+                </p>
+              </div>
+              <motion.div variants={unitSwitchVariants}>
+                <LayoutGroup id="bmiQuickCalcUnitGroup">
+                  <div className="inline-flex items-center p-1 rounded-xl bg-white/60 dark:bg-[#070F2B]/60 border border-brand-500/15 font-['Inter'] text-xs font-extrabold shrink-0 whitespace-nowrap select-none">
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.94 }}
+                      onClick={() => handleUnitSwitch("metric")}
+                      className="relative px-3 py-1.5 rounded-lg transition-colors duration-200 cursor-pointer whitespace-nowrap inline-flex items-center gap-1"
+                    >
+                      {unit === "metric" && (
+                        <motion.span
+                          layoutId="activeBmiUnitTab"
+                          className="absolute inset-0 bg-active rounded-lg shadow-xs"
+                          transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                        />
+                      )}
+                      <motion.span
+                        animate={{ scale: unit === "metric" ? 1.04 : 1 }}
+                        transition={{ duration: 0.2 }}
+                        className={`relative z-10 ${unit === "metric" ? "text-white font-black" : "text-secondary hover:text-foreground"}`}
+                      >
+                        Metric
+                      </motion.span>
+                    </motion.button>
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.94 }}
+                      onClick={() => handleUnitSwitch("imperial")}
+                      className="relative px-3 py-1.5 rounded-lg transition-colors duration-200 cursor-pointer whitespace-nowrap inline-flex items-center gap-1"
+                    >
+                      {unit === "imperial" && (
+                        <motion.span
+                          layoutId="activeBmiUnitTab"
+                          className="absolute inset-0 bg-active rounded-lg shadow-xs"
+                          transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                        />
+                      )}
+                      <motion.span
+                        animate={{ scale: unit === "imperial" ? 1.04 : 1 }}
+                        transition={{ duration: 0.2 }}
+                        className={`relative z-10 ${unit === "imperial" ? "text-white font-black" : "text-secondary hover:text-foreground"}`}
+                      >
+                        Imperial
+                      </motion.span>
+                    </motion.button>
+                  </div>
+                </LayoutGroup>
+              </motion.div>
+            </motion.div>
+
+            {/* Interactive Sliders & Results (existing inner JSX preserved below) */}
+            <AnimatePresence mode="wait">
                 {unit === "metric" ? (
                   <motion.div
                     key="metric-tab-panel"
@@ -1130,31 +1104,24 @@ export default function HomeBmiQuickCalc() {
 
               </div>
 
-              {/* Action Buttons Row (Fulfilling Workable Requirement) */}
-              <motion.div
-                variants={consoleBtnVariants}
-                className="flex flex-col sm:flex-row items-center gap-3 pt-2 border-t border-brand-500/15"
-              >
-                
-                {/* WORKABLE BUTTON 2: Find Matched Classes */}
+              {/* Action Buttons Row */}
+              <div className="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-brand-500/15">
                 <Link
                   href={matchedClassUrl}
-                  className="w-full sm:flex-1 py-3 px-5 rounded-2xl bg-btn-bg text-btn-text hover:brightness-105 active:scale-95 font-extrabold text-xs sm:text-sm text-center shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 border border-white/20"
+                  className="w-full sm:flex-1 py-3.5 px-5 rounded-2xl bg-btn-bg text-btn-text hover:brightness-105 active:scale-95 font-extrabold text-xs sm:text-sm text-center shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 border border-white/20"
                 >
                   <FiActivity className="w-4 h-4 text-btn-text" />
                   <span>Find Matched Classes</span>
                 </Link>
 
-                {/* WORKABLE BUTTON 3: Advanced Macro Calculator with Pre-filled Data */}
                 <Link
                   href={macroCalculatorUrl}
-                  className="w-full sm:flex-1 py-3 px-5 rounded-2xl bg-searchbox-bg hover:bg-searchbox-hover text-foreground font-bold text-xs sm:text-sm text-center border border-brand-500/25 hover:border-active/50 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group shadow-xs"
+                  className="w-full sm:flex-1 py-3.5 px-5 rounded-2xl bg-searchbox-bg hover:bg-searchbox-hover text-foreground font-bold text-xs sm:text-sm text-center border border-brand-500/25 hover:border-active/50 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group shadow-xs"
                 >
                   <span>Advanced Macro Calculator</span>
                   <FiArrowRight className="w-4 h-4 text-active group-hover:translate-x-1 transition-transform" />
                 </Link>
-
-              </motion.div>
+              </div>
 
             </motion.div>
           </div>
