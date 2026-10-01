@@ -353,18 +353,34 @@ export default function HomePricingPreview() {
 
         {/* ── Section Header (GSAP-driven element-by-element) ── */}
         <div className="text-center max-w-3xl mx-auto mb-14 sm:mb-18 space-y-4">
-          <AnimatedSectionTitle
-            align="center"
-            badge="Transparent Memberships"
-            badgeDetail="Zero Long-Term Contracts"
-            title="Invest in Your"
-            highlightText="Transformation"
-            subtitle="Transparent pricing with no hidden enrollment fees. Pause, upgrade, or cancel your membership anytime with zero friction."
-            titleKey={`pricing-preview-heading-${billingCycle}`}
-            kickerClassName="pricing-kicker"
-            titleClassName="pricing-title"
-            subtitleClassName="pricing-subtitle"
-          />
+          <div className="space-y-3 flex flex-col items-center">
+            {/* Kicker Badge */}
+            <div className="pricing-kicker inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100/90 dark:bg-white/10 border border-slate-200/80 dark:border-white/10 text-xs font-bold tracking-wide shadow-xs">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-active opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-active" />
+              </span>
+              <span className="text-active uppercase tracking-wider font-extrabold text-[11px]">
+                Transparent Memberships
+              </span>
+              <span className="text-slate-500 dark:text-slate-400">
+                • Zero Long-Term Contracts
+              </span>
+            </div>
+
+            {/* Headline */}
+            <h2 className="pricing-title text-3xl sm:text-4xl lg:text-5xl font-extrabold font-['Outfit'] tracking-tight text-foreground leading-[1.12]">
+              Invest in Your{" "}
+              <span className="text-active inline-block transition-transform hover:scale-105 duration-200 cursor-default">
+                Transformation
+              </span>
+            </h2>
+
+            {/* Subtitle */}
+            <p className="pricing-subtitle text-xs sm:text-sm lg:text-base text-slate-500 dark:text-slate-400 font-['Inter'] leading-relaxed pt-0.5 max-w-2xl mx-auto">
+              Transparent pricing with no hidden enrollment fees. Pause, upgrade, or cancel your membership anytime with zero friction.
+            </p>
+          </div>
 
           {/* Billing Cycle Toggle — GSAP horizontal slide from right */}
           <LayoutGroup id="homePricingCycleGroup">
