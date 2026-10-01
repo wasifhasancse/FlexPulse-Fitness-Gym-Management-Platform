@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
+import { authClient } from "@/lib/auth-client";
 import {
   FaBolt,
   FaCheckCircle,
@@ -29,7 +30,6 @@ function AnimatedTelemetryNumber({ value, prefix = "", suffix = "", duration = 2
     if (!isInView) return;
     const target = typeof value === "number" ? value : parseInt(value, 10) || 0;
     if (target === 0) {
-      setDisplayValue(0);
       return;
     }
     const startTime = performance.now();
@@ -60,6 +60,17 @@ function AnimatedTelemetryNumber({ value, prefix = "", suffix = "", duration = 2
 
 export default function ForumHero({ totalPosts = 12 }) {
   const router = useRouter();
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+  const userRole = (user?.role || "").toLowerCase();
+
+  const getNewPostHref = () => {
+    if (!user) return "/dashboard/member/forum";
+    if (userRole === "admin") return "/dashboard/admin/manageForumPosts";
+    if (userRole === "trainer") return "/dashboard/trainer/my-posts";
+    return "/dashboard/member/forum";
+  };
+
   const [heroSearch, setHeroSearch] = useState("");
 
   const heroRef = useRef(null);
@@ -227,7 +238,7 @@ export default function ForumHero({ totalPosts = 12 }) {
               transition={{ type: "spring", stiffness: 220, damping: 22, delay: 0.5 }}
             >
               <Link
-                href="/dashboard/trainer/forum-post"
+                href={getNewPostHref()}
                 className="inline-flex items-center gap-2 px-6 py-3.5 bg-btn-bg text-btn-text font-bold rounded-2xl shadow-sm hover:shadow-md border border-white/20 hover:opacity-95 hover:-translate-y-0.5 active:scale-95 transition-all text-xs uppercase tracking-wider cursor-pointer"
               >
                 <FaPlus className="w-3.5 h-3.5" />

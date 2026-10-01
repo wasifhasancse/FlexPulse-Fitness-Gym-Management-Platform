@@ -37,11 +37,42 @@ export const deleteForumPost = async (id, token) => {
   return res.json();
 };
 
-export const updateForumPostStatus = async (id, status, token) => {
-  return serverMutation(
-    `/api/admin/forum-posts/${id}`,
-    { status },
-    token,
-    "PATCH",
-  );
+export const createForumPost = async (postData, token) => {
+  const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+  const res = await fetch(`${baseUrl}/api/forumPost`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { authorization: `Bearer ${token}` }),
+    },
+    body: JSON.stringify(postData),
+  });
+  return res.json();
 };
+
+export const updateForumPost = async (id, postData, token) => {
+  const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+  const res = await fetch(`${baseUrl}/api/forumPost/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { authorization: `Bearer ${token}` }),
+    },
+    body: JSON.stringify(postData),
+  });
+  return res.json();
+};
+
+export const updateForumPostStatus = async (id, status, token) => {
+  const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+  const res = await fetch(`${baseUrl}/api/admin/forum-posts/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { authorization: `Bearer ${token}` }),
+    },
+    body: JSON.stringify({ status }),
+  });
+  return res.json();
+};
+

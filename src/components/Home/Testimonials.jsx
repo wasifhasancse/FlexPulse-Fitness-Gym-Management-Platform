@@ -14,6 +14,7 @@ import {
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { getPublicTestimonials } from "@/lib/api/getTestimonials";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -211,6 +212,7 @@ const bottomBarVariants = {
 };
 
 export default function Testimonials() {
+  const [reviewsList, setReviewsList] = useState(REVIEWS);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visibleCards, setVisibleCards] = useState(3);
   const [isPaused, setIsPaused] = useState(false);
@@ -223,6 +225,39 @@ export default function Testimonials() {
 
   const isCarouselInView = useInView(carouselRef, { once: true, amount: 0.1 });
   const [carouselTriggered, setCarouselTriggered] = useState(false);
+
+  // Fetch approved member testimonials dynamically from database
+  useEffect(() => {
+    let ignore = false;
+    const loadLiveApprovedTestimonials = async () => {
+      try {
+        const approved = await getPublicTestimonials();
+        if (!ignore && Array.isArray(approved) && approved.length > 0) {
+          const formatted = approved.map((item) => ({
+            id: item._id,
+            name: item.name || "Athlete Member",
+            role: item.role || "Verified Athlete Member",
+            tenure: item.tenure || "Active Member",
+            achievement: item.achievement || "Milestone Achieved",
+            discipline: item.discipline || "Body Recomposition",
+            image: item.userImage || "https://prio.co.in/avatar.png",
+            quote: item.quote,
+            rating: item.rating || 5,
+            tagColor: item.tagColor || "bg-active/10 text-active border-active/20",
+          }));
+          // Put approved dynamic member testimonials first, followed by legacy verified athlete stories
+          setReviewsList([...formatted, ...REVIEWS]);
+        }
+      } catch (err) {
+        console.error("Failed to load approved live testimonials:", err);
+      }
+    };
+
+    loadLiveApprovedTestimonials();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   // 1.0s staged delay for carousel cards
   useEffect(() => {
@@ -243,11 +278,8 @@ export default function Testimonials() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const maxIndex = Math.max(0, REVIEWS.length - visibleCards);
-
-  useEffect(() => {
-    if (currentIndex > maxIndex) setCurrentIndex(maxIndex);
-  }, [maxIndex, currentIndex]);
+  const maxIndex = Math.max(0, reviewsList.length - visibleCards);
+  const activeIndex = Math.min(currentIndex, maxIndex);
 
   useEffect(() => {
     if (isPaused || maxIndex === 0) return;
@@ -443,11 +475,11 @@ export default function Testimonials() {
         >
           <div
             className="flex transition-transform duration-500 ease-out flex-nowrap py-1"
-            style={{ transform: `translateX(-${currentIndex * (100 / visibleCards)}%)` }}
+            style={{ transform: `translateX(-${activeIndex * (100 / visibleCards)}%)` }}
           >
-            {REVIEWS.map((rev) => (
+            {reviewsList.map((rev) => (
               <div
-                key={rev.id}
+                key={rev.id || rev._id}
                 className="shrink-0 px-3 sm:px-3.5 flex"
                 style={{ width: `${100 / visibleCards}%` }}
               >
@@ -572,7 +604,7 @@ export default function Testimonials() {
           {/* Segmented Pagination Dots */}
           <div className="flex items-center gap-2">
             {Array.from({ length: maxIndex + 1 }).map((_, idx) => {
-              const isActive = currentIndex === idx;
+              const isActive = activeIndex === idx;
               return (
                 <button
                   key={idx}
@@ -610,8 +642,8 @@ export default function Testimonials() {
             </div>
             <div className="h-4 w-px bg-slate-200 dark:bg-white/10" />
             <span className="text-[11px] font-bold text-foreground">
-              Showing 0{currentIndex + 1} - 0{Math.min(currentIndex + visibleCards, REVIEWS.length)} of 0
-              {REVIEWS.length}
+              Showing 0{activeIndex + 1} - 0{Math.min(activeIndex + visibleCards, reviewsList.length)} of 0
+              {reviewsList.length}
             </span>
           </div>
         </motion.div>

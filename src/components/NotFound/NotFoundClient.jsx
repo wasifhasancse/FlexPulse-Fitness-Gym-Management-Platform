@@ -188,7 +188,7 @@ export default function NotFoundClient() {
             >
               <span className="h-[2px] w-8 bg-active rounded-full inline-block shrink-0" />
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-active">
-                <span className="font-['Inter'] italic font-extrabold text-foreground mr-1.5">//</span>
+                <span className="font-['Inter'] italic font-extrabold text-foreground mr-1.5">{"//"}</span>
                 Navigation Error
               </p>
             </motion.div>

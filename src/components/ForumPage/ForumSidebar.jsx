@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef } from "react";
+import { authClient } from "@/lib/auth-client";
 import {
   FaCheckCircle,
   FaFireAlt,
@@ -17,6 +18,17 @@ import {
 
 export default function ForumSidebar({ onTagClick }) {
   const router = useRouter();
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+  const userRole = (user?.role || "").toLowerCase();
+
+  const getNewPostHref = () => {
+    if (!user) return "/dashboard/member/forum";
+    if (userRole === "admin") return "/dashboard/admin/manageForumPosts";
+    if (userRole === "trainer") return "/dashboard/trainer/my-posts";
+    return "/dashboard/member/forum";
+  };
+
   const sidebarRef = useRef(null);
   const isInView = useInView(sidebarRef, { once: true, amount: 0.1 });
 
@@ -111,7 +123,7 @@ export default function ForumSidebar({ onTagClick }) {
           transition={{ type: "spring", stiffness: 220, damping: 20, delay: 0.3 }}
         >
           <Link
-            href="/dashboard/trainer/forum-post"
+            href={getNewPostHref()}
             className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-btn-bg text-btn-text font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-all shadow-sm hover:shadow-md active:scale-95 cursor-pointer"
           >
             <FaPlus className="w-3.5 h-3.5" />
