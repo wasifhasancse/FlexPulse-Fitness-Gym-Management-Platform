@@ -1,49 +1,28 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
-import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
+import FacilitiesHeroHeader from "./FacilitiesHeroHeader";
+import FacilitiesFilterDeck from "./FacilitiesFilterDeck";
+import FacilitiesGrid from "./FacilitiesGrid";
+import FacilitiesBrandMarquee from "./FacilitiesBrandMarquee";
+import FacilitiesPeakHours from "./FacilitiesPeakHours";
+import FacilitiesOperatingHours from "./FacilitiesOperatingHours";
+import FacilitiesFaq from "./FacilitiesFaq";
+import FacilitiesVipBanner from "./FacilitiesVipBanner";
+import FacilitySpecsModal from "./FacilitySpecsModal";
+import FacilityTourModal from "./FacilityTourModal";
+
 import {
-  FiCheckCircle,
-  FiClock,
   FiCompass,
-  FiMapPin,
-  FiShield,
-  FiWifi,
   FiZap,
-  FiX,
-  FiMaximize2,
-  FiArrowRight,
-  FiAward,
-  FiCheck,
-  FiSearch,
-  FiGrid,
-  FiList,
-  FiCalendar,
-  FiUsers,
-  FiActivity,
-  FiPhone,
   FiCoffee,
-  FiChevronDown,
-  FiChevronUp,
-  FiLayers,
-  FiEye,
-  FiSliders,
-  FiVolume2,
-  FiWind,
 } from "react-icons/fi";
 import {
   FaDumbbell,
   FaFire,
-  FaHeartbeat,
-  FaWater,
   FaSpa,
-  FaShieldAlt,
-  FaTemperatureHigh,
-  FaTemperatureLow,
-  FaCheckCircle,
+  FaWater,
+  FaHeartbeat,
 } from "react-icons/fa";
 
 // 8 Complete, authentic zones with multi-angle photography and detailed specs
@@ -378,7 +357,7 @@ const FACILITY_ZONES = [
   },
 ];
 
-// Highlight Ticker Items for the Top Marquee (Calm velocity, crystal clear typography)
+// Highlight Ticker Items for the Top Marquee
 const TICKER_HIGHLIGHTS = [
   { text: "25,000+ SQ FT ATHLETIC DECK", icon: "⚡", metric: "Olympic Standard" },
   { text: "12 ROGUE MONSTER POWER RIGS", icon: "🏋️", metric: "Heavy Lifting" },
@@ -391,104 +370,6 @@ const TICKER_HIGHLIGHTS = [
   { text: "REVERSE OSMOSIS ELECTROLYTE BAR", icon: "💧", metric: "Alkaline 9.5pH" },
   { text: "DYSON SUPERSONIC GROOMING SUITES", icon: "✨", metric: "Executive Care" },
   { text: "HEPA MEDICAL AIR CYCLED EVERY 6 MIN", icon: "🍃", metric: "Clean Mountain Air" },
-];
-
-// Official Commercial Brand Partners (Marquee Lane 1: Heavy Hardware)
-const BRAND_PARTNERS_LANE1 = [
-  {
-    name: "ROGUE FITNESS",
-    flag: "🇺🇸",
-    origin: "USA",
-    category: "Monster Rigs & Barbells",
-    badge: "Official Strength Rig",
-    monogram: "RG",
-    color: "#ff1844",
-  },
-  {
-    name: "ELEIKO",
-    flag: "🇸🇪",
-    origin: "SWEDEN",
-    category: "IWF Certified Plates & Bars",
-    badge: "Olympic Standard",
-    monogram: "EL",
-    color: "#0284c7",
-  },
-  {
-    name: "TECHNOGYM",
-    flag: "🇮🇹",
-    origin: "ITALY",
-    category: "Skillmill Curved Cardio",
-    badge: "Biomechanics Lab",
-    monogram: "TG",
-    color: "#f59e0b",
-  },
-  {
-    name: "CONCEPT2",
-    flag: "🇺🇸",
-    origin: "USA",
-    category: "RowErg & SkiErg PM5",
-    badge: "Ergometer Fleet",
-    monogram: "C2",
-    color: "#10b981",
-  },
-  {
-    name: "BALANCED BODY",
-    flag: "🇺🇸",
-    origin: "USA",
-    category: "Allegro 2 Reformers",
-    badge: "Pilates Apparatus",
-    monogram: "BB",
-    color: "#8b5cf6",
-  },
-];
-
-// Official Commercial Brand Partners (Marquee Lane 2: Recovery & Technology)
-const BRAND_PARTNERS_LANE2 = [
-  {
-    name: "NORMATEC",
-    flag: "🇺🇸",
-    origin: "USA",
-    category: "Pneumatic Compression Boots",
-    badge: "Active Recovery",
-    monogram: "NT",
-    color: "#ec4899",
-  },
-  {
-    name: "EVERLAST PRO",
-    flag: "🇺🇸",
-    origin: "USA",
-    category: "Championship Boxing Rings",
-    badge: "Combat Arena",
-    monogram: "EV",
-    color: "#ef4444",
-  },
-  {
-    name: "DYSON PRO",
-    flag: "🇬🇧",
-    origin: "UK",
-    category: "Supersonic Grooming Suites",
-    badge: "Luxury Amenity",
-    monogram: "DY",
-    color: "#a855f7",
-  },
-  {
-    name: "MYZONE",
-    flag: "🇬🇧",
-    origin: "UK",
-    category: "Live Telemetry Projections",
-    badge: "Biometric Heart Sync",
-    monogram: "MZ",
-    color: "#f97316",
-  },
-  {
-    name: "TORQUE FITNESS",
-    flag: "🇺🇸",
-    origin: "USA",
-    category: "Tank Magnetic Prowler Sleds",
-    badge: "Conditioning Turf",
-    monogram: "TF",
-    color: "#14b8a6",
-  },
 ];
 
 const CATEGORY_TABS = [
@@ -510,35 +391,6 @@ const FLOOR_LEVELS = [
   { id: "lower", label: "Lower Level (Spa & Lockers)", count: 2 },
 ];
 
-const PEAK_HOURS = [
-  { time: "5:00 AM – 7:00 AM", label: "Early Dawn", density: "Moderate (40%)", bar: "w-2/5 bg-emerald-500", note: "Serene & focused" },
-  { time: "7:00 AM – 9:00 AM", label: "Morning Peak", density: "High Traffic (85%)", bar: "w-4/5 bg-active", note: "Fast-paced business flow" },
-  { time: "9:00 AM – 12:00 PM", label: "Midday Window", density: "Optimal Open Floor (30%)", bar: "w-1/3 bg-emerald-500", note: "Plentiful squat racks" },
-  { time: "12:00 PM – 2:00 PM", label: "Lunch Rush", density: "Moderate Activity (55%)", bar: "w-7/12 bg-amber-500", note: "Quick HIIT & steam" },
-  { time: "2:00 PM – 5:00 PM", label: "Afternoon Serene", density: "Low Density (25%)", bar: "w-1/4 bg-emerald-500", note: "Ultra quiet & open" },
-  { time: "5:00 PM – 8:00 PM", label: "Evening Rush", density: "Peak Session (90%)", bar: "w-11/12 bg-active", note: "High energy music & buzz" },
-  { time: "8:00 PM – 11:00 PM", label: "Night Focus", density: "Quiet Hours (35%)", bar: "w-1/3 bg-emerald-500", note: "Optimal cold plunge flow" },
-];
-
-const FAQS = [
-  {
-    q: "Are luxury locker rooms and towel services included in standard membership?",
-    a: "Yes! All active FlexPulse memberships and paid day-pass holders receive full access to our executive locker suites, rain showers, Malin+Goetz grooming amenities, and complimentary steamed eucalyptus towel service.",
-  },
-  {
-    q: "How does the Cryo & Cold Plunge Spa access work?",
-    a: "Contrast therapy (cold plunge baths and Finnish sauna) is open during all club operating hours. Standard members can drop in anytime without reservations, while VIP members can reserve private Normatec compression boot sessions via our mobile app.",
-  },
-  {
-    q: "Can I bring a guest or workout partner to try out the facilities?",
-    a: "Pro and VIP members receive 2 complimentary guest passes each month. First-time visitors can also book a free VIP facility walkthrough and trial session by using the 'Book Club Tour' button on this page.",
-  },
-  {
-    q: "Is dedicated parking and EV charging available on site?",
-    a: "We provide two subterranean parking decks with 180 reserved spaces for members, including 12 complimentary 50kW Level-2 EV charging bays with a 2-hour workout grace period.",
-  },
-];
-
 export default function FacilitiesClient() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLevel, setSelectedLevel] = useState("all");
@@ -546,10 +398,6 @@ export default function FacilitiesClient() {
   const [viewMode, setViewMode] = useState("split"); // 'split' | 'grid' | 'blueprint'
   const [activeModalZone, setActiveModalZone] = useState(null);
   const [showTourModal, setShowTourModal] = useState(false);
-  const [openFaqIndex, setOpenFaqIndex] = useState(null);
-  
-  // Active photo angle index per zone ID for multi-angle thumbnail preview
-  const [activeGalleryIndices, setActiveGalleryIndices] = useState({});
 
   // Tour Booking Form State
   const [tourForm, setTourForm] = useState({
@@ -595,39 +443,47 @@ export default function FacilitiesClient() {
     });
   }, [selectedCategory, selectedLevel, searchQuery]);
 
-  // Handle Tour Submit
   const handleTourSubmit = (e) => {
     e.preventDefault();
     setTourSubmitted(true);
   };
 
-  const handleThumbnailSelect = (zoneId, index, e) => {
-    e.stopPropagation();
-    setActiveGalleryIndices((prev) => ({
-      ...prev,
-      [zoneId]: index,
-    }));
+  const resetAllFilters = () => {
+    setSearchQuery("");
+    setSelectedCategory("all");
+    setSelectedLevel("all");
+  };
+
+  const handleOpenTourWithZone = (zone) => {
+    if (zone && zone.name) {
+      setTourForm((prev) => ({
+        ...prev,
+        focusZone: zone.name,
+      }));
+    }
+    setTourSubmitted(false);
+    setShowTourModal(true);
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pt-3 pb-12 sm:pt-4 sm:pb-16 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto space-y-8 sm:space-y-12">
-        
-        {/* ============================================================== */}
-        {/* 1. TOP LIVE TICKER MARQUEE (CALM VELOCITY, HIGH CONTRAST)      */}
-        {/* ============================================================== */}
-        <div className="relative overflow-hidden rounded-xl border border-slate-200/90 dark:border-brand-500/25 bg-slate-50/90 dark:bg-[#121026]/90 backdrop-blur-md shadow-xs py-2.5 px-2 mask-marquee">
+    <div className="min-h-screen bg-background text-foreground py-8 sm:py-12 transition-colors duration-300">
+      {/* ============================================================== */}
+      {/* UNIVERSAL CONTAINER WIDTH: Strict w-11/12 mx-auto matching Nav/Footer */}
+      {/* ============================================================== */}
+      <div className="w-11/12 mx-auto relative z-10 space-y-8 sm:space-y-12">
+        {/* 1. TOP LIVE TICKER MARQUEE */}
+        <div className="relative overflow-hidden rounded-2xl border border-brand-500/20 bg-brand-900/40 dark:bg-[#121026]/75 backdrop-blur-xl shadow-xs py-2.5 px-2 mask-marquee">
           <div className="animate-marquee-ticker flex items-center gap-7 whitespace-nowrap">
             {[...TICKER_HIGHLIGHTS, ...TICKER_HIGHLIGHTS, ...TICKER_HIGHLIGHTS].map((item, idx) => (
               <div
                 key={`ticker-${idx}`}
-                className="inline-flex items-center gap-2.5 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-secondary hover:text-foreground transition-colors cursor-default"
+                className="inline-flex items-center gap-2.5 text-xs font-bold uppercase tracking-wider text-secondary hover:text-foreground transition-colors cursor-default"
               >
-                <span className="w-6 h-6 rounded-md bg-white dark:bg-white/10 border border-slate-200/90 dark:border-white/10 flex items-center justify-center text-xs shadow-2xs shrink-0">
+                <span className="w-6 h-6 rounded-lg bg-card-bg dark:bg-white/10 border border-brand-500/15 flex items-center justify-center text-xs shadow-2xs shrink-0">
                   {item.icon}
                 </span>
-                <span className="text-slate-900 dark:text-foreground font-black tracking-tight">{item.text}</span>
-                <span className="px-2 py-0.5 rounded-full bg-active/10 dark:bg-active/20 border border-active/30 text-active text-[10px] font-extrabold tracking-wide">
+                <span className="text-foreground font-black tracking-tight">{item.text}</span>
+                <span className="px-2 py-0.5 rounded-full bg-active/10 border border-active/30 text-active text-[10px] font-black tracking-wide">
                   {item.metric}
                 </span>
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-active/40 mx-2" />
@@ -636,1284 +492,87 @@ export default function FacilitiesClient() {
           </div>
         </div>
 
-        {/* ============================================================== */}
-        {/* 2. HERO HEADER WITH EXIT ANIMATION                             */}
-        {/* ============================================================== */}
-        <div className="text-center space-y-3.5 max-w-2xl mx-auto relative pt-1 sm:pt-2">
-          <AnimatedSectionTitle
-            kicker="FLEXPULSE ATHLETIC CAMPUS • 25,000 SQ FT"
-            title="Built for Elite Performance"
-            highlightText="Performance"
-            subtitle="Competition-grade powerlifting decks, curved metabolic turf, infrared hot studios, and contrast hydrotherapy recovery spas engineered for serious athletes."
-            align="center"
-            className="mb-1"
-          />
+        {/* 2. HERO HEADER (GSAP ScrollTrigger Entrance & Clean Background) */}
+        <FacilitiesHeroHeader
+          onOpenTourModal={() => {
+            setTourSubmitted(false);
+            setShowTourModal(true);
+          }}
+        />
 
-          {/* Quick Action Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
-            <button
-              onClick={() => {
-                setTourSubmitted(false);
-                setShowTourModal(true);
-              }}
-              className="px-4 py-2 rounded-xl bg-active text-btn-text text-xs sm:text-sm font-bold shadow-sm hover:opacity-90 transition-all flex items-center gap-2 cursor-pointer"
-            >
-              <FiCalendar size={14} /> Schedule VIP Walkthrough
-            </button>
-            <Link
-              href="/all-classes"
-              className="px-4 py-2 rounded-xl border border-slate-300 dark:border-brand-500/25 bg-white dark:bg-background hover:bg-slate-100 dark:hover:bg-brand-500/10 text-xs sm:text-sm font-semibold text-foreground transition-all flex items-center gap-1.5"
-            >
-              <span>Explore Studio Classes</span>
-              <FiArrowRight size={13} />
-            </Link>
-          </div>
-        </div>
+        {/* 3. INTERACTIVE CONTROL DECK (Search, Levels & Category Tabs) */}
+        <FacilitiesFilterDeck
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          selectedLevel={selectedLevel}
+          setSelectedLevel={setSelectedLevel}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          categoryTabs={CATEGORY_TABS}
+          floorLevels={FLOOR_LEVELS}
+          totalZones={FACILITY_ZONES.length}
+          filteredCount={filteredZones.length}
+          facilityZones={FACILITY_ZONES}
+          resetAllFilters={resetAllFilters}
+        />
 
-        {/* ============================================================== */}
-        {/* 3. INFRASTRUCTURE STATS BAR                                   */}
-        {/* ============================================================== */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">
-          <div className="p-4 rounded-2xl bg-white dark:bg-[#121026]/60 border border-slate-200 dark:border-brand-500/20 text-center backdrop-blur-md shadow-xs hover:border-active/40 transition-colors">
-            <span className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground block">
-              25,000+
-            </span>
-            <span className="text-[11px] font-semibold text-secondary uppercase tracking-wider block mt-0.5">
-              Square Feet Arena
-            </span>
-          </div>
+        {/* 4. FACILITY ZONES DISPLAY (Showcase / Cards / Blueprint Ledger) */}
+        <FacilitiesGrid
+          viewMode={viewMode}
+          filteredZones={filteredZones}
+          searchQuery={searchQuery}
+          resetAllFilters={resetAllFilters}
+          onOpenSpecsModal={(zone) => setActiveModalZone(zone)}
+          onOpenTourModal={handleOpenTourWithZone}
+        />
 
-          <div className="p-4 rounded-2xl bg-white dark:bg-[#121026]/60 border border-slate-200 dark:border-brand-500/20 text-center backdrop-blur-md shadow-xs hover:border-active/40 transition-colors">
-            <span className="font-['Outfit'] text-2xl sm:text-3xl font-black text-active block">
-              12 Racks
-            </span>
-            <span className="text-[11px] font-semibold text-secondary uppercase tracking-wider block mt-0.5">
-              Rogue Monster Decks
-            </span>
-          </div>
+        {/* 5. OFFICIAL COMMERCIAL PARTNERSHIPS DUAL-LANE MARQUEE */}
+        <FacilitiesBrandMarquee />
 
-          <div className="p-4 rounded-2xl bg-white dark:bg-[#121026]/60 border border-slate-200 dark:border-brand-500/20 text-center backdrop-blur-md shadow-xs hover:border-active/40 transition-colors">
-            <span className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground block">
-              38°F / 195°F
-            </span>
-            <span className="text-[11px] font-semibold text-secondary uppercase tracking-wider block mt-0.5">
-              Contrast Thermal Spa
-            </span>
-          </div>
+        {/* 6. REAL-TIME TRAFFIC & PEAK HOURS DENSITY GUIDE */}
+        <FacilitiesPeakHours />
 
-          <div className="p-4 rounded-2xl bg-white dark:bg-[#121026]/60 border border-slate-200 dark:border-brand-500/20 text-center backdrop-blur-md shadow-xs hover:border-active/40 transition-colors">
-            <span className="font-['Outfit'] text-2xl sm:text-3xl font-black text-emerald-500 block">
-              24/7 Access
-            </span>
-            <span className="text-[11px] font-semibold text-secondary uppercase tracking-wider block mt-0.5">
-              RFID Keyless Entry
-            </span>
-          </div>
-        </div>
+        {/* 7. CLUB OPERATING HOURS & HYGIENE STANDARDS */}
+        <FacilitiesOperatingHours />
 
-        {/* ============================================================== */}
-        {/* 4. INTERACTIVE CONTROL DECK: SEARCH, LEVEL & VIEW MODE         */}
-        {/* ============================================================== */}
-        <div className="space-y-3.5 max-w-5xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-            {/* Real-time Search Input */}
-            <div className="relative flex-1">
-              <FiSearch
-                size={16}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-secondary pointer-events-none"
-              />
-              <input
-                type="text"
-                placeholder="Search equipment or arena (e.g., Eleiko, Cold Plunge, Turf, Sauna, Rogue)..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-brand-500/20 bg-white dark:bg-[#121026]/60 text-xs sm:text-sm text-foreground placeholder:text-secondary/70 focus:outline-none focus:border-active transition-colors shadow-xs"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-foreground text-xs cursor-pointer"
-                >
-                  <FiX size={14} />
-                </button>
-              )}
-            </div>
+        {/* 8. FACILITY FAQS ACCORDION */}
+        <FacilitiesFaq />
 
-            {/* View Mode Toggle with Layout Animation */}
-            <LayoutGroup id="facilitiesViewModeGroup">
-              <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-[#121026]/70 border border-slate-200 dark:border-brand-500/20 self-end sm:self-auto shrink-0">
-                {[
-                  { id: "split", label: "Showcase (Left/Right)", icon: FiLayers, title: "Alternating Left / Right Showcase" },
-                  { id: "grid", label: "Cards", icon: FiGrid, title: "Card Grid View" },
-                  { id: "blueprint", label: "Specs Ledger", icon: FiList, title: "Blueprint Spec Ledger View" },
-                ].map((item) => {
-                  const Icon = item.icon;
-                  const isActive = viewMode === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => setViewMode(item.id)}
-                      className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                        isActive ? "text-btn-text" : "text-secondary hover:text-foreground"
-                      }`}
-                      title={item.title}
-                    >
-                      {isActive && (
-                        <motion.span
-                          layoutId="activeFacilitiesViewModePill"
-                          className="absolute inset-0 rounded-lg bg-active shadow-xs"
-                          transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                        />
-                      )}
-                      <Icon size={13} className="relative z-10" />
-                      <span className="relative z-10">{item.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </LayoutGroup>
-          </div>
-
-          {/* Level Filter Pills with Layout Animation */}
-          <LayoutGroup id="facilitiesLevelGroup">
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
-              <span className="text-secondary font-bold text-[11px] uppercase tracking-wider mr-1 shrink-0 flex items-center gap-1">
-                <FiMapPin size={12} /> Campus Level:
-              </span>
-              {FLOOR_LEVELS.map((lvl) => {
-                const isSelected = selectedLevel === lvl.id;
-                return (
-                  <button
-                    key={lvl.id}
-                    onClick={() => setSelectedLevel(lvl.id)}
-                    className={`relative px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-                      isSelected
-                        ? "text-white font-bold"
-                        : "bg-white dark:bg-[#121026]/50 border border-slate-200/90 dark:border-brand-500/15 text-slate-700 dark:text-secondary hover:text-foreground"
-                    }`}
-                  >
-                    {isSelected && (
-                      <motion.span
-                        layoutId="activeFacilitiesLevelPill"
-                        className="absolute inset-0 rounded-lg bg-active shadow-xs"
-                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                      />
-                    )}
-                    <span className="relative z-10">{lvl.label} ({lvl.count})</span>
-                  </button>
-                );
-              })}
-            </div>
-          </LayoutGroup>
-
-          {/* Arena Category Tabs Bar with Layout Animation */}
-          <LayoutGroup id="facilitiesCategoryGroup">
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-              {CATEGORY_TABS.map((tab) => {
-                const Icon = tab.icon;
-                const isSelected = selectedCategory === tab.id;
-                const count =
-                  tab.id === "all"
-                    ? FACILITY_ZONES.length
-                    : FACILITY_ZONES.filter((z) => z.categoryKey === tab.id).length;
-
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setSelectedCategory(tab.id)}
-                    className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-                      isSelected
-                        ? "text-btn-text font-bold"
-                        : "bg-white dark:bg-[#121026]/70 border border-slate-200 dark:border-brand-500/20 text-slate-700 dark:text-secondary hover:text-foreground hover:bg-slate-100/80 dark:hover:bg-brand-500/10"
-                    }`}
-                  >
-                    {isSelected && (
-                      <motion.span
-                        layoutId="activeFacilitiesCategoryPill"
-                        className="absolute inset-0 rounded-xl bg-active shadow-sm"
-                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                      />
-                    )}
-                    <Icon size={13} className={`relative z-10 ${isSelected ? "text-white" : "text-active"}`} />
-                    <span className="relative z-10">{tab.label}</span>
-                    <span
-                      className={`relative z-10 px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                        isSelected
-                          ? "bg-black/20 text-white"
-                          : "bg-slate-100 dark:bg-brand-500/15 text-secondary"
-                      }`}
-                    >
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </LayoutGroup>
-        </div>
-
-        {/* ============================================================== */}
-        {/* 5. FACILITY ZONES DISPLAY: ALTERNATING LEFT/RIGHT SHOWCASE     */}
-        {/* ============================================================== */}
-        {filteredZones.length === 0 ? (
-          <div className="text-center py-16 px-4 bg-white dark:bg-[#121026]/40 rounded-2xl border border-slate-200 dark:border-brand-500/20 space-y-3">
-            <FiSearch size={32} className="mx-auto text-secondary opacity-60" />
-            <h3 className="font-['Outfit'] text-lg font-bold text-foreground">
-              No matching facility zones found
-            </h3>
-            <p className="text-xs text-secondary max-w-sm mx-auto">
-              We couldn&apos;t find any arena matching &quot;{searchQuery}&quot;. Try adjusting your search query or reset filters.
-            </p>
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedCategory("all");
-                setSelectedLevel("all");
-              }}
-              className="px-4 py-2 rounded-xl bg-active text-btn-text text-xs font-bold shadow-sm cursor-pointer"
-            >
-              Reset Filters
-            </button>
-          </div>
-        ) : viewMode === "split" ? (
-          /* ============================================================ */
-          /* ALTERNATING LEFT/RIGHT LUXURY EDITORIAL ROWS                 */
-          /* ============================================================ */
-          <div className="space-y-8 sm:space-y-12">
-            {filteredZones.map((zone, index) => {
-              const isImageLeft = index % 2 === 0;
-              const occupancyPct = Math.round(
-                (zone.currentOccupancy / zone.maxCapacity) * 100
-              );
-              const activeGalleryIdx = activeGalleryIndices[zone.id] || 0;
-              const currentImageUrl = zone.gallery[activeGalleryIdx]?.url || zone.image;
-
-              return (
-                <div
-                  key={zone.id}
-                  className="rounded-3xl border border-slate-200/90 dark:border-brand-500/20 hover:border-active/40 bg-white dark:bg-[#121026]/75 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
-                >
-                  <div
-                    className={`flex flex-col ${
-                      isImageLeft ? "lg:flex-row" : "lg:flex-row-reverse"
-                    } items-stretch`}
-                  >
-                    {/* ---------------- IMAGE CONTAINER ---------------- */}
-                    <div className="lg:w-1/2 relative min-h-[320px] sm:min-h-[380px] lg:min-h-[460px] overflow-hidden group">
-                      <Image
-                        src={currentImageUrl}
-                        alt={zone.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                        sizes="(max-width: 1024px) 100vw, 50vw"
-                      />
-                      {/* Artistic overlay gradient */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/20" />
-
-                      {/* Top floating badges */}
-                      <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2">
-                        <span className="px-3 py-1 rounded-full bg-active text-btn-text text-[11px] font-black uppercase tracking-wider shadow-md">
-                          {zone.tag}
-                        </span>
-                        <span className="px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/15 text-white text-[11px] font-bold">
-                          {zone.temp}
-                        </span>
-                      </div>
-
-                      {/* Photo angle thumbnail selector tabs */}
-                      <div className="absolute top-4 right-4 flex items-center gap-1.5 z-10">
-                        {zone.gallery.map((view, vIdx) => (
-                          <button
-                            key={vIdx}
-                            onClick={(e) => handleThumbnailSelect(zone.id, vIdx, e)}
-                            className={`px-2 py-1 rounded-lg text-[10px] font-bold backdrop-blur-md transition-all cursor-pointer ${
-                              activeGalleryIdx === vIdx
-                                ? "bg-active text-white border border-active shadow"
-                                : "bg-black/60 text-white/80 border border-white/10 hover:bg-black/80 hover:text-white"
-                            }`}
-                          >
-                            {view.label}
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* Bottom floating location & dimension badges */}
-                      <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white">
-                        <div className="flex items-center gap-2 text-xs font-semibold bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
-                          <FiMapPin size={13} className="text-active" />
-                          <span>{zone.floor}</span>
-                        </div>
-                        <div className="text-xs font-bold font-mono bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
-                          {zone.footage} • {zone.ceilingHeight}
-                        </div>
-                      </div>
-
-                      {/* Hover action button overlay */}
-                      <button
-                        onClick={() => setActiveModalZone(zone)}
-                        className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-2xs cursor-pointer"
-                      >
-                        <span className="px-4 py-2 rounded-xl bg-white/90 text-black font-bold text-xs shadow-lg flex items-center gap-2 transform translate-y-2 group-hover:translate-y-0 transition-transform">
-                          <FiEye size={14} /> View Arena Specifications
-                        </span>
-                      </button>
-                    </div>
-
-                    {/* ---------------- CONTENT CONTAINER ---------------- */}
-                    <div className="lg:w-1/2 p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6">
-                      <div className="space-y-4">
-                        {/* Category & Occupancy Header */}
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs font-black uppercase tracking-wider text-active">
-                            {zone.category}
-                          </span>
-
-                          <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-brand-500/10 border border-slate-200 dark:border-brand-500/20 text-[11px] font-semibold text-secondary">
-                            <span
-                              className={`w-2 h-2 rounded-full ${
-                                occupancyPct > 75
-                                  ? "bg-active"
-                                  : occupancyPct > 45
-                                  ? "bg-amber-500"
-                                  : "bg-emerald-500"
-                              } animate-pulse`}
-                            />
-                            <span>
-                              {zone.currentOccupancy}/{zone.maxCapacity} ({occupancyPct}%)
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Arena Name */}
-                        <h2 className="font-['Outfit'] text-2xl sm:text-3xl font-black text-slate-900 dark:text-foreground tracking-tight leading-snug">
-                          {zone.name}
-                        </h2>
-
-                        {/* Description */}
-                        <p className="text-xs sm:text-sm text-secondary leading-relaxed">
-                          {zone.description}
-                        </p>
-
-                        {/* Live Capacity Bar */}
-                        <div className="space-y-1 pt-1">
-                          <div className="flex items-center justify-between text-[11px] text-secondary">
-                            <span className="font-semibold text-slate-800 dark:text-foreground">
-                              Arena Capacity Telemetry
-                            </span>
-                            <span>{zone.occupancyStatus}</span>
-                          </div>
-                          <div className="w-full h-2 bg-slate-200 dark:bg-brand-500/20 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full transition-all duration-500 ${
-                                occupancyPct > 75
-                                  ? "bg-active"
-                                  : occupancyPct > 45
-                                  ? "bg-amber-500"
-                                  : "bg-emerald-500"
-                              }`}
-                              style={{ width: `${occupancyPct}%` }}
-                            />
-                          </div>
-                        </div>
-
-                        {/* Certified Hardware Specs Highlights (4 items) */}
-                        <div className="space-y-2 pt-2">
-                          <span className="text-[11px] font-bold text-slate-800 dark:text-foreground uppercase tracking-wider block">
-                            Key Certified Hardware Roster
-                          </span>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-foreground">
-                            {zone.specs.slice(0, 4).map((spec, idx) => (
-                              <div
-                                key={idx}
-                                className="flex items-start gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-[#121026]/50 border border-slate-200/80 dark:border-brand-500/15"
-                              >
-                                <FiCheckCircle
-                                  size={13}
-                                  className="text-active shrink-0 mt-0.5"
-                                />
-                                <span className="line-clamp-2 leading-snug text-slate-700 dark:text-slate-200">
-                                  {spec}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Engineering Highlight */}
-                        {zone.engineering && zone.engineering[0] && (
-                          <div className="text-[11px] text-secondary flex items-center gap-1.5 p-2 rounded-lg bg-slate-100/70 dark:bg-brand-500/5 border border-slate-200/80 dark:border-brand-500/15">
-                            <FiWind size={12} className="text-active shrink-0" />
-                            <span className="truncate">
-                              <strong>Engineering:</strong> {zone.engineering[0]}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Action Bar */}
-                      <div className="pt-4 border-t border-slate-200 dark:border-brand-500/15 flex flex-wrap items-center gap-3">
-                        <button
-                          onClick={() => setActiveModalZone(zone)}
-                          className="px-4 py-2.5 rounded-xl bg-active text-btn-text text-xs font-bold hover:opacity-90 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
-                        >
-                          <FiMaximize2 size={13} /> Full Technical Specs
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setTourForm((prev) => ({
-                              ...prev,
-                              focusZone: zone.name,
-                            }));
-                            setTourSubmitted(false);
-                            setShowTourModal(true);
-                          }}
-                          className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-brand-500/25 bg-white dark:bg-[#121026]/50 hover:border-active text-xs font-bold text-foreground transition-all flex items-center gap-1.5 cursor-pointer"
-                        >
-                          <FiCalendar size={13} className="text-active" /> Book Arena Tour
-                        </button>
-
-                        <Link
-                          href="/all-classes"
-                          className="px-3.5 py-2.5 rounded-xl text-xs font-semibold text-secondary hover:text-foreground transition-colors ml-auto flex items-center gap-1"
-                        >
-                          <span>Classes</span>
-                          <FiArrowRight size={12} />
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : viewMode === "grid" ? (
-          /* ============================================================ */
-          /* COMPACT 3-COLUMN CARD GRID VIEW                              */
-          /* ============================================================ */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-            {filteredZones.map((zone) => {
-              const occupancyPct = Math.round(
-                (zone.currentOccupancy / zone.maxCapacity) * 100
-              );
-
-              return (
-                <div
-                  key={zone.id}
-                  className="group bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 hover:border-active/50 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
-                >
-                  {/* Image Banner */}
-                  <div className="relative h-60 w-full overflow-hidden bg-brand-800/30">
-                    <Image
-                      src={zone.gallery[0]?.url || zone.image}
-                      alt={zone.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
-
-                    {/* Top Badges */}
-                    <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                      <span className="px-2.5 py-1 rounded-full bg-active text-btn-text text-[10px] font-black uppercase tracking-wider shadow">
-                        {zone.tag}
-                      </span>
-                    </div>
-
-                    <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/10 text-white text-[10px] font-bold">
-                      {zone.temp}
-                    </div>
-
-                    {/* Name & Floor on top of image */}
-                    <div className="absolute bottom-3 left-3.5 right-3.5 text-white">
-                      <div className="flex items-center justify-between text-[11px] font-bold text-active uppercase tracking-wider mb-0.5">
-                        <span>{zone.category}</span>
-                        <span className="text-white/80 font-medium normal-case">
-                          {zone.footage}
-                        </span>
-                      </div>
-                      <h3 className="font-['Outfit'] text-lg sm:text-xl font-bold tracking-tight drop-shadow line-clamp-1">
-                        {zone.name}
-                      </h3>
-                      <p className="text-[11px] text-white/70 flex items-center gap-1 mt-0.5">
-                        <FiMapPin size={11} className="text-active" /> {zone.floor}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Card Details */}
-                  <div className="p-5 space-y-4 flex-1 flex flex-col justify-between">
-                    <div className="space-y-3.5">
-                      <p className="text-xs text-secondary leading-relaxed line-clamp-2">
-                        {zone.description}
-                      </p>
-
-                      {/* Live Capacity Meter */}
-                      <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#121026]/50 border border-slate-200/80 dark:border-brand-500/15 space-y-1.5">
-                        <div className="flex items-center justify-between text-[11px]">
-                          <span className="font-bold text-slate-800 dark:text-foreground flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                            Live Capacity
-                          </span>
-                          <span className="text-secondary font-medium">
-                            {zone.currentOccupancy} / {zone.maxCapacity} ({occupancyPct}%)
-                          </span>
-                        </div>
-                        <div className="w-full h-1.5 bg-slate-200 dark:bg-brand-500/20 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              occupancyPct > 75
-                                ? "bg-active"
-                                : occupancyPct > 45
-                                ? "bg-amber-500"
-                                : "bg-emerald-500"
-                            }`}
-                            style={{ width: `${occupancyPct}%` }}
-                          />
-                        </div>
-                        <div className="text-[10px] text-secondary font-medium text-right">
-                          {zone.occupancyStatus}
-                        </div>
-                      </div>
-
-                      {/* Equipment Highlights (first 3) */}
-                      <div className="space-y-1.5">
-                        <span className="text-[10px] font-bold text-slate-800 dark:text-secondary uppercase tracking-wider block">
-                          Featured Certified Equipment
-                        </span>
-                        <ul className="space-y-1 text-xs text-slate-700 dark:text-foreground">
-                          {zone.specs.slice(0, 3).map((spec, idx) => (
-                            <li key={idx} className="flex items-center gap-2 truncate">
-                              <FiCheck className="text-active shrink-0" size={13} />
-                              <span className="truncate">{spec}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-
-                    {/* Action Bar */}
-                    <div className="pt-3.5 border-t border-slate-200 dark:border-brand-500/15 flex items-center justify-between gap-2.5">
-                      <button
-                        onClick={() => setActiveModalZone(zone)}
-                        className="flex-1 py-2.5 rounded-xl bg-active text-btn-text text-xs font-bold hover:opacity-90 shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                      >
-                        <FiMaximize2 size={13} /> Full Specs & Rules
-                      </button>
-
-                      <Link
-                        href="/all-classes"
-                        className="px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-brand-500/25 bg-white dark:bg-background hover:bg-slate-100 dark:hover:bg-brand-500/10 text-xs font-semibold text-foreground transition-colors shrink-0"
-                      >
-                        Classes
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          /* ============================================================ */
-          /* BLUEPRINT SPEC LEDGER TABLE VIEW                             */
-          /* ============================================================ */
-          <div className="rounded-2xl border border-slate-200 dark:border-brand-500/20 bg-white dark:bg-[#121026]/75 overflow-hidden shadow-xs">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="border-b border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-[#121026]/90 text-[11px] font-bold uppercase tracking-wider text-secondary">
-                    <th className="py-3.5 px-4">Arena Name & Zone</th>
-                    <th className="py-3.5 px-4">Floor Level</th>
-                    <th className="py-3.5 px-4">Floor Area</th>
-                    <th className="py-3.5 px-4">Climate Control</th>
-                    <th className="py-3.5 px-4">Live Occupancy</th>
-                    <th className="py-3.5 px-4">Top Equipment</th>
-                    <th className="py-3.5 px-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-brand-500/15 text-foreground">
-                  {filteredZones.map((zone) => {
-                    const pct = Math.round(
-                      (zone.currentOccupancy / zone.maxCapacity) * 100
-                    );
-                    return (
-                      <tr
-                        key={zone.id}
-                        className="hover:bg-slate-50 dark:hover:bg-brand-500/5 transition-colors"
-                      >
-                        <td className="py-4 px-4">
-                          <div className="font-bold text-sm text-foreground">
-                            {zone.name}
-                          </div>
-                          <span className="text-[10px] font-semibold text-active uppercase tracking-wider">
-                            {zone.category}
-                          </span>
-                        </td>
-                        <td className="py-4 px-4 text-secondary whitespace-nowrap">
-                          {zone.floor}
-                        </td>
-                        <td className="py-4 px-4 font-mono font-semibold whitespace-nowrap">
-                          {zone.footage}
-                        </td>
-                        <td className="py-4 px-4 text-secondary whitespace-nowrap">
-                          {zone.temp}
-                        </td>
-                        <td className="py-4 px-4 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <div className="w-16 h-2 bg-slate-200 dark:bg-brand-500/20 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full rounded-full ${
-                                  pct > 75
-                                    ? "bg-active"
-                                    : pct > 45
-                                    ? "bg-amber-500"
-                                    : "bg-emerald-500"
-                                }`}
-                                style={{ width: `${pct}%` }}
-                              />
-                            </div>
-                            <span className="font-medium text-[11px] text-secondary">
-                              {zone.currentOccupancy}/{zone.maxCapacity}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-4 px-4 text-secondary max-w-xs truncate">
-                          {zone.specs[0]}
-                        </td>
-                        <td className="py-4 px-4 text-right whitespace-nowrap">
-                          <button
-                            onClick={() => setActiveModalZone(zone)}
-                            className="px-3 py-1.5 rounded-lg bg-active text-btn-text font-bold text-xs hover:opacity-90 transition-opacity cursor-pointer inline-flex items-center gap-1"
-                          >
-                            <FiMaximize2 size={12} /> Specs
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================== */}
-        {/* 6. OFFICIAL COMMERCIAL PARTNERSHIPS DUAL-LANE MARQUEE          */}
-        {/* ============================================================== */}
-        <div className="space-y-5 pt-2">
-          <div className="text-center space-y-2 max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-active/30 bg-active/10 text-active text-[11px] font-bold uppercase tracking-wider">
-              <FiAward size={14} />
-              <span>Certified Equipment Heritage</span>
-            </div>
-            <h2 className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground tracking-tight">
-              Official Commercial Partnerships
-            </h2>
-            <p className="text-xs sm:text-sm text-secondary leading-relaxed">
-              We exclusively commission competition-sanctioned hardware engineered by the globe&apos;s most prestigious athletic and biomedical manufacturers.
-            </p>
-          </div>
-
-          <div className="space-y-3.5">
-            {/* Lane 1: Heavy Hardware (Forward Scrolling Left) */}
-            <div className="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-brand-500/20 bg-white dark:bg-[#121026]/60 backdrop-blur-md p-3.5 mask-marquee shadow-xs">
-              <div className="animate-marquee-slow flex items-center gap-5 whitespace-nowrap">
-                {[...BRAND_PARTNERS_LANE1, ...BRAND_PARTNERS_LANE1, ...BRAND_PARTNERS_LANE1].map((brand, idx) => (
-                  <div
-                    key={`partner-lane1-${idx}`}
-                    className="inline-flex items-center gap-4 px-5 py-3 rounded-2xl border border-slate-200/90 dark:border-brand-500/20 bg-slate-50 dark:bg-[#121026]/90 hover:border-active/60 transition-all duration-300 shadow-2xs group cursor-default"
-                  >
-                    {/* Brand Monogram Badge */}
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm tracking-wider shadow-inner text-white shrink-0 group-hover:scale-105 transition-transform"
-                      style={{ backgroundColor: brand.color }}
-                    >
-                      {brand.monogram}
-                    </div>
-
-                    <div className="space-y-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className="font-['Outfit'] font-black text-sm text-foreground group-hover:text-active transition-colors">
-                          {brand.name}
-                        </span>
-                        <span className="px-2 py-0.5 rounded-md bg-slate-200/80 dark:bg-brand-500/15 text-slate-700 dark:text-secondary text-[10px] font-bold">
-                          {brand.flag} {brand.origin}
-                        </span>
-                      </div>
-                      <div className="text-[11px] text-secondary font-medium">
-                        {brand.category}
-                      </div>
-                      <div className="text-[10px] text-active font-semibold flex items-center gap-1">
-                        <FaCheckCircle size={10} /> {brand.badge}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Lane 2: Recovery & Technology (Reverse Scrolling Right) */}
-            <div className="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-brand-500/20 bg-white dark:bg-[#121026]/60 backdrop-blur-md p-3.5 mask-marquee shadow-xs">
-              <div className="animate-marquee-reverse-slow flex items-center gap-5 whitespace-nowrap">
-                {[...BRAND_PARTNERS_LANE2, ...BRAND_PARTNERS_LANE2, ...BRAND_PARTNERS_LANE2].map((brand, idx) => (
-                  <div
-                    key={`partner-lane2-${idx}`}
-                    className="inline-flex items-center gap-4 px-5 py-3 rounded-2xl border border-slate-200/90 dark:border-brand-500/20 bg-slate-50 dark:bg-[#121026]/90 hover:border-active/60 transition-all duration-300 shadow-2xs group cursor-default"
-                  >
-                    {/* Brand Monogram Badge */}
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm tracking-wider shadow-inner text-white shrink-0 group-hover:scale-105 transition-transform"
-                      style={{ backgroundColor: brand.color }}
-                    >
-                      {brand.monogram}
-                    </div>
-
-                    <div className="space-y-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className="font-['Outfit'] font-black text-sm text-foreground group-hover:text-active transition-colors">
-                          {brand.name}
-                        </span>
-                        <span className="px-2 py-0.5 rounded-md bg-slate-200/80 dark:bg-brand-500/15 text-slate-700 dark:text-secondary text-[10px] font-bold">
-                          {brand.flag} {brand.origin}
-                        </span>
-                      </div>
-                      <div className="text-[11px] text-secondary font-medium">
-                        {brand.category}
-                      </div>
-                      <div className="text-[10px] text-active font-semibold flex items-center gap-1">
-                        <FaCheckCircle size={10} /> {brand.badge}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ============================================================== */}
-        {/* 7. LIVE TRAFFIC & PEAK HOURS DENSITY GUIDE                     */}
-        {/* ============================================================== */}
-        <div className="rounded-3xl bg-white dark:bg-[#121026]/70 border border-slate-200 dark:border-brand-500/20 p-6 sm:p-8 space-y-6 shadow-xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="space-y-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-active flex items-center gap-1.5">
-                <FiActivity size={14} /> Real-Time Traffic Telemetry
-              </span>
-              <h2 className="font-['Outfit'] text-xl sm:text-2xl font-bold text-foreground">
-                Club Crowd Density & Peak Hours
-              </h2>
-              <p className="text-xs text-secondary">
-                Plan your workouts to match your preferred energy level: quiet & open or peak buzz.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3 text-xs text-secondary self-start sm:self-auto">
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                <span>Low / Calm</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                <span>Moderate</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-active" />
-                <span>Peak Rush</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
-            {PEAK_HOURS.map((slot, idx) => (
-              <div
-                key={idx}
-                className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#121026]/90 border border-slate-200/80 dark:border-brand-500/15 space-y-2 text-center"
-              >
-                <span className="text-[11px] font-bold text-foreground block">
-                  {slot.time}
-                </span>
-                <span className="text-[10px] font-semibold text-secondary uppercase tracking-wider block">
-                  {slot.label}
-                </span>
-                <div className="w-full h-1.5 bg-slate-200 dark:bg-brand-500/20 rounded-full overflow-hidden">
-                  <div className={`h-full rounded-full ${slot.bar}`} />
-                </div>
-                <span className="text-[10px] text-secondary font-medium block">
-                  {slot.density}
-                </span>
-                <span className="text-[9px] text-secondary/70 block italic">
-                  {slot.note}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ============================================================== */}
-        {/* 8. OPERATING HOURS & STANDARDS                                 */}
-        {/* ============================================================== */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 rounded-3xl bg-white dark:bg-[#121026]/70 border border-slate-200 dark:border-brand-500/20 space-y-3 backdrop-blur-md shadow-xs">
-            <div className="flex items-center gap-2 text-active font-bold text-sm">
-              <FiClock size={16} /> Club Operating Hours
-            </div>
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between pb-1.5 border-b border-slate-100 dark:border-brand-500/15">
-                <span className="text-secondary font-medium">Monday – Friday</span>
-                <span className="font-bold text-foreground">05:00 AM – 11:00 PM</span>
-              </div>
-              <div className="flex justify-between pb-1.5 border-b border-slate-100 dark:border-brand-500/15">
-                <span className="text-secondary font-medium">Saturday & Sunday</span>
-                <span className="font-bold text-foreground">07:00 AM – 09:00 PM</span>
-              </div>
-              <div className="flex justify-between pt-0.5">
-                <span className="text-secondary font-medium">Pro & VIP Members</span>
-                <span className="font-bold text-active">24/7 Keycard Access</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-6 rounded-3xl bg-white dark:bg-[#121026]/70 border border-slate-200 dark:border-brand-500/20 space-y-3 backdrop-blur-md shadow-xs">
-            <div className="flex items-center gap-2 text-active font-bold text-sm">
-              <FiShield size={16} /> Hygiene & Sanitization
-            </div>
-            <p className="text-xs text-secondary leading-relaxed">
-              Medical-grade UV-C sterilization runs hourly in locker suites. Touchless disinfectant stations, antibacterial wipes, and chalk-cleaner spray are stationed every 10 meters on the gym floor.
-            </p>
-          </div>
-
-          <div className="p-6 rounded-3xl bg-white dark:bg-[#121026]/70 border border-slate-200 dark:border-brand-500/20 space-y-3 backdrop-blur-md shadow-xs">
-            <div className="flex items-center gap-2 text-active font-bold text-sm">
-              <FiAward size={16} /> Mechanical Calibration
-            </div>
-            <p className="text-xs text-secondary leading-relaxed">
-              Every barbell, cable pulley station, and Concept2 ergometer undergoes bi-weekly mechanical calibration by certified equipment technicians to guarantee peak performance and lifting safety.
-            </p>
-          </div>
-        </div>
-
-        {/* ============================================================== */}
-        {/* 9. FACILITY FAQS ACCORDION                                     */}
-        {/* ============================================================== */}
-        <div className="rounded-3xl bg-white dark:bg-[#121026]/70 border border-slate-200 dark:border-brand-500/20 p-6 sm:p-8 space-y-5 shadow-xs">
-          <div className="text-center space-y-1 max-w-xl mx-auto">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-active">
-              Frequently Asked Questions
-            </span>
-            <h3 className="font-['Outfit'] text-xl sm:text-2xl font-bold text-foreground">
-              Facility Access & Policies
-            </h3>
-          </div>
-
-          <div className="max-w-3xl mx-auto space-y-3">
-            {FAQS.map((faq, index) => {
-              const isOpen = openFaqIndex === index;
-              return (
-                <div
-                  key={index}
-                  className="rounded-2xl border border-slate-200 dark:border-brand-500/15 bg-slate-50 dark:bg-[#121026]/60 overflow-hidden"
-                >
-                  <button
-                    onClick={() => setOpenFaqIndex(isOpen ? null : index)}
-                    className="w-full py-3.5 px-4 text-left flex items-center justify-between gap-3 text-xs sm:text-sm font-bold text-foreground hover:text-active transition-colors cursor-pointer"
-                  >
-                    <span>{faq.q}</span>
-                    {isOpen ? (
-                      <FiChevronUp size={16} className="text-active shrink-0" />
-                    ) : (
-                      <FiChevronDown size={16} className="text-secondary shrink-0" />
-                    )}
-                  </button>
-
-                  {isOpen && (
-                    <div className="px-4 pb-3.5 text-xs text-secondary leading-relaxed border-t border-slate-200 dark:border-brand-500/10 pt-2.5">
-                      {faq.a}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* ============================================================== */}
-        {/* 10. TOUR & MEMBERSHIP CTA BANNER                               */}
-        {/* ============================================================== */}
-        <div className="rounded-3xl bg-white dark:bg-[#121026]/60 border border-slate-200 dark:border-brand-500/20 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-5 shadow-sm">
-          <div className="space-y-1 text-center md:text-left">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-active">
-              Tour & Guest Passes
-            </span>
-            <h2 className="font-['Outfit'] text-xl sm:text-2xl font-bold text-foreground">
-              Experience FlexPulse in Person
-            </h2>
-            <p className="text-xs sm:text-sm text-secondary max-w-xl">
-              Book a complimentary facility walk-through and trial workout session with one of our master trainers today.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2.5 shrink-0">
-            <Link
-              href="/pricing"
-              className="px-5 py-2.5 rounded-xl bg-active text-btn-text font-bold text-xs sm:text-sm shadow-sm hover:opacity-90 transition-all"
-            >
-              View Memberships
-            </Link>
-            <button
-              onClick={() => {
-                setTourSubmitted(false);
-                setShowTourModal(true);
-              }}
-              className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-brand-500/25 bg-white dark:bg-background text-foreground font-bold text-xs sm:text-sm hover:border-active transition-all cursor-pointer"
-            >
-              Book Club Tour
-            </button>
-          </div>
-        </div>
+        {/* 9. VIP TOUR & MEMBERSHIP CTA BANNER */}
+        <FacilitiesVipBanner
+          onOpenTourModal={() => {
+            setTourSubmitted(false);
+            setShowTourModal(true);
+          }}
+        />
       </div>
 
       {/* ============================================================== */}
-      {/* 11. INTERACTIVE ZONE SPECIFICATIONS MODAL                      */}
+      {/* 10. INTERACTIVE ZONE SPECIFICATIONS MODAL                      */}
       {/* ============================================================== */}
-      {activeModalZone && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
-          <div
-            className="fixed inset-0"
-            onClick={() => setActiveModalZone(null)}
-          />
-
-          <div className="relative bg-background border border-brand-500/25 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl z-10 p-6 sm:p-8 space-y-6">
-            {/* Modal Close Button */}
-            <button
-              onClick={() => setActiveModalZone(null)}
-              className="absolute top-4 right-4 p-1.5 rounded-lg text-secondary hover:text-foreground hover:bg-brand-500/10 transition-colors cursor-pointer"
-            >
-              <FiX size={18} />
-            </button>
-
-            {/* Modal Image Header */}
-            <div className="relative h-64 w-full rounded-2xl overflow-hidden border border-brand-500/20 bg-brand-800/30">
-              <Image
-                src={activeModalZone.gallery[0]?.url || activeModalZone.image}
-                alt={activeModalZone.name}
-                fill
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 text-white">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="px-2.5 py-0.5 rounded-full bg-active text-btn-text text-[10px] font-black uppercase tracking-wider shadow">
-                    {activeModalZone.category}
-                  </span>
-                  <span className="text-white/80 text-xs font-semibold">
-                    {activeModalZone.footage} • {activeModalZone.floor}
-                  </span>
-                </div>
-                <h3 className="font-['Outfit'] text-2xl font-black tracking-tight">
-                  {activeModalZone.name}
-                </h3>
-              </div>
-            </div>
-
-            {/* Overview */}
-            <div className="space-y-1.5">
-              <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">
-                Arena Architecture & Environment
-              </h4>
-              <p className="text-xs sm:text-sm text-secondary leading-relaxed">
-                {activeModalZone.description}
-              </p>
-            </div>
-
-            {/* Equipment Specs */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-                <FaDumbbell className="text-active" /> Certified Equipment Roster
-              </h4>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-foreground">
-                {activeModalZone.specs.map((spec, idx) => (
-                  <li
-                    key={idx}
-                    className="flex items-start gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-[#121026]/50 border border-slate-200/80 dark:border-brand-500/15"
-                  >
-                    <FiCheckCircle className="text-active shrink-0 mt-0.5" size={14} />
-                    <span>{spec}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Engineering & Acoustics */}
-            {activeModalZone.engineering && (
-              <div className="space-y-2">
-                <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-                  <FiSliders className="text-active" /> Architectural & Engineering Specs
-                </h4>
-                <ul className="space-y-1 text-xs text-secondary">
-                  {activeModalZone.engineering.map((item, idx) => (
-                    <li key={idx} className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Arena Rules */}
-            {activeModalZone.rules && (
-              <div className="space-y-2">
-                <h4 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
-                  <FiShield className="text-active" /> Etiquette & Safety Protocols
-                </h4>
-                <ul className="space-y-1 text-xs text-secondary">
-                  {activeModalZone.rules.map((rule, idx) => (
-                    <li key={idx} className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-active shrink-0" />
-                      <span>{rule}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Associated Classes */}
-            {activeModalZone.classesAssociated && (
-              <div className="p-3.5 rounded-xl bg-brand-500/5 border border-brand-500/15 text-xs text-secondary flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <span>
-                  Classes Hosted in Arena:{" "}
-                  <strong className="text-foreground">
-                    {activeModalZone.classesAssociated}
-                  </strong>
-                </span>
-                <Link
-                  href="/all-classes"
-                  className="text-active font-bold hover:underline shrink-0"
-                >
-                  Browse Schedule &rarr;
-                </Link>
-              </div>
-            )}
-
-            {/* Modal Bottom Actions */}
-            <div className="pt-3 border-t border-brand-500/15 flex items-center justify-end gap-2.5">
-              <button
-                onClick={() => {
-                  setActiveModalZone(null);
-                  setTourForm((prev) => ({
-                    ...prev,
-                    focusZone: activeModalZone.name,
-                  }));
-                  setTourSubmitted(false);
-                  setShowTourModal(true);
-                }}
-                className="px-4 py-2 rounded-xl bg-active text-btn-text text-xs font-bold shadow-sm hover:opacity-90 transition-opacity cursor-pointer"
-              >
-                Schedule Arena Tour
-              </button>
-              <Link
-                href="/pricing"
-                className="px-4 py-2 rounded-xl border border-brand-500/25 text-xs font-semibold text-foreground hover:border-active transition-colors"
-              >
-                Membership Plans
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
+      <FacilitySpecsModal
+        activeZone={activeModalZone}
+        onClose={() => setActiveModalZone(null)}
+        onOpenTourFromSpecs={(zone) => {
+          setActiveModalZone(null);
+          handleOpenTourWithZone(zone);
+        }}
+      />
 
       {/* ============================================================== */}
-      {/* 12. INTERACTIVE VIP TOUR BOOKING MODAL                         */}
+      {/* 11. INTERACTIVE VIP TOUR BOOKING MODAL                         */}
       {/* ============================================================== */}
-      {showTourModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
-          <div
-            className="fixed inset-0"
-            onClick={() => setShowTourModal(false)}
-          />
-
-          <div className="relative bg-background border border-brand-500/25 rounded-3xl max-w-lg w-full shadow-2xl z-10 p-6 sm:p-7 space-y-5">
-            <button
-              onClick={() => setShowTourModal(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-lg text-secondary hover:text-foreground hover:bg-brand-500/10 transition-colors cursor-pointer"
-            >
-              <FiX size={18} />
-            </button>
-
-            {tourSubmitted ? (
-              <div className="text-center py-6 space-y-4">
-                <div className="w-14 h-14 rounded-full bg-emerald-500/15 text-emerald-500 flex items-center justify-center mx-auto text-2xl font-bold">
-                  <FiCheck />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="font-['Outfit'] text-2xl font-bold text-foreground">
-                    Tour Appointment Confirmed!
-                  </h3>
-                  <p className="text-xs sm:text-sm text-secondary max-w-sm mx-auto">
-                    Thank you, <strong className="text-foreground">{tourForm.name || "Athlete"}</strong>. Your VIP facility walkthrough for <strong>{tourForm.focusZone}</strong> is reserved for <strong>{tourForm.preferredDate} ({tourForm.preferredTime})</strong>.
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#121026]/60 border border-slate-200 dark:border-brand-500/15 text-left text-xs space-y-1 text-secondary">
-                  <div className="flex justify-between">
-                    <span>Confirmation Code:</span>
-                    <span className="font-mono font-bold text-active">FP-TOUR-7842</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Guest Pass Access:</span>
-                    <span className="font-bold text-emerald-500">Complimentary 1-Day Trial Included</span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setShowTourModal(false)}
-                  className="w-full py-2.5 rounded-xl bg-active text-btn-text text-xs font-bold hover:opacity-90 shadow-sm cursor-pointer"
-                >
-                  Return to Facilities
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleTourSubmit} className="space-y-4">
-                <div className="space-y-1">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-active">
-                    VIP Facility Walkthrough
-                  </span>
-                  <h3 className="font-['Outfit'] text-xl font-bold text-foreground">
-                    Book a Private Club Tour
-                  </h3>
-                  <p className="text-xs text-secondary">
-                    Meet with a Master Trainer for a customized tour and trial session.
-                  </p>
-                </div>
-
-                <div className="space-y-3 text-xs">
-                  <div>
-                    <label className="block font-semibold text-foreground mb-1">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Alexander Cole"
-                      value={tourForm.name}
-                      onChange={(e) =>
-                        setTourForm({ ...tourForm, name: e.target.value })
-                      }
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-[#121026]/60 text-foreground focus:outline-none focus:border-active"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-semibold text-foreground mb-1">
-                        Email Address *
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        placeholder="alex@example.com"
-                        value={tourForm.email}
-                        onChange={(e) =>
-                          setTourForm({ ...tourForm, email: e.target.value })
-                        }
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-[#121026]/60 text-foreground focus:outline-none focus:border-active"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-semibold text-foreground mb-1">
-                        Phone Number *
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        placeholder="+1 (555) 000-0000"
-                        value={tourForm.phone}
-                        onChange={(e) =>
-                          setTourForm({ ...tourForm, phone: e.target.value })
-                        }
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-[#121026]/60 text-foreground focus:outline-none focus:border-active"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-semibold text-foreground mb-1">
-                        Preferred Date
-                      </label>
-                      <select
-                        value={tourForm.preferredDate}
-                        onChange={(e) =>
-                          setTourForm({ ...tourForm, preferredDate: e.target.value })
-                        }
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-[#121026]/60 text-foreground focus:outline-none focus:border-active"
-                      >
-                        <option value="Tomorrow">Tomorrow</option>
-                        <option value="This Wednesday">This Wednesday</option>
-                        <option value="This Friday">This Friday</option>
-                        <option value="This Weekend (Saturday)">This Weekend (Saturday)</option>
-                        <option value="Next Week">Next Week</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block font-semibold text-foreground mb-1">
-                        Time Window
-                      </label>
-                      <select
-                        value={tourForm.preferredTime}
-                        onChange={(e) =>
-                          setTourForm({ ...tourForm, preferredTime: e.target.value })
-                        }
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-[#121026]/60 text-foreground focus:outline-none focus:border-active"
-                      >
-                        <option value="Morning (8:00 AM - 11:00 AM)">Morning (8:00 AM - 11:00 AM)</option>
-                        <option value="Midday (12:00 PM - 3:00 PM)">Midday (12:00 PM - 3:00 PM)</option>
-                        <option value="Evening (4:00 PM - 7:00 PM)">Evening (4:00 PM - 7:00 PM)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block font-semibold text-foreground mb-1">
-                      Primary Facility Interest
-                    </label>
-                    <select
-                      value={tourForm.focusZone}
-                      onChange={(e) =>
-                        setTourForm({ ...tourForm, focusZone: e.target.value })
-                      }
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-[#121026]/60 text-foreground focus:outline-none focus:border-active"
-                    >
-                      <option value="Full Club Infrastructure Walkthrough">
-                        Full Club Infrastructure Walkthrough
-                      </option>
-                      {FACILITY_ZONES.map((z) => (
-                        <option key={z.id} value={z.name}>
-                          {z.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="pt-2">
-                  <button
-                    type="submit"
-                    className="w-full py-2.5 rounded-xl bg-active text-btn-text text-xs font-bold hover:opacity-90 shadow-sm transition-opacity cursor-pointer"
-                  >
-                    Confirm Walkthrough Request
-                  </button>
-                  <p className="text-[10px] text-secondary text-center mt-2">
-                    Complimentary 1-day pass included for all booked tour guests. No credit card required.
-                  </p>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
+      <FacilityTourModal
+        showTourModal={showTourModal}
+        onClose={() => setShowTourModal(false)}
+        tourSubmitted={tourSubmitted}
+        tourForm={tourForm}
+        setTourForm={setTourForm}
+        handleTourSubmit={handleTourSubmit}
+        facilityZones={FACILITY_ZONES}
+      />
     </div>
   );
 }

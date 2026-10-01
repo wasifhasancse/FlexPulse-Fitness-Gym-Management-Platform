@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup, useInView } from "framer-motion";
 import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
 import {
   FiActivity,
@@ -40,6 +40,263 @@ import { submitTrialPass } from "@/lib/api/getClasses";
 import toast from "react-hot-toast";
 import AthleteVerificationTicker from "@/components/common/AthleteVerificationTicker";
 
+// =========================================================================
+// MOTION VARIANTS FOR TRIGGERED TRANSITIONS ACROSS ALL ELEMENTS
+// =========================================================================
+
+const containerStagger = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.07,
+      delayChildren: 0.04,
+    },
+  },
+};
+
+const leftCardVariants = {
+  hidden: { opacity: 0, x: -28 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      type: "spring",
+      stiffness: 380,
+      damping: 28,
+      staggerChildren: 0.07,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+const rightCardVariants = {
+  hidden: { opacity: 0, x: 28 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      type: "spring",
+      stiffness: 380,
+      damping: 28,
+      staggerChildren: 0.08,
+      delayChildren: 0.08,
+    },
+  },
+};
+
+const itemHeaderVariants = {
+  hidden: { opacity: 0, y: -12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 420, damping: 28 },
+  },
+};
+
+const itemFieldVariants = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 400, damping: 26 },
+  },
+};
+
+const itemButtonVariants = {
+  hidden: { opacity: 0, scale: 0.92 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { type: "spring", stiffness: 460, damping: 25 },
+  },
+};
+
+const scorePopVariants = {
+  hidden: { opacity: 0, scale: 0.82, y: 15 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 420, damping: 24 },
+  },
+};
+
+const gaugeVariants = {
+  hidden: { opacity: 0, scaleX: 0.9 },
+  visible: {
+    opacity: 1,
+    scaleX: 1,
+    transition: { type: "spring", stiffness: 360, damping: 28 },
+  },
+};
+
+const metricCardLeftVariants = {
+  hidden: { opacity: 0, x: -16, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 420, damping: 26 },
+  },
+};
+
+const metricCardRightVariants = {
+  hidden: { opacity: 0, x: 16, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 420, damping: 26 },
+  },
+};
+
+const insightVariants = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 380, damping: 28 },
+  },
+};
+
+const chipVariants = {
+  hidden: { opacity: 0, scale: 0.85, y: 8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 480, damping: 24 },
+  },
+};
+
+const ctaBtnVariants = {
+  hidden: { opacity: 0, y: 12, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 440, damping: 26 },
+  },
+};
+
+// Photographic Banner variants
+const bannerContainerVariants = {
+  hidden: { opacity: 0, y: 26 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 350,
+      damping: 28,
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const bannerImageVariants = {
+  hidden: { opacity: 0, scale: 1.06 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.8, ease: "easeOut" },
+  },
+};
+
+const bannerTextVariants = {
+  hidden: { opacity: 0, x: 18 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { type: "spring", stiffness: 380, damping: 28 },
+  },
+};
+
+// VIP Section Variants
+const vipSectionContainer = {
+  hidden: { opacity: 0, y: 32 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 340,
+      damping: 28,
+      staggerChildren: 0.08,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+const vipKickerVariants = {
+  hidden: { opacity: 0, scale: 0.8, y: -12 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 480, damping: 25 },
+  },
+};
+
+const vipTitleVariants = {
+  hidden: { opacity: 0, y: 22 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 380, damping: 28 },
+  },
+};
+
+const vipDescVariants = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 360, damping: 30 },
+  },
+};
+
+const vipChipItemVariants = {
+  hidden: { opacity: 0, scale: 0.88, y: 12 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 440, damping: 26 },
+  },
+};
+
+const vipTicketStubVariants = {
+  hidden: { opacity: 0, scale: 0.93, y: 26, rotateX: 6 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    rotateX: 0,
+    transition: { type: "spring", stiffness: 360, damping: 26, staggerChildren: 0.06 },
+  },
+};
+
+const vipFieldItemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 420, damping: 28 },
+  },
+};
+
+const vipBtnItemVariants = {
+  hidden: { opacity: 0, scale: 0.94, y: 10 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 460, damping: 25 },
+  },
+};
+
 export default function FitnessCalculatorClient() {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("bmi"); // 'bmi' | 'macros' | 'hydration'
@@ -51,6 +308,19 @@ export default function FitnessCalculatorClient() {
   const [passGeneratedCode, setPassGeneratedCode] = useState(null);
   const [copied, setCopied] = useState(false);
   const [copiedSummary, setCopiedSummary] = useState(false);
+
+  // Trigger Refs for Viewport Observers
+  const vipRef = useRef(null);
+  const vipInView = useInView(vipRef, { once: true, amount: 0.15 });
+
+  const bannerBmiRef = useRef(null);
+  const bannerBmiInView = useInView(bannerBmiRef, { once: true, amount: 0.2 });
+
+  const bannerMacroRef = useRef(null);
+  const bannerMacroInView = useInView(bannerMacroRef, { once: true, amount: 0.2 });
+
+  const tickerRef = useRef(null);
+  const tickerInView = useInView(tickerRef, { once: true, amount: 0.15 });
 
   const handleClaimPass = async (e) => {
     e.preventDefault();
@@ -65,7 +335,6 @@ export default function FitnessCalculatorClient() {
         setPassGeneratedCode(res.passCode);
         toast.success("Congratulations! VIP 1-Day Trial Pass Activated.");
       } else {
-        // Fallback robust pass code generation for guaranteed user delight
         const fallbackCode = `FP-VIP-${Math.floor(1000 + Math.random() * 9000)}`;
         setPassGeneratedCode(fallbackCode);
         toast.success("VIP 1-Day Trial Pass Activated!");
@@ -276,15 +545,12 @@ export default function FitnessCalculatorClient() {
   // Hydration Calculation
   const hydrationData = useMemo(() => {
     const w = unitSystem === "metric" ? weightKg : weightLbs * 0.453592;
-    // Base: 35ml per kg
     let liters = w * 0.035;
-    // Workout addition: +0.6L per 60 mins of training
     liters += (workoutDurationMins / 60) * 0.65;
-    // Climate factor
     if (climate === "hot") liters += 0.5;
 
     const roundedLiters = Number(liters.toFixed(1));
-    const glasses = Math.round((roundedLiters * 1000) / 250); // 250ml per glass
+    const glasses = Math.round((roundedLiters * 1000) / 250);
 
     return {
       liters: roundedLiters,
@@ -302,11 +568,12 @@ export default function FitnessCalculatorClient() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-8 sm:py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <div className="max-w-6xl mx-auto space-y-10 sm:space-y-14">
+    <div className="min-h-screen bg-background text-foreground py-8 sm:py-12 transition-colors duration-300 relative">
+      {/* UNIVERSAL CONTAINER WIDTH: Strict w-11/12 mx-auto matching Nav/Footer */}
+      <div className="w-11/12 mx-auto relative z-10 space-y-10 sm:space-y-14">
         
         {/* ============================================================== */}
-        {/* 1. HERO HEADER WITH EXIT ANIMATION & COMPACT TITLE             */}
+        {/* 1. HERO HEADER WITH TRIGGERED EXIT ANIMATION & COMPACT TITLE   */}
         {/* ============================================================== */}
         <div className="text-center space-y-3.5 max-w-2xl mx-auto">
           <AnimatedSectionTitle
@@ -319,904 +586,1065 @@ export default function FitnessCalculatorClient() {
           />
 
           {/* Mode Switcher Tabs with Layout Animation */}
-          <LayoutGroup id="calculatorModeGroup">
-            <div className="inline-flex p-1 rounded-2xl bg-slate-100 dark:bg-[#121026] border border-slate-200 dark:border-brand-500/20 shadow-xs mt-1">
-              {[
-                { id: "bmi", label: "BMI Calculator", icon: FaHeartbeat, size: 13 },
-                { id: "macros", label: "Calorie & Macros", icon: FiPieChart, size: 13 },
-                { id: "hydration", label: "Hydration Tracker", icon: FaTint, size: 12 },
-              ].map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`relative flex items-center gap-2 px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-bold transition-colors cursor-pointer ${
-                      isActive
-                        ? "text-btn-text"
-                        : "text-slate-600 dark:text-secondary hover:text-foreground"
-                    }`}
-                  >
-                    {isActive && (
-                      <motion.span
-                        layoutId="activeCalculatorModePill"
-                        className="absolute inset-0 rounded-xl bg-active shadow-sm"
-                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                      />
-                    )}
-                    <Icon size={tab.size} className="relative z-10" />
-                    <span className="relative z-10">{tab.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </LayoutGroup>
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 420, damping: 26, delay: 0.1 }}
+          >
+            <LayoutGroup id="calculatorModeGroup">
+              <div className="inline-flex p-1 rounded-2xl bg-slate-100 dark:bg-[#121026] border border-slate-200 dark:border-brand-500/20 shadow-xs mt-1">
+                {[
+                  { id: "bmi", label: "BMI Calculator", icon: FaHeartbeat, size: 13 },
+                  { id: "macros", label: "Calorie & Macros", icon: FiPieChart, size: 13 },
+                  { id: "hydration", label: "Hydration Tracker", icon: FaTint, size: 12 },
+                ].map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`relative flex items-center gap-2 px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-bold transition-colors cursor-pointer ${
+                        isActive
+                          ? "text-btn-text"
+                          : "text-slate-600 dark:text-secondary hover:text-foreground"
+                      }`}
+                    >
+                      {isActive && (
+                        <motion.span
+                          layoutId="activeCalculatorModePill"
+                          className="absolute inset-0 rounded-xl bg-active shadow-2xs"
+                          transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                        />
+                      )}
+                      <Icon size={tab.size} className="relative z-10" />
+                      <span className="relative z-10">{tab.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </LayoutGroup>
+          </motion.div>
         </div>
 
         {/* ============================================================== */}
-        {/* 2. TAB 1: BMI & BODY COMPOSITION CALCULATOR                   */}
+        {/* TABS CONTAINER WITH ANIMATEPRESENCE FOR HIGH-SPEED TRANSITION  */}
         {/* ============================================================== */}
-        {activeTab === "bmi" && (
-          <div className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
-              
-              {/* Input Controls Column (6 cols) */}
-              <div className="lg:col-span-6 bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5">
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-brand-500/15 pb-3.5">
-                  <div className="space-y-0.5">
+        <AnimatePresence mode="wait">
+          {/* ============================================================== */}
+          {/* 2. TAB 1: BMI & BODY COMPOSITION CALCULATOR                   */}
+          {/* ============================================================== */}
+          {activeTab === "bmi" && (
+            <motion.div
+              key="bmi-tab"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.28, ease: "easeInOut" }}
+              className="space-y-8"
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
+                
+                {/* Input Controls Column (6 cols) */}
+                <motion.div
+                  variants={leftCardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="lg:col-span-6 bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5"
+                >
+                  <motion.div variants={itemHeaderVariants} className="flex items-center justify-between border-b border-slate-100 dark:border-brand-500/15 pb-3.5">
+                    <div className="space-y-0.5">
+                      <h3 className="font-['Outfit'] text-lg font-bold text-foreground">
+                        Personal Biometrics
+                      </h3>
+                      <p className="text-[11px] text-secondary">
+                        Input your current anatomical dimensions
+                      </p>
+                    </div>
+
+                    {/* Unit toggle with Layout Animation */}
+                    <LayoutGroup id="calculatorBmiUnitGroup">
+                      <div className="inline-flex items-center gap-1 bg-slate-100 dark:bg-background/80 border border-slate-200 dark:border-brand-500/20 rounded-xl p-1 shrink-0 select-none">
+                        <button
+                          type="button"
+                          onClick={() => setUnitSystem("metric")}
+                          className={`relative px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                            unitSystem === "metric"
+                              ? "text-btn-text"
+                              : "text-secondary hover:text-foreground"
+                          }`}
+                        >
+                          {unitSystem === "metric" && (
+                            <motion.span
+                              layoutId="activeCalculatorBmiUnitPill"
+                              className="absolute inset-0 rounded-lg bg-active shadow-2xs"
+                              transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                            />
+                          )}
+                          <span className="relative z-10">Metric</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setUnitSystem("imperial")}
+                          className={`relative px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                            unitSystem === "imperial"
+                              ? "text-btn-text"
+                              : "text-secondary hover:text-foreground"
+                          }`}
+                        >
+                          {unitSystem === "imperial" && (
+                            <motion.span
+                              layoutId="activeCalculatorBmiUnitPill"
+                              className="absolute inset-0 rounded-lg bg-active shadow-2xs"
+                              transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                            />
+                          )}
+                          <span className="relative z-10">Imperial</span>
+                        </button>
+                      </div>
+                    </LayoutGroup>
+                  </motion.div>
+
+                  {/* Gender Select */}
+                  <motion.div variants={itemFieldVariants} className="space-y-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-secondary">
+                      Biological Profile
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <motion.button
+                        variants={itemButtonVariants}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        type="button"
+                        onClick={() => setGender("male")}
+                        className={`py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                          gender === "male"
+                            ? "border-active bg-active/10 text-active font-extrabold shadow-2xs"
+                            : "border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-background/50 text-slate-700 dark:text-secondary hover:text-foreground"
+                        }`}
+                      >
+                        <span>Male Athlete</span>
+                      </motion.button>
+                      <motion.button
+                        variants={itemButtonVariants}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        type="button"
+                        onClick={() => setGender("female")}
+                        className={`py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                          gender === "female"
+                            ? "border-active bg-active/10 text-active font-extrabold shadow-2xs"
+                            : "border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-background/50 text-slate-700 dark:text-secondary hover:text-foreground"
+                        }`}
+                      >
+                        <span>Female Athlete</span>
+                      </motion.button>
+                    </div>
+                  </motion.div>
+
+                  {/* Age Slider */}
+                  <motion.div variants={itemFieldVariants} className="space-y-2">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold uppercase tracking-wider text-secondary">Age</span>
+                      <span className="font-['Outfit'] text-sm font-extrabold text-foreground px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-brand-500/10 border border-slate-200 dark:border-brand-500/15">
+                        {age} Years
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="14"
+                      max="85"
+                      value={age}
+                      onChange={(e) => setAge(Number(e.target.value))}
+                      className="w-full accent-[#ff1844] cursor-pointer"
+                    />
+                  </motion.div>
+
+                  {/* Height Inputs */}
+                  {unitSystem === "metric" ? (
+                    <motion.div variants={itemFieldVariants} className="space-y-2">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-bold uppercase tracking-wider text-secondary">Height</span>
+                        <span className="font-['Outfit'] text-sm font-extrabold text-foreground px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-brand-500/10 border border-slate-200 dark:border-brand-500/15">
+                          {heightCm} cm ({(heightCm / 100).toFixed(2)} m)
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="120"
+                        max="220"
+                        value={heightCm}
+                        onChange={(e) => setHeightCm(Number(e.target.value))}
+                        className="w-full accent-[#ff1844] cursor-pointer"
+                      />
+                    </motion.div>
+                  ) : (
+                    <motion.div variants={itemFieldVariants} className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-secondary">Feet</label>
+                        <input
+                          type="number"
+                          min="3"
+                          max="7"
+                          value={heightFt}
+                          onChange={(e) => setHeightFt(Number(e.target.value))}
+                          className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-background/60 border border-slate-200 dark:border-brand-500/20 text-foreground text-sm font-bold focus:outline-none focus:border-active"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-secondary">Inches</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="11"
+                          value={heightIn}
+                          onChange={(e) => setHeightIn(Number(e.target.value))}
+                          className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-background/60 border border-slate-200 dark:border-brand-500/20 text-foreground text-sm font-bold focus:outline-none focus:border-active"
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Weight Inputs */}
+                  {unitSystem === "metric" ? (
+                    <motion.div variants={itemFieldVariants} className="space-y-2">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-bold uppercase tracking-wider text-secondary">Weight</span>
+                        <span className="font-['Outfit'] text-sm font-extrabold text-foreground px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-brand-500/10 border border-slate-200 dark:border-brand-500/15">
+                          {weightKg} kg ({Math.round(weightKg * 2.20462)} lbs)
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="35"
+                        max="180"
+                        value={weightKg}
+                        onChange={(e) => setWeightKg(Number(e.target.value))}
+                        className="w-full accent-[#ff1844] cursor-pointer"
+                      />
+                    </motion.div>
+                  ) : (
+                    <motion.div variants={itemFieldVariants} className="space-y-2">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-bold uppercase tracking-wider text-secondary">Weight</span>
+                        <span className="font-['Outfit'] text-sm font-extrabold text-foreground px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-brand-500/10 border border-slate-200 dark:border-brand-500/15">
+                          {weightLbs} lbs ({Math.round(weightLbs * 0.453592)} kg)
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="80"
+                        max="400"
+                        value={weightLbs}
+                        onChange={(e) => setWeightLbs(Number(e.target.value))}
+                        className="w-full accent-[#ff1844] cursor-pointer"
+                      />
+                    </motion.div>
+                  )}
+
+                  {/* Quick Visual Calibration Note */}
+                  <motion.div variants={insightVariants} className="p-3.5 rounded-2xl bg-slate-50 dark:bg-brand-500/5 border border-slate-200/80 dark:border-brand-500/15 flex items-center gap-2.5 text-xs text-secondary shadow-2xs">
+                    <FiInfo className="text-active shrink-0" size={15} />
+                    <span>Calibrated against World Health Organization (WHO) and InBody 570 clinical reference scales.</span>
+                  </motion.div>
+                </motion.div>
+
+                {/* Results & Visual Gauge Column (6 cols) */}
+                <motion.div
+                  variants={rightCardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="lg:col-span-6 bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5"
+                >
+                  {/* Hero Score Display */}
+                  <motion.div variants={scorePopVariants} className="text-center space-y-1.5 pb-2">
+                    <span className="text-[11px] uppercase font-extrabold tracking-widest text-secondary block">
+                      Calculated Body Mass Index
+                    </span>
+                    <div className="font-['Outfit'] text-5xl sm:text-6xl font-black text-foreground drop-shadow tracking-tight">
+                      {bmiData.bmi}
+                    </div>
+                    <div>
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-black uppercase tracking-wider ${bmiData.badgeBg} shadow-2xs`}>
+                        {bmiData.status}
+                      </span>
+                    </div>
+                  </motion.div>
+
+                  {/* Visual Horizontal Spectrum Gauge */}
+                  <motion.div variants={gaugeVariants} className="space-y-2">
+                    <div className="relative h-3 w-full rounded-full overflow-hidden flex bg-slate-200 dark:bg-brand-800/40">
+                      <div className="h-full bg-sky-500 w-[20%]" title="Underweight (<18.5)" />
+                      <div className="h-full bg-emerald-500 w-[35%]" title="Normal (18.5 - 24.9)" />
+                      <div className="h-full bg-amber-500 w-[25%]" title="Overweight (25 - 29.9)" />
+                      <div className="h-full bg-rose-500 w-[20%]" title="Obese (30+)" />
+                    </div>
+
+                    {/* Pointer indicator with smooth spring slide */}
+                    <div className="relative w-full h-2">
+                      <motion.div
+                        className="absolute -top-1 -translate-x-1/2 w-3.5 h-3.5 rotate-45 bg-foreground border border-black shadow-xs"
+                        initial={false}
+                        animate={{ left: `${bmiData.percentage}%` }}
+                        transition={{ type: "spring", stiffness: 320, damping: 25 }}
+                      />
+                    </div>
+
+                    <div className="flex justify-between text-[10px] text-secondary font-semibold">
+                      <span>Underweight (&lt;18.5)</span>
+                      <span className="text-emerald-500 font-bold">Healthy (18.5-24.9)</span>
+                      <span>Overweight (25-29.9)</span>
+                      <span>Obese (30+)</span>
+                    </div>
+                  </motion.div>
+
+                  {/* Target Metric Cards Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <motion.div
+                      variants={metricCardLeftVariants}
+                      whileHover={{ y: -2 }}
+                      className="p-3.5 rounded-2xl bg-slate-50 dark:bg-brand-900/30 border border-slate-200 dark:border-brand-500/15 space-y-0.5 shadow-2xs"
+                    >
+                      <span className="text-[11px] font-bold text-secondary uppercase tracking-wider block">
+                        Ideal Target Weight
+                      </span>
+                      <span className="font-['Outfit'] text-base font-extrabold text-active block">
+                        {bmiData.minHealthyWeight} – {bmiData.maxHealthyWeight} kg
+                      </span>
+                      <span className="text-[10px] text-secondary">
+                        Clinical normal zone for your stature
+                      </span>
+                    </motion.div>
+
+                    <motion.div
+                      variants={metricCardRightVariants}
+                      whileHover={{ y: -2 }}
+                      className="p-3.5 rounded-2xl bg-slate-50 dark:bg-brand-900/30 border border-slate-200 dark:border-brand-500/15 space-y-0.5 shadow-2xs"
+                    >
+                      <span className="text-[11px] font-bold text-secondary uppercase tracking-wider block">
+                        Daily Water Intake
+                      </span>
+                      <span className="font-['Outfit'] text-base font-extrabold text-sky-500 block">
+                        {bmiData.baselineWaterLiters} L ({bmiData.baselineWaterOz} oz)
+                      </span>
+                      <span className="text-[10px] text-secondary">
+                        Baseline cellular hydration
+                      </span>
+                    </motion.div>
+                  </div>
+
+                  {/* Personalized Coaching Insight */}
+                  <motion.div variants={insightVariants} className="space-y-2 pt-1">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5">
+                      <FiCompass className="text-active" /> Personalized Coaching Insight
+                    </h4>
+                    <p className="text-xs text-foreground leading-relaxed bg-slate-50 dark:bg-background/50 p-3.5 rounded-2xl border border-slate-200/80 dark:border-brand-500/10 shadow-2xs">
+                      {bmiData.advice}
+                    </p>
+                  </motion.div>
+
+                  {/* Recommended Classes CTA */}
+                  <motion.div variants={itemFieldVariants} className="space-y-3 pt-1">
+                    <span className="text-xs font-bold uppercase tracking-wider text-secondary block">
+                      Recommended Workout Disciplines:
+                    </span>
+                    <motion.div variants={containerStagger} className="flex flex-wrap gap-2">
+                      {bmiData.recommendedClasses.map((clsName) => (
+                        <motion.span
+                          key={clsName}
+                          variants={chipVariants}
+                          whileHover={{ scale: 1.05 }}
+                          className="px-3 py-1 rounded-xl bg-active/10 border border-active/30 text-active text-xs font-semibold flex items-center gap-1.5 shadow-2xs"
+                        >
+                          <FaDumbbell size={11} /> {clsName}
+                        </motion.span>
+                      ))}
+                    </motion.div>
+
+                    <motion.div variants={ctaBtnVariants} className="flex items-center gap-2 pt-1">
+                      <Link
+                        href="/all-classes"
+                        className="relative group overflow-hidden flex-1 py-3 rounded-xl bg-active text-btn-text text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-sm hover:opacity-95 active:scale-98 transition-all"
+                      >
+                        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-linear-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+                        <span className="relative z-10">Explore Recommended Classes</span>
+                        <FiArrowRight size={13} className="relative z-10 transition-transform group-hover:translate-x-1" />
+                      </Link>
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+              </div>
+
+              {/* Visual Photographic Banner: Athletic Assessment */}
+              <motion.div
+                ref={bannerBmiRef}
+                variants={bannerContainerVariants}
+                initial="hidden"
+                animate={bannerBmiInView ? "visible" : "hidden"}
+                className="relative rounded-3xl overflow-hidden border border-slate-200 dark:border-brand-500/20 bg-white dark:bg-[#121026]/75 shadow-xs"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-12 items-center">
+                  <motion.div variants={bannerImageVariants} className="md:col-span-5 relative h-64 sm:h-72 w-full overflow-hidden">
+                    <Image
+                      src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1200&auto=format&fit=crop"
+                      alt="Athletic Body Composition & Assessment"
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/85 via-black/40 to-transparent" />
+                    <div className="absolute bottom-4 left-4 text-white">
+                      <span className="px-2.5 py-0.5 rounded-full bg-active text-btn-text text-[10px] font-bold uppercase tracking-wider shadow-2xs">
+                        InBody 570 Bio-Impedance
+                      </span>
+                      <h4 className="font-['Outfit'] text-lg font-bold mt-1">
+                        Clinical Skeletal Muscle Scan
+                      </h4>
+                    </div>
+                  </motion.div>
+
+                  <motion.div variants={bannerTextVariants} className="md:col-span-7 p-6 sm:p-8 space-y-3">
+                    <div className="inline-flex items-center gap-2 text-active text-xs font-bold uppercase tracking-wider">
+                      <FiAward size={14} /> Beyond Simple BMI
+                    </div>
+                    <h3 className="font-['Outfit'] text-xl sm:text-2xl font-black text-foreground">
+                      Get a Medical-Grade Body Composition Scan
+                    </h3>
+                    <p className="text-xs sm:text-sm text-secondary leading-relaxed">
+                      While BMI provides a fast clinical baseline, it does not distinguish between dense muscle mass and visceral fat. Every FlexPulse Pro membership includes a complimentary monthly <strong>InBody 570 segmented scan</strong> measuring segmental lean tissue, body fat percentage, and intracellular water.
+                    </p>
+                    <div className="pt-1">
+                      <a
+                        href="#trial-pass"
+                        className="inline-flex items-center gap-2 text-xs font-bold text-active hover:underline"
+                      >
+                        Claim a Free Scan with your VIP Day Pass &rarr;
+                      </a>
+                    </div>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+
+          {/* ============================================================== */}
+          {/* 3. TAB 2: MACRONUTRIENT & CALORIC ENGINE (TDEE)               */}
+          {/* ============================================================== */}
+          {activeTab === "macros" && (
+            <motion.div
+              key="macros-tab"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.28, ease: "easeInOut" }}
+              className="space-y-8"
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
+                
+                {/* Input Controls Column (6 cols) */}
+                <motion.div
+                  variants={leftCardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="lg:col-span-6 bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5"
+                >
+                  <motion.div variants={itemHeaderVariants} className="border-b border-slate-100 dark:border-brand-500/15 pb-3.5 space-y-0.5">
                     <h3 className="font-['Outfit'] text-lg font-bold text-foreground">
-                      Personal Biometrics
+                      Metabolic & Activity Parameters
                     </h3>
                     <p className="text-[11px] text-secondary">
-                      Input your current anatomical dimensions
+                      Configure your weekly energy expenditure and physical demands
                     </p>
-                  </div>
+                  </motion.div>
 
-                  {/* Unit toggle with Layout Animation */}
-                  <LayoutGroup id="calculatorBmiUnitGroup">
-                    <div className="inline-flex items-center gap-1 bg-slate-100 dark:bg-background/80 border border-slate-200 dark:border-brand-500/20 rounded-xl p-1 shrink-0 select-none">
-                      <button
-                        type="button"
-                        onClick={() => setUnitSystem("metric")}
-                        className={`relative px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                          unitSystem === "metric"
-                            ? "text-btn-text"
-                            : "text-secondary hover:text-foreground"
-                        }`}
-                      >
-                        {unitSystem === "metric" && (
-                          <motion.span
-                            layoutId="activeCalculatorBmiUnitPill"
-                            className="absolute inset-0 rounded-lg bg-active shadow-xs"
-                            transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                          />
-                        )}
-                        <span className="relative z-10">Metric</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setUnitSystem("imperial")}
-                        className={`relative px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                          unitSystem === "imperial"
-                            ? "text-btn-text"
-                            : "text-secondary hover:text-foreground"
-                        }`}
-                      >
-                        {unitSystem === "imperial" && (
-                          <motion.span
-                            layoutId="activeCalculatorBmiUnitPill"
-                            className="absolute inset-0 rounded-lg bg-active shadow-xs"
-                            transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                          />
-                        )}
-                        <span className="relative z-10">Imperial</span>
-                      </button>
+                  {/* Activity Level Selector */}
+                  <motion.div variants={itemFieldVariants} className="space-y-2.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-secondary">
+                      Daily Physical Activity Multiplier
+                    </label>
+                    <motion.div variants={containerStagger} className="space-y-2">
+                      {[
+                        { value: 1.2, label: "Sedentary", desc: "Desk occupation, minimal or no regular exercise" },
+                        { value: 1.375, label: "Lightly Active", desc: "1–3 light workouts or recreational walks per week" },
+                        { value: 1.55, label: "Moderately Active", desc: "3–5 intense gym sessions or studio classes per week" },
+                        { value: 1.725, label: "Very Active", desc: "6–7 rigorous athletic strength & conditioning sessions" },
+                        { value: 1.9, label: "Extra Athletic", desc: "Twice-daily training or physically demanding occupation" },
+                      ].map((act) => (
+                        <motion.button
+                          key={act.label}
+                          variants={itemFieldVariants}
+                          whileHover={{ scale: 1.015, x: 3 }}
+                          whileTap={{ scale: 0.98 }}
+                          type="button"
+                          onClick={() => setActivityLevel(act.value)}
+                          className={`w-full p-3 rounded-xl text-left border transition-all cursor-pointer flex items-center justify-between ${
+                            activityLevel === act.value
+                              ? "border-active bg-active/10 shadow-2xs"
+                              : "border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-background/40 hover:bg-slate-100 dark:hover:bg-brand-800/10"
+                          }`}
+                        >
+                          <div>
+                            <span
+                              className={`text-xs font-bold block ${
+                                activityLevel === act.value ? "text-active" : "text-foreground"
+                              }`}
+                            >
+                              {act.label}
+                            </span>
+                            <span className="text-[11px] text-secondary">{act.desc}</span>
+                          </div>
+                          {activityLevel === act.value && (
+                            <FiCheckCircle className="text-active shrink-0" size={16} />
+                          )}
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  </motion.div>
+
+                  {/* Primary Goal Selector */}
+                  <motion.div variants={itemFieldVariants} className="space-y-2 pt-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-secondary">
+                      Primary Fitness Objective
+                    </label>
+                    <motion.div variants={containerStagger} className="grid grid-cols-3 gap-2.5">
+                      {[
+                        { key: "loss", title: "Fat Loss (Cut)", delta: "-500 kcal deficit" },
+                        { key: "maintenance", title: "Maintain Weight", delta: "Energy equilibrium" },
+                        { key: "gain", title: "Muscle Build (Bulk)", delta: "+400 kcal surplus" },
+                      ].map((g) => (
+                        <motion.button
+                          key={g.key}
+                          variants={itemButtonVariants}
+                          whileHover={{ scale: 1.03, y: -2 }}
+                          whileTap={{ scale: 0.98 }}
+                          type="button"
+                          onClick={() => setGoal(g.key)}
+                          className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
+                            goal === g.key
+                              ? "border-active bg-active text-btn-text font-bold shadow-2xs"
+                              : "border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-background/50 text-slate-700 dark:text-secondary hover:text-foreground"
+                          }`}
+                        >
+                          <span className="text-xs font-bold block">{g.title}</span>
+                          <span className="text-[10px] opacity-80 block mt-0.5">{g.delta}</span>
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+
+                {/* Results Column (6 cols) */}
+                <motion.div
+                  variants={rightCardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="lg:col-span-6 bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5"
+                >
+                  {/* Daily Calorie Target Display */}
+                  <motion.div variants={scorePopVariants} className="text-center space-y-1">
+                    <span className="text-[11px] uppercase font-extrabold tracking-widest text-secondary block">
+                      Recommended Daily Caloric Intake
+                    </span>
+                    <div className="font-['Outfit'] text-5xl sm:text-6xl font-black text-active drop-shadow tracking-tight">
+                      {macroData.targetCalories}
+                      <span className="text-sm font-bold text-foreground ml-2">kcal / day</span>
                     </div>
-                  </LayoutGroup>
-                </div>
+                    <div className="flex items-center justify-center gap-4 text-xs text-secondary pt-1">
+                      <span>BMR: <strong className="text-foreground">{macroData.bmr} kcal</strong></span>
+                      <span>•</span>
+                      <span>Maintenance TDEE: <strong className="text-foreground">{macroData.tdee} kcal</strong></span>
+                    </div>
+                  </motion.div>
 
-                {/* Gender Select */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-secondary">
-                    Biological Profile
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setGender("male")}
-                      className={`py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center justify-center gap-2 ${
-                        gender === "male"
-                          ? "border-active bg-active/10 text-active font-extrabold shadow-2xs"
-                          : "border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-background/50 text-slate-700 dark:text-secondary hover:text-foreground"
-                      }`}
-                    >
-                      <span>Male Athlete</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setGender("female")}
-                      className={`py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center justify-center gap-2 ${
-                        gender === "female"
-                          ? "border-active bg-active/10 text-active font-extrabold shadow-2xs"
-                          : "border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-background/50 text-slate-700 dark:text-secondary hover:text-foreground"
-                      }`}
-                    >
-                      <span>Female Athlete</span>
-                    </button>
-                  </div>
-                </div>
+                  {/* Macro Distribution Cards with Real Food Badges */}
+                  <motion.div variants={itemFieldVariants} className="space-y-2.5 pt-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold uppercase tracking-wider text-secondary">
+                        Macronutrient Distribution
+                      </span>
+                      <span className="text-[11px] text-secondary font-medium">
+                        Calibrated for lean muscle & recovery
+                      </span>
+                    </div>
 
-                {/* Age Slider */}
-                <div className="space-y-2">
+                    <div className="grid grid-cols-3 gap-3">
+                      {/* Protein */}
+                      <motion.div
+                        variants={metricCardLeftVariants}
+                        whileHover={{ scale: 1.04, y: -2 }}
+                        className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/25 text-center space-y-1 shadow-2xs"
+                      >
+                        <div className="flex items-center justify-center gap-1 text-[11px] font-extrabold text-rose-500 dark:text-rose-400 uppercase tracking-wider">
+                          <FaEgg size={12} />
+                          <span>Protein</span>
+                        </div>
+                        <span className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground block">
+                          {macroData.proteinGrams}g
+                        </span>
+                        <span className="text-[10px] text-secondary block">
+                          {macroData.proteinPct}% of total (4 kcal/g)
+                        </span>
+                      </motion.div>
+
+                      {/* Carbs */}
+                      <motion.div
+                        variants={metricCardLeftVariants}
+                        whileHover={{ scale: 1.04, y: -2 }}
+                        className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-center space-y-1 shadow-2xs"
+                      >
+                        <div className="flex items-center justify-center gap-1 text-[11px] font-extrabold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+                          <FaBreadSlice size={12} />
+                          <span>Carbs</span>
+                        </div>
+                        <span className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground block">
+                          {macroData.carbGrams}g
+                        </span>
+                        <span className="text-[10px] text-secondary block">
+                          {macroData.carbPct}% of total (4 kcal/g)
+                        </span>
+                      </motion.div>
+
+                      {/* Healthy Fats */}
+                      <motion.div
+                        variants={metricCardRightVariants}
+                        whileHover={{ scale: 1.04, y: -2 }}
+                        className="p-3.5 rounded-2xl bg-sky-500/10 border border-sky-500/25 text-center space-y-1 shadow-2xs"
+                      >
+                        <div className="flex items-center justify-center gap-1 text-[11px] font-extrabold text-sky-500 dark:text-sky-400 uppercase tracking-wider">
+                          <FaAppleAlt size={12} />
+                          <span>Fats</span>
+                        </div>
+                        <span className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground block">
+                          {macroData.fatGrams}g
+                        </span>
+                        <span className="text-[10px] text-secondary block">
+                          {macroData.fatPct}% of total (9 kcal/g)
+                        </span>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+
+                  {/* Dynamic Animated Progress Visual Bars */}
+                  <motion.div variants={gaugeVariants} className="space-y-2 pt-1">
+                    <div className="h-3 w-full rounded-full overflow-hidden flex bg-slate-200 dark:bg-brand-800/40">
+                      <motion.div
+                        initial={{ width: "0%" }}
+                        animate={{ width: `${macroData.proteinPct}%` }}
+                        transition={{ duration: 0.9, ease: "easeOut" }}
+                        className="bg-rose-500 h-full"
+                        title="Protein"
+                      />
+                      <motion.div
+                        initial={{ width: "0%" }}
+                        animate={{ width: `${macroData.carbPct}%` }}
+                        transition={{ duration: 0.9, delay: 0.15, ease: "easeOut" }}
+                        className="bg-amber-500 h-full"
+                        title="Carbs"
+                      />
+                      <motion.div
+                        initial={{ width: "0%" }}
+                        animate={{ width: `${macroData.fatPct}%` }}
+                        transition={{ duration: 0.9, delay: 0.3, ease: "easeOut" }}
+                        className="bg-sky-500 h-full"
+                        title="Fats"
+                      />
+                    </div>
+                    <div className="flex justify-between text-[11px] text-secondary">
+                      <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-500" /> Protein</span>
+                      <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" /> Carbs</span>
+                      <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-sky-500" /> Healthy Fats</span>
+                    </div>
+                  </motion.div>
+
+                  {/* 4-Meal Distribution Breakdown */}
+                  <motion.div variants={itemFieldVariants} className="space-y-2 pt-1">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-secondary">
+                      Sample 4-Meal Timing Blueprint:
+                    </h4>
+                    <motion.div variants={containerStagger} className="grid grid-cols-2 gap-2 text-xs">
+                      {macroData.meals.map((meal, idx) => (
+                        <motion.div
+                          key={idx}
+                          variants={chipVariants}
+                          whileHover={{ y: -2 }}
+                          className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#121026]/50 border border-slate-200/80 dark:border-brand-500/15 space-y-0.5 shadow-2xs"
+                        >
+                          <span className="font-bold text-foreground block">{meal.name}</span>
+                          <div className="text-[10px] text-secondary flex items-center justify-between">
+                            <span>{meal.protein}g Pro</span>
+                            <span>{meal.carbs}g Carb</span>
+                            <span>{meal.fats}g Fat</span>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  </motion.div>
+
+                  {/* Action Buttons */}
+                  <motion.div variants={ctaBtnVariants} className="pt-2 flex items-center gap-2.5">
+                    <button
+                      onClick={handleCopyMacroSummary}
+                      className="relative group overflow-hidden flex-1 py-3 rounded-xl bg-active text-btn-text text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-sm hover:opacity-95 active:scale-98 transition-all cursor-pointer"
+                    >
+                      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-linear-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+                      {copiedSummary ? <FiCheck className="relative z-10" /> : <FiCopy className="relative z-10" />}
+                      <span className="relative z-10">{copiedSummary ? "Copied Blueprint!" : "Copy Target Summary"}</span>
+                    </button>
+
+                    <Link
+                      href="/pricing"
+                      className="px-4 py-3 rounded-xl border border-slate-300 dark:border-brand-500/25 bg-white dark:bg-background text-foreground text-xs sm:text-sm font-bold hover:border-active transition-all shadow-2xs"
+                    >
+                      Nutrition Plans
+                    </Link>
+                  </motion.div>
+                </motion.div>
+              </div>
+
+              {/* Visual Photographic Banner: Clean Nutrition Protocol */}
+              <motion.div
+                ref={bannerMacroRef}
+                variants={bannerContainerVariants}
+                initial="hidden"
+                animate={bannerMacroInView ? "visible" : "hidden"}
+                className="relative rounded-3xl overflow-hidden border border-slate-200 dark:border-brand-500/20 bg-white dark:bg-[#121026]/75 shadow-xs"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-12 items-center">
+                  <motion.div variants={bannerImageVariants} className="md:col-span-5 relative h-64 sm:h-72 w-full overflow-hidden">
+                    <Image
+                      src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1200&auto=format&fit=crop"
+                      alt="Precision Macronutrient Nutrition"
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/85 via-black/40 to-transparent" />
+                    <div className="absolute bottom-4 left-4 text-white">
+                      <span className="px-2.5 py-0.5 rounded-full bg-active text-btn-text text-[10px] font-bold uppercase tracking-wider shadow-2xs">
+                        Metabolic Fuel
+                      </span>
+                      <h4 className="font-['Outfit'] text-lg font-bold mt-1">
+                        Nutrient Timing & Bioavailability
+                      </h4>
+                    </div>
+                  </motion.div>
+
+                  <motion.div variants={bannerTextVariants} className="md:col-span-7 p-6 sm:p-8 space-y-3">
+                    <div className="inline-flex items-center gap-2 text-active text-xs font-bold uppercase tracking-wider">
+                      <FiAward size={14} /> FlexPulse Fuel Bar Integration
+                    </div>
+                    <h3 className="font-['Outfit'] text-xl sm:text-2xl font-black text-foreground">
+                      Macro-Balanced Meals Prepared on Site
+                    </h3>
+                    <p className="text-xs sm:text-sm text-secondary leading-relaxed">
+                      Hitting 2.0 grams of protein per kilogram of body weight is effortless at FlexPulse. Visit our <strong>Metabolic Nutrition & Fuel Bar</strong> in the main atrium to pre-order chef-crafted post-workout whey isolate shakes and macro-balanced cold meal prep boxes containing your exact calculated macros.
+                    </p>
+                    <div className="pt-1">
+                      <Link
+                        href="/facilities"
+                        className="inline-flex items-center gap-2 text-xs font-bold text-active hover:underline"
+                      >
+                        Explore the Nutrition & Fuel Bar Facility &rarr;
+                      </Link>
+                    </div>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+
+          {/* ============================================================== */}
+          {/* 4. TAB 3: HYDRATION & ELECTROLYTE TRACKER                     */}
+          {/* ============================================================== */}
+          {activeTab === "hydration" && (
+            <motion.div
+              key="hydration-tab"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.28, ease: "easeInOut" }}
+              className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start"
+            >
+              {/* Input Controls */}
+              <motion.div
+                variants={leftCardVariants}
+                initial="hidden"
+                animate="visible"
+                className="lg:col-span-6 bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5"
+              >
+                <motion.div variants={itemHeaderVariants} className="border-b border-slate-100 dark:border-brand-500/15 pb-3.5 space-y-0.5">
+                  <h3 className="font-['Outfit'] text-lg font-bold text-foreground">
+                    Hydration & Sweat Rate Parameters
+                  </h3>
+                  <p className="text-[11px] text-secondary">
+                    Calculate cellular hydration needs during intense training
+                  </p>
+                </motion.div>
+
+                {/* Workout Duration */}
+                <motion.div variants={itemFieldVariants} className="space-y-2">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="font-bold uppercase tracking-wider text-secondary">Age</span>
+                    <span className="font-bold uppercase tracking-wider text-secondary">Daily Workout Duration</span>
                     <span className="font-['Outfit'] text-sm font-extrabold text-foreground px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-brand-500/10 border border-slate-200 dark:border-brand-500/15">
-                      {age} Years
+                      {workoutDurationMins} Minutes
                     </span>
                   </div>
                   <input
                     type="range"
-                    min="14"
-                    max="85"
-                    value={age}
-                    onChange={(e) => setAge(Number(e.target.value))}
+                    min="0"
+                    max="180"
+                    step="15"
+                    value={workoutDurationMins}
+                    onChange={(e) => setWorkoutDurationMins(Number(e.target.value))}
                     className="w-full accent-[#ff1844] cursor-pointer"
                   />
-                </div>
+                </motion.div>
 
-                {/* Height Inputs */}
-                {unitSystem === "metric" ? (
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="font-bold uppercase tracking-wider text-secondary">Height</span>
-                      <span className="font-['Outfit'] text-sm font-extrabold text-foreground px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-brand-500/10 border border-slate-200 dark:border-brand-500/15">
-                        {heightCm} cm ({(heightCm / 100).toFixed(2)} m)
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min="120"
-                      max="220"
-                      value={heightCm}
-                      onChange={(e) => setHeightCm(Number(e.target.value))}
-                      className="w-full accent-[#ff1844] cursor-pointer"
-                    />
-                  </div>
-                ) : (
+                {/* Training Environment / Climate */}
+                <motion.div variants={itemFieldVariants} className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-secondary">
+                    Training Environment Climate
+                  </label>
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-secondary">Feet</label>
-                      <input
-                        type="number"
-                        min="3"
-                        max="7"
-                        value={heightFt}
-                        onChange={(e) => setHeightFt(Number(e.target.value))}
-                        className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-background/60 border border-slate-200 dark:border-brand-500/20 text-foreground text-sm font-bold focus:outline-none focus:border-active"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-secondary">Inches</label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="11"
-                        value={heightIn}
-                        onChange={(e) => setHeightIn(Number(e.target.value))}
-                        className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-background/60 border border-slate-200 dark:border-brand-500/20 text-foreground text-sm font-bold focus:outline-none focus:border-active"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Weight Inputs */}
-                {unitSystem === "metric" ? (
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="font-bold uppercase tracking-wider text-secondary">Weight</span>
-                      <span className="font-['Outfit'] text-sm font-extrabold text-foreground px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-brand-500/10 border border-slate-200 dark:border-brand-500/15">
-                        {weightKg} kg ({Math.round(weightKg * 2.20462)} lbs)
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min="35"
-                      max="180"
-                      value={weightKg}
-                      onChange={(e) => setWeightKg(Number(e.target.value))}
-                      className="w-full accent-[#ff1844] cursor-pointer"
-                    />
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="font-bold uppercase tracking-wider text-secondary">Weight</span>
-                      <span className="font-['Outfit'] text-sm font-extrabold text-foreground px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-brand-500/10 border border-slate-200 dark:border-brand-500/15">
-                        {weightLbs} lbs ({Math.round(weightLbs * 0.453592)} kg)
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min="80"
-                      max="400"
-                      value={weightLbs}
-                      onChange={(e) => setWeightLbs(Number(e.target.value))}
-                      className="w-full accent-[#ff1844] cursor-pointer"
-                    />
-                  </div>
-                )}
-
-                {/* Quick Visual Calibration Note */}
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-brand-500/5 border border-slate-200/80 dark:border-brand-500/15 flex items-center gap-2.5 text-xs text-secondary">
-                  <FiInfo className="text-active shrink-0" size={15} />
-                  <span>Calibrated against World Health Organization (WHO) and InBody 570 clinical reference scales.</span>
-                </div>
-              </div>
-
-              {/* Results & Visual Gauge Column (6 cols) */}
-              <div className="lg:col-span-6 bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5">
-                {/* Hero Score Display */}
-                <div className="text-center space-y-1.5 pb-2">
-                  <span className="text-[11px] uppercase font-extrabold tracking-widest text-secondary block">
-                    Calculated Body Mass Index
-                  </span>
-                  <div className="font-['Outfit'] text-5xl sm:text-6xl font-black text-foreground drop-shadow tracking-tight">
-                    {bmiData.bmi}
-                  </div>
-                  <div>
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-black uppercase tracking-wider ${bmiData.badgeBg}`}>
-                      {bmiData.status}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Visual Horizontal Spectrum Gauge */}
-                <div className="space-y-2">
-                  <div className="relative h-3 w-full rounded-full overflow-hidden flex bg-slate-200 dark:bg-brand-800/40">
-                    <div className="h-full bg-sky-500 w-[20%]" title="Underweight (<18.5)" />
-                    <div className="h-full bg-emerald-500 w-[35%]" title="Normal (18.5 - 24.9)" />
-                    <div className="h-full bg-amber-500 w-[25%]" title="Overweight (25 - 29.9)" />
-                    <div className="h-full bg-rose-500 w-[20%]" title="Obese (30+)" />
-                  </div>
-
-                  {/* Pointer indicator */}
-                  <div className="relative w-full h-2">
-                    <div
-                      className="absolute -top-1 -translate-x-1/2 w-3 h-3 rotate-45 bg-foreground border border-black shadow-md transition-all duration-300"
-                      style={{ left: `${bmiData.percentage}%` }}
-                    />
-                  </div>
-
-                  <div className="flex justify-between text-[10px] text-secondary font-semibold">
-                    <span>Underweight (&lt;18.5)</span>
-                    <span className="text-emerald-500 font-bold">Healthy (18.5-24.9)</span>
-                    <span>Overweight (25-29.9)</span>
-                    <span>Obese (30+)</span>
-                  </div>
-                </div>
-
-                {/* Target Metric Cards Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-brand-900/30 border border-slate-200 dark:border-brand-500/15 space-y-0.5">
-                    <span className="text-[11px] font-bold text-secondary uppercase tracking-wider block">
-                      Ideal Target Weight
-                    </span>
-                    <span className="font-['Outfit'] text-base font-extrabold text-active block">
-                      {bmiData.minHealthyWeight} – {bmiData.maxHealthyWeight} kg
-                    </span>
-                    <span className="text-[10px] text-secondary">
-                      Clinical normal zone for your stature
-                    </span>
-                  </div>
-
-                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-brand-900/30 border border-slate-200 dark:border-brand-500/15 space-y-0.5">
-                    <span className="text-[11px] font-bold text-secondary uppercase tracking-wider block">
-                      Daily Water Intake
-                    </span>
-                    <span className="font-['Outfit'] text-base font-extrabold text-sky-500 block">
-                      {bmiData.baselineWaterLiters} L ({bmiData.baselineWaterOz} oz)
-                    </span>
-                    <span className="text-[10px] text-secondary">
-                      Baseline cellular hydration
-                    </span>
-                  </div>
-                </div>
-
-                {/* Personalized Coaching Insight */}
-                <div className="space-y-2 pt-1">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5">
-                    <FiCompass className="text-active" /> Personalized Coaching Insight
-                  </h4>
-                  <p className="text-xs text-foreground leading-relaxed bg-slate-50 dark:bg-background/50 p-3.5 rounded-2xl border border-slate-200/80 dark:border-brand-500/10">
-                    {bmiData.advice}
-                  </p>
-                </div>
-
-                {/* Recommended Classes CTA */}
-                <div className="space-y-3 pt-1">
-                  <span className="text-xs font-bold uppercase tracking-wider text-secondary block">
-                    Recommended Workout Disciplines:
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {bmiData.recommendedClasses.map((clsName) => (
-                      <span
-                        key={clsName}
-                        className="px-3 py-1 rounded-xl bg-active/10 border border-active/30 text-active text-xs font-semibold flex items-center gap-1.5"
-                      >
-                        <FaDumbbell size={11} /> {clsName}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center gap-2 pt-1">
-                    <Link
-                      href="/all-classes"
-                      className="flex-1 py-2.5 rounded-xl bg-active text-btn-text text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-sm hover:opacity-90 transition-all"
+                    <motion.button
+                      variants={itemButtonVariants}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="button"
+                      onClick={() => setClimate("temperate")}
+                      className={`py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer text-center ${
+                        climate === "temperate"
+                          ? "border-active bg-active/10 text-active font-extrabold shadow-2xs"
+                          : "border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-background/50 text-slate-700 dark:text-secondary hover:text-foreground"
+                      }`}
                     >
-                      <span>Explore Recommended Classes</span>
-                      <FiArrowRight size={13} />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
+                      Climate-Controlled (68°F)
+                    </motion.button>
 
-            {/* Visual Photographic Banner: Athletic Assessment */}
-            <div className="relative rounded-3xl overflow-hidden border border-slate-200 dark:border-brand-500/20 bg-white dark:bg-[#121026]/75 shadow-xs">
-              <div className="grid grid-cols-1 md:grid-cols-12 items-center">
-                <div className="md:col-span-5 relative h-64 sm:h-72 w-full overflow-hidden">
-                  <Image
-                    src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1200&auto=format&fit=crop"
-                    alt="Athletic Body Composition & Assessment"
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/85 via-black/40 to-transparent" />
-                  <div className="absolute bottom-4 left-4 text-white">
-                    <span className="px-2.5 py-0.5 rounded-full bg-active text-btn-text text-[10px] font-bold uppercase tracking-wider">
-                      InBody 570 Bio-Impedance
-                    </span>
-                    <h4 className="font-['Outfit'] text-lg font-bold mt-1">
-                      Clinical Skeletal Muscle Scan
-                    </h4>
-                  </div>
-                </div>
-
-                <div className="md:col-span-7 p-6 sm:p-8 space-y-3">
-                  <div className="inline-flex items-center gap-2 text-active text-xs font-bold uppercase tracking-wider">
-                    <FiAward size={14} /> Beyond Simple BMI
-                  </div>
-                  <h3 className="font-['Outfit'] text-xl sm:text-2xl font-black text-foreground">
-                    Get a Medical-Grade Body Composition Scan
-                  </h3>
-                  <p className="text-xs sm:text-sm text-secondary leading-relaxed">
-                    While BMI provides a fast clinical baseline, it does not distinguish between dense muscle mass and visceral fat. Every FlexPulse Pro membership includes a complimentary monthly <strong>InBody 570 segmented scan</strong> measuring segmental lean tissue, body fat percentage, and intracellular water.
-                  </p>
-                  <div className="pt-1">
-                    <a
-                      href="#trial-pass"
-                      className="inline-flex items-center gap-2 text-xs font-bold text-active hover:underline"
+                    <motion.button
+                      variants={itemButtonVariants}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="button"
+                      onClick={() => setClimate("hot")}
+                      className={`py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer text-center ${
+                        climate === "hot"
+                          ? "border-active bg-active/10 text-active font-extrabold shadow-2xs"
+                          : "border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-background/50 text-slate-700 dark:text-secondary hover:text-foreground"
+                      }`}
                     >
-                      Claim a Free Scan with your VIP Day Pass &rarr;
-                    </a>
+                      Hot Yoga / Outdoor Turf (85°F+)
+                    </motion.button>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+                </motion.div>
 
-        {/* ============================================================== */}
-        {/* 3. TAB 2: MACRONUTRIENT & CALORIC ENGINE (TDEE)               */}
-        {/* ============================================================== */}
-        {activeTab === "macros" && (
-          <div className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
-              
-              {/* Input Controls Column (6 cols) */}
-              <div className="lg:col-span-6 bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5">
-                <div className="border-b border-slate-100 dark:border-brand-500/15 pb-3.5 space-y-0.5">
-                  <h3 className="font-['Outfit'] text-lg font-bold text-foreground">
-                    Metabolic & Activity Parameters
-                  </h3>
-                  <p className="text-[11px] text-secondary">
-                    Configure your weekly energy expenditure and physical demands
-                  </p>
-                </div>
-
-                {/* Activity Level Selector */}
-                <div className="space-y-2.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-secondary">
-                    Daily Physical Activity Multiplier
-                  </label>
-                  <div className="space-y-2">
-                    {[
-                      { value: 1.2, label: "Sedentary", desc: "Desk occupation, minimal or no regular exercise" },
-                      { value: 1.375, label: "Lightly Active", desc: "1–3 light workouts or recreational walks per week" },
-                      { value: 1.55, label: "Moderately Active", desc: "3–5 intense gym sessions or studio classes per week" },
-                      { value: 1.725, label: "Very Active", desc: "6–7 rigorous athletic strength & conditioning sessions" },
-                      { value: 1.9, label: "Extra Athletic", desc: "Twice-daily training or physically demanding occupation" },
-                    ].map((act) => (
-                      <button
-                        key={act.label}
-                        type="button"
-                        onClick={() => setActivityLevel(act.value)}
-                        className={`w-full p-3 rounded-xl text-left border transition-all cursor-pointer flex items-center justify-between ${
-                          activityLevel === act.value
-                            ? "border-active bg-active/10 shadow-2xs"
-                            : "border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-background/40 hover:bg-slate-100 dark:hover:bg-brand-800/10"
-                        }`}
-                      >
-                        <div>
-                          <span
-                            className={`text-xs font-bold block ${
-                              activityLevel === act.value ? "text-active" : "text-foreground"
-                            }`}
-                          >
-                            {act.label}
-                          </span>
-                          <span className="text-[11px] text-secondary">{act.desc}</span>
-                        </div>
-                        {activityLevel === act.value && (
-                          <FiCheckCircle className="text-active shrink-0" size={16} />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Primary Goal Selector */}
-                <div className="space-y-2 pt-1">
-                  <label className="text-xs font-bold uppercase tracking-wider text-secondary">
-                    Primary Fitness Objective
-                  </label>
-                  <div className="grid grid-cols-3 gap-2.5">
-                    {[
-                      { key: "loss", title: "Fat Loss (Cut)", delta: "-500 kcal deficit" },
-                      { key: "maintenance", title: "Maintain Weight", delta: "Energy equilibrium" },
-                      { key: "gain", title: "Muscle Build (Bulk)", delta: "+400 kcal surplus" },
-                    ].map((g) => (
-                      <button
-                        key={g.key}
-                        type="button"
-                        onClick={() => setGoal(g.key)}
-                        className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
-                          goal === g.key
-                            ? "border-active bg-active text-btn-text font-bold shadow-sm"
-                            : "border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-background/50 text-slate-700 dark:text-secondary hover:text-foreground"
-                        }`}
-                      >
-                        <span className="text-xs font-bold block">{g.title}</span>
-                        <span className="text-[10px] opacity-80 block mt-0.5">{g.delta}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Results Column (6 cols) */}
-              <div className="lg:col-span-6 bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5">
-                {/* Daily Calorie Target Display */}
-                <div className="text-center space-y-1">
-                  <span className="text-[11px] uppercase font-extrabold tracking-widest text-secondary block">
-                    Recommended Daily Caloric Intake
+                {/* Electrolyte Guidance */}
+                <motion.div variants={insightVariants} className="p-4 rounded-2xl bg-sky-500/10 border border-sky-500/25 space-y-1.5 text-xs shadow-2xs">
+                  <span className="font-bold text-sky-600 dark:text-sky-400 flex items-center gap-1.5">
+                    <FaTint /> Athletic Electrolyte Protocol
                   </span>
-                  <div className="font-['Outfit'] text-5xl sm:text-6xl font-black text-active drop-shadow tracking-tight">
-                    {macroData.targetCalories}
-                    <span className="text-sm font-bold text-foreground ml-2">kcal / day</span>
-                  </div>
-                  <div className="flex items-center justify-center gap-4 text-xs text-secondary pt-1">
-                    <span>BMR: <strong className="text-foreground">{macroData.bmr} kcal</strong></span>
-                    <span>•</span>
-                    <span>Maintenance TDEE: <strong className="text-foreground">{macroData.tdee} kcal</strong></span>
-                  </div>
-                </div>
-
-                {/* Macro Distribution Cards with Real Food Badges */}
-                <div className="space-y-2.5 pt-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold uppercase tracking-wider text-secondary">
-                      Macronutrient Distribution
-                    </span>
-                    <span className="text-[11px] text-secondary font-medium">
-                      Calibrated for lean muscle & recovery
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-3">
-                    {/* Protein */}
-                    <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/25 text-center space-y-1">
-                      <div className="flex items-center justify-center gap-1 text-[11px] font-extrabold text-rose-500 dark:text-rose-400 uppercase tracking-wider">
-                        <FaEgg size={12} />
-                        <span>Protein</span>
-                      </div>
-                      <span className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground block">
-                        {macroData.proteinGrams}g
-                      </span>
-                      <span className="text-[10px] text-secondary block">
-                        {macroData.proteinPct}% of total (4 kcal/g)
-                      </span>
-                    </div>
-
-                    {/* Carbs */}
-                    <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-center space-y-1">
-                      <div className="flex items-center justify-center gap-1 text-[11px] font-extrabold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-                        <FaBreadSlice size={12} />
-                        <span>Carbs</span>
-                      </div>
-                      <span className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground block">
-                        {macroData.carbGrams}g
-                      </span>
-                      <span className="text-[10px] text-secondary block">
-                        {macroData.carbPct}% of total (4 kcal/g)
-                      </span>
-                    </div>
-
-                    {/* Healthy Fats */}
-                    <div className="p-3.5 rounded-2xl bg-sky-500/10 border border-sky-500/25 text-center space-y-1">
-                      <div className="flex items-center justify-center gap-1 text-[11px] font-extrabold text-sky-500 dark:text-sky-400 uppercase tracking-wider">
-                        <FaAppleAlt size={12} />
-                        <span>Fats</span>
-                      </div>
-                      <span className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground block">
-                        {macroData.fatGrams}g
-                      </span>
-                      <span className="text-[10px] text-secondary block">
-                        {macroData.fatPct}% of total (9 kcal/g)
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Progress Visual Bars */}
-                <div className="space-y-2 pt-1">
-                  <div className="h-2.5 w-full rounded-full overflow-hidden flex bg-slate-200 dark:bg-brand-800/40">
-                    <div style={{ width: `${macroData.proteinPct}%` }} className="bg-rose-500" title="Protein" />
-                    <div style={{ width: `${macroData.carbPct}%` }} className="bg-amber-500" title="Carbs" />
-                    <div style={{ width: `${macroData.fatPct}%` }} className="bg-sky-500" title="Fats" />
-                  </div>
-                  <div className="flex justify-between text-[11px] text-secondary">
-                    <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-500" /> Protein</span>
-                    <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" /> Carbs</span>
-                    <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-sky-500" /> Healthy Fats</span>
-                  </div>
-                </div>
-
-                {/* 4-Meal Distribution Breakdown */}
-                <div className="space-y-2 pt-1">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-secondary">
-                    Sample 4-Meal Timing Blueprint:
-                  </h4>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    {macroData.meals.map((meal, idx) => (
-                      <div
-                        key={idx}
-                        className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#121026]/50 border border-slate-200/80 dark:border-brand-500/15 space-y-0.5"
-                      >
-                        <span className="font-bold text-foreground block">{meal.name}</span>
-                        <div className="text-[10px] text-secondary flex items-center justify-between">
-                          <span>{meal.protein}g Pro</span>
-                          <span>{meal.carbs}g Carb</span>
-                          <span>{meal.fats}g Fat</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="pt-2 flex items-center gap-2.5">
-                  <button
-                    onClick={handleCopyMacroSummary}
-                    className="flex-1 py-2.5 rounded-xl bg-active text-btn-text text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-sm hover:opacity-90 transition-all cursor-pointer"
-                  >
-                    {copiedSummary ? <FiCheck /> : <FiCopy />}
-                    <span>{copiedSummary ? "Copied Blueprint!" : "Copy Target Summary"}</span>
-                  </button>
-
-                  <Link
-                    href="/pricing"
-                    className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-brand-500/25 bg-white dark:bg-background text-foreground text-xs sm:text-sm font-bold hover:border-active transition-all"
-                  >
-                    Nutrition Plans
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            {/* Visual Photographic Banner: Clean Nutrition Protocol */}
-            <div className="relative rounded-3xl overflow-hidden border border-slate-200 dark:border-brand-500/20 bg-white dark:bg-[#121026]/75 shadow-xs">
-              <div className="grid grid-cols-1 md:grid-cols-12 items-center">
-                <div className="md:col-span-5 relative h-64 sm:h-72 w-full overflow-hidden">
-                  <Image
-                    src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1200&auto=format&fit=crop"
-                    alt="Precision Macronutrient Nutrition"
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/85 via-black/40 to-transparent" />
-                  <div className="absolute bottom-4 left-4 text-white">
-                    <span className="px-2.5 py-0.5 rounded-full bg-active text-btn-text text-[10px] font-bold uppercase tracking-wider">
-                      Metabolic Fuel
-                    </span>
-                    <h4 className="font-['Outfit'] text-lg font-bold mt-1">
-                      Nutrient Timing & Bioavailability
-                    </h4>
-                  </div>
-                </div>
-
-                <div className="md:col-span-7 p-6 sm:p-8 space-y-3">
-                  <div className="inline-flex items-center gap-2 text-active text-xs font-bold uppercase tracking-wider">
-                    <FiAward size={14} /> FlexPulse Fuel Bar Integration
-                  </div>
-                  <h3 className="font-['Outfit'] text-xl sm:text-2xl font-black text-foreground">
-                    Macro-Balanced Meals Prepared on Site
-                  </h3>
-                  <p className="text-xs sm:text-sm text-secondary leading-relaxed">
-                    Hitting 2.0 grams of protein per kilogram of body weight is effortless at FlexPulse. Visit our <strong>Metabolic Nutrition & Fuel Bar</strong> in the main atrium to pre-order chef-crafted post-workout whey isolate shakes and macro-balanced cold meal prep boxes containing your exact calculated macros.
+                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
+                    Drinking plain water without electrolytes during 60+ minute training sessions can dilute blood sodium levels. Supplement with 400–600mg sodium and 200mg potassium per hour of strenuous sweat output.
                   </p>
-                  <div className="pt-1">
-                    <Link
-                      href="/facilities"
-                      className="inline-flex items-center gap-2 text-xs font-bold text-active hover:underline"
-                    >
-                      Explore the Nutrition & Fuel Bar Facility &rarr;
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+                </motion.div>
+              </motion.div>
 
-        {/* ============================================================== */}
-        {/* 4. TAB 3: HYDRATION & ELECTROLYTE TRACKER                     */}
-        {/* ============================================================== */}
-        {activeTab === "hydration" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
-            {/* Input Controls */}
-            <div className="lg:col-span-6 bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5">
-              <div className="border-b border-slate-100 dark:border-brand-500/15 pb-3.5 space-y-0.5">
-                <h3 className="font-['Outfit'] text-lg font-bold text-foreground">
-                  Hydration & Sweat Rate Parameters
-                </h3>
-                <p className="text-[11px] text-secondary">
-                  Calculate cellular hydration needs during intense training
-                </p>
-              </div>
-
-              {/* Workout Duration */}
-              <div className="space-y-2">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold uppercase tracking-wider text-secondary">Daily Workout Duration</span>
-                  <span className="font-['Outfit'] text-sm font-extrabold text-foreground px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-brand-500/10 border border-slate-200 dark:border-brand-500/15">
-                    {workoutDurationMins} Minutes
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="180"
-                  step="15"
-                  value={workoutDurationMins}
-                  onChange={(e) => setWorkoutDurationMins(Number(e.target.value))}
-                  className="w-full accent-[#ff1844] cursor-pointer"
-                />
-              </div>
-
-              {/* Training Environment / Climate */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-secondary">
-                  Training Environment Climate
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setClimate("temperate")}
-                    className={`py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer text-center ${
-                      climate === "temperate"
-                        ? "border-active bg-active/10 text-active font-extrabold shadow-2xs"
-                        : "border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-background/50 text-slate-700 dark:text-secondary hover:text-foreground"
-                    }`}
-                  >
-                    Climate-Controlled (68°F)
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setClimate("hot")}
-                    className={`py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer text-center ${
-                      climate === "hot"
-                        ? "border-active bg-active/10 text-active font-extrabold shadow-2xs"
-                        : "border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-background/50 text-slate-700 dark:text-secondary hover:text-foreground"
-                    }`}
-                  >
-                    Hot Yoga / Outdoor Turf (85°F+)
-                  </button>
-                </div>
-              </div>
-
-              {/* Electrolyte Guidance */}
-              <div className="p-4 rounded-2xl bg-sky-500/10 border border-sky-500/25 space-y-1.5 text-xs">
-                <span className="font-bold text-sky-600 dark:text-sky-400 flex items-center gap-1.5">
-                  <FaTint /> Athletic Electrolyte Protocol
-                </span>
-                <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-                  Drinking plain water without electrolytes during 60+ minute training sessions can dilute blood sodium levels. Supplement with 400–600mg sodium and 200mg potassium per hour of strenuous sweat output.
-                </p>
-              </div>
-            </div>
-
-            {/* Hydration Results */}
-            <div className="lg:col-span-6 bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5">
-              <div className="text-center space-y-1">
-                <span className="text-[11px] uppercase font-extrabold tracking-widest text-secondary block">
-                  Recommended Daily Water Volume
-                </span>
-                <div className="font-['Outfit'] text-5xl sm:text-6xl font-black text-sky-500 drop-shadow tracking-tight">
-                  {hydrationData.liters}
-                  <span className="text-sm font-bold text-foreground ml-2">Liters / day</span>
-                </div>
-                <p className="text-xs text-secondary pt-0.5">
-                  Equivalent to approximately <strong>{hydrationData.glasses} standard 250ml glasses</strong> ({hydrationData.ounces} fl oz)
-                </p>
-              </div>
-
-              {/* Glass visual tracker */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-brand-900/30 border border-slate-200 dark:border-brand-500/15 space-y-2">
-                <span className="text-xs font-bold text-foreground uppercase tracking-wider block">
-                  Daily Intake Pacing
-                </span>
-                <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 text-center">
-                  {Array.from({ length: Math.min(hydrationData.glasses, 12) }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="p-2 rounded-xl bg-sky-500/15 border border-sky-500/30 text-sky-500 text-xs font-bold flex flex-col items-center justify-center gap-1"
-                    >
-                      <FaTint size={12} />
-                      <span className="text-[10px] text-foreground">#{i + 1}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2 text-xs text-secondary leading-relaxed bg-slate-50 dark:bg-background/50 p-4 rounded-2xl border border-slate-200/80 dark:border-brand-500/15">
-                <strong className="text-foreground block">Free Chilled Alkaline Hydration at FlexPulse:</strong>
-                Our gym floor features continuous reverse-osmosis filtration taps delivering chilled 9.5 pH alkaline water with magnesium and trace minerals for all active athletes.
-              </div>
-
-              <Link
-                href="/facilities"
-                className="w-full py-2.5 rounded-xl bg-active text-btn-text text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-sm hover:opacity-90 transition-all"
+              {/* Hydration Results */}
+              <motion.div
+                variants={rightCardVariants}
+                initial="hidden"
+                animate="visible"
+                className="lg:col-span-6 bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5"
               >
-                <span>View Club Amenities & Alkaline Bar</span>
-                <FiArrowRight size={13} />
-              </Link>
-            </div>
-          </div>
-        )}
+                <motion.div variants={scorePopVariants} className="text-center space-y-1">
+                  <span className="text-[11px] uppercase font-extrabold tracking-widest text-secondary block">
+                    Recommended Daily Water Volume
+                  </span>
+                  <div className="font-['Outfit'] text-5xl sm:text-6xl font-black text-sky-500 drop-shadow tracking-tight">
+                    {hydrationData.liters}
+                    <span className="text-sm font-bold text-foreground ml-2">Liters / day</span>
+                  </div>
+                  <p className="text-xs text-secondary pt-0.5">
+                    Equivalent to approximately <strong>{hydrationData.glasses} standard 250ml glasses</strong> ({hydrationData.ounces} fl oz)
+                  </p>
+                </motion.div>
+
+                {/* Glass visual tracker */}
+                <motion.div variants={containerStagger} className="p-4 rounded-2xl bg-slate-50 dark:bg-brand-900/30 border border-slate-200 dark:border-brand-500/15 space-y-2 shadow-2xs">
+                  <span className="text-xs font-bold text-foreground uppercase tracking-wider block">
+                    Daily Intake Pacing
+                  </span>
+                  <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 text-center">
+                    {Array.from({ length: Math.min(hydrationData.glasses, 12) }).map((_, i) => (
+                      <motion.div
+                        key={i}
+                        variants={chipVariants}
+                        whileHover={{ scale: 1.1, y: -2 }}
+                        className="p-2 rounded-xl bg-sky-500/15 border border-sky-500/30 text-sky-500 text-xs font-bold flex flex-col items-center justify-center gap-1 shadow-2xs"
+                      >
+                        <FaTint size={12} />
+                        <span className="text-[10px] text-foreground">#{i + 1}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                <motion.div variants={insightVariants} className="space-y-2 text-xs text-secondary leading-relaxed bg-slate-50 dark:bg-background/50 p-4 rounded-2xl border border-slate-200/80 dark:border-brand-500/15 shadow-2xs">
+                  <strong className="text-foreground block">Free Chilled Alkaline Hydration at FlexPulse:</strong>
+                  Our gym floor features continuous reverse-osmosis filtration taps delivering chilled 9.5 pH alkaline water with magnesium and trace minerals for all active athletes.
+                </motion.div>
+
+                <motion.div variants={ctaBtnVariants}>
+                  <Link
+                    href="/facilities"
+                    className="relative group overflow-hidden w-full py-3 rounded-xl bg-active text-btn-text text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-sm hover:opacity-95 active:scale-98 transition-all"
+                  >
+                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-linear-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+                    <span className="relative z-10">View Club Amenities & Alkaline Bar</span>
+                    <FiArrowRight size={13} className="relative z-10 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ============================================================== */}
         {/* 5. DECORATIVE VIP 1-DAY TRIAL PASS VOUCHER SHOWCASE           */}
+        {/* RE-ENGINEERED COLOR DESIGN: HIGH CONTRAST LUXURY TICKET STUB  */}
         {/* ============================================================== */}
-        <section id="trial-pass" className="pt-6 border-t border-slate-200 dark:border-brand-500/20">
-          <div className="relative rounded-3xl bg-linear-to-br from-active/15 via-[#1B1A55]/30 to-[#070F2B] border border-active/35 p-6 sm:p-10 shadow-2xl overflow-hidden">
+        <section id="trial-pass" ref={vipRef} className="pt-6 border-t border-slate-200 dark:border-brand-500/20">
+          <motion.div
+            variants={vipSectionContainer}
+            initial="hidden"
+            animate={vipInView ? "visible" : "hidden"}
+            className="relative rounded-3xl bg-linear-to-br from-active/10 via-brand-500/10 to-slate-100/90 dark:from-active/15 dark:via-[#1B1A55]/30 dark:to-[#0c0a1d]/90 border border-slate-200/90 dark:border-brand-500/25 p-6 sm:p-10 shadow-md backdrop-blur-md overflow-hidden"
+          >
             {/* Background ambient lighting */}
-            <div className="absolute top-0 right-1/4 w-80 h-80 bg-active/10 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute -top-12 -right-12 w-96 h-96 bg-active/15 dark:bg-active/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-12 -left-12 w-80 h-80 bg-brand-500/10 dark:bg-[#1B1A55]/40 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               
               {/* Left Ticket Info & Perks (7 cols) */}
               <div className="lg:col-span-7 space-y-4">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-active text-white text-xs font-bold uppercase tracking-wider shadow-sm">
+                <motion.div
+                  variants={vipKickerVariants}
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-active text-btn-text text-xs font-bold uppercase tracking-wider shadow-2xs"
+                >
                   <FiGift className="w-3.5 h-3.5" />
                   <span>Complimentary VIP Invitation</span>
-                </div>
+                </motion.div>
 
-                <h3 className="font-['Outfit'] text-2xl sm:text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight leading-tight">
+                <motion.h3
+                  variants={vipTitleVariants}
+                  className="font-['Outfit'] text-2xl sm:text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight leading-tight"
+                >
                   Test Your New Plan With a <br />
                   <span className="text-active">Free 1-Day VIP Pass</span>
-                </h3>
+                </motion.h3>
 
-                <p className="font-['Inter'] text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3] leading-relaxed max-w-xl">
+                <motion.p
+                  variants={vipDescVariants}
+                  className="font-['Inter'] text-xs sm:text-sm text-secondary leading-relaxed max-w-xl"
+                >
                   Now that you know your body composition baseline and target calories, test drive your routine at FlexPulse. Enjoy full access to our Olympic weight room, functional turf, any studio group class, and recovery hydro-spa.
-                </p>
+                </motion.p>
 
                 {/* Perforated Ticket Feature Chips */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1 font-['Inter'] text-xs">
-                  <div className="p-2.5 rounded-xl bg-background/60 border border-brand-500/15 flex items-center gap-2">
-                    <FiCheckCircle className="text-active w-4 h-4 shrink-0" />
-                    <span className="font-semibold text-foreground">Olympic Weights</span>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-background/60 border border-brand-500/15 flex items-center gap-2">
-                    <FiCheckCircle className="text-active w-4 h-4 shrink-0" />
-                    <span className="font-semibold text-foreground">1 Group Class</span>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-background/60 border border-brand-500/15 flex items-center gap-2">
-                    <FiCheckCircle className="text-active w-4 h-4 shrink-0" />
-                    <span className="font-semibold text-foreground">InBody 570 Scan</span>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-background/60 border border-brand-500/15 flex items-center gap-2">
-                    <FiCheckCircle className="text-active w-4 h-4 shrink-0" />
-                    <span className="font-semibold text-foreground">Sauna & Recovery</span>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-background/60 border border-brand-500/15 flex items-center gap-2">
-                    <FiCheckCircle className="text-active w-4 h-4 shrink-0" />
-                    <span className="font-semibold text-foreground">Locker & Towel</span>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-background/60 border border-brand-500/15 flex items-center gap-2">
-                    <FiShield className="text-active w-4 h-4 shrink-0" />
-                    <span className="font-semibold text-foreground">No Credit Card</span>
-                  </div>
-                </div>
+                <motion.div variants={containerStagger} className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2 font-['Inter'] text-xs">
+                  {[
+                    { label: "Olympic Weights", icon: FiCheckCircle },
+                    { label: "1 Group Class", icon: FiCheckCircle },
+                    { label: "InBody 570 Scan", icon: FiCheckCircle },
+                    { label: "Sauna & Recovery", icon: FiCheckCircle },
+                    { label: "Locker & Towel", icon: FiCheckCircle },
+                    { label: "No Credit Card", icon: FiShield },
+                  ].map((perk, pIdx) => {
+                    const Icon = perk.icon;
+                    return (
+                      <motion.div
+                        key={pIdx}
+                        variants={vipChipItemVariants}
+                        whileHover={{ scale: 1.03, y: -2 }}
+                        className="p-3 rounded-2xl bg-white/85 dark:bg-[#121026]/70 border border-slate-200/90 dark:border-brand-500/20 shadow-2xs hover:border-active/40 hover:bg-white dark:hover:bg-[#121026] transition-all flex items-center gap-2.5 backdrop-blur-xs group"
+                      >
+                        <Icon className="text-active w-4 h-4 shrink-0 transition-transform group-hover:scale-110" />
+                        <span className="font-semibold text-xs text-foreground">{perk.label}</span>
+                      </motion.div>
+                    );
+                  })}
+                </motion.div>
               </div>
 
               {/* Right Ticket Stub / Generator Card (5 cols) */}
               <div className="lg:col-span-5">
-                <div className="relative rounded-3xl bg-[#070F2B] border-2 border-active/40 p-6 sm:p-7 shadow-2xl space-y-4">
+                <motion.div
+                  variants={vipTicketStubVariants}
+                  className="relative rounded-3xl bg-white dark:bg-[#0c0a1d] border-2 border-active/40 p-6 sm:p-8 shadow-md space-y-4 overflow-hidden"
+                >
                   {/* Decorative Ticket Perforation Badge */}
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-0.5 rounded-full bg-active text-white text-[10px] font-mono font-bold uppercase tracking-widest shadow-md">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-0.5 rounded-full bg-active text-btn-text text-[10px] font-mono font-bold uppercase tracking-widest shadow-2xs">
                     ALL-ACCESS TICKET
                   </div>
 
                   {passGeneratedCode ? (
-                    <div className="text-center space-y-3.5 py-2">
-                      <div className="w-12 h-12 rounded-full bg-active/20 text-active flex items-center justify-center mx-auto">
+                    <motion.div variants={containerStagger} initial="hidden" animate="visible" className="text-center space-y-3.5 py-2">
+                      <motion.div variants={vipKickerVariants} className="w-12 h-12 rounded-full bg-active/15 text-active flex items-center justify-center mx-auto shadow-2xs">
                         <FiCheckCircle className="w-7 h-7" />
-                      </div>
-                      <div className="space-y-0.5">
-                        <h4 className="font-['Outfit'] text-xl font-bold text-white">
+                      </motion.div>
+                      <motion.div variants={vipFieldItemVariants} className="space-y-0.5">
+                        <h4 className="font-['Outfit'] text-xl font-bold text-foreground">
                           Your Pass Is Ready!
                         </h4>
-                        <p className="text-xs text-gray-300 font-['Inter']">
+                        <p className="text-xs text-secondary font-['Inter']">
                           Show this digital pass code to our reception desk on arrival:
                         </p>
-                      </div>
+                      </motion.div>
 
                       {/* Barcode & Code Box */}
-                      <div className="p-3.5 rounded-2xl bg-black/70 border border-active/50 space-y-1.5 select-all">
+                      <motion.div variants={vipFieldItemVariants} className="p-4 rounded-2xl bg-slate-50 dark:bg-black/50 border border-active/40 space-y-1.5 select-all text-center shadow-2xs">
                         <div className="font-mono text-2xl sm:text-3xl font-black text-active tracking-widest">
                           {passGeneratedCode}
                         </div>
-                        <div className="text-[10px] text-gray-400 font-mono tracking-widest uppercase">
+                        <div className="text-[10px] text-slate-400 dark:text-gray-400 font-mono tracking-widest uppercase">
                           ||| | | |||| || | || |||| | |||
                         </div>
-                      </div>
+                      </motion.div>
 
-                      <div className="flex gap-2">
+                      <motion.div variants={vipBtnItemVariants} className="flex gap-2 pt-1">
                         <button
+                          type="button"
                           onClick={handleCopyCode}
-                          className="flex-1 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+                          className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-brand-500/30 bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-foreground font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs"
                         >
-                          {copied ? <FiCheck className="w-4 h-4 text-emerald-400" /> : <FiCopy className="w-4 h-4" />}
+                          {copied ? <FiCheck className="w-4 h-4 text-emerald-500" /> : <FiCopy className="w-4 h-4" />}
                           <span>{copied ? "Copied!" : "Copy Code"}</span>
                         </button>
                         <Link
                           href="/schedule"
-                          className="py-2.5 px-4 rounded-xl bg-active text-white font-bold text-xs flex items-center justify-center transition-all"
+                          className="relative group overflow-hidden py-2.5 px-4 rounded-xl bg-active text-btn-text font-bold text-xs flex items-center justify-center transition-all shadow-2xs"
                         >
-                          Schedule
+                          <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-linear-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+                          <span className="relative z-10">Schedule</span>
                         </Link>
-                      </div>
+                      </motion.div>
 
-                      <p className="text-[10px] text-gray-400 font-['Inter']">
+                      <motion.p variants={vipFieldItemVariants} className="text-[10px] text-secondary font-['Inter']">
                         Valid for 7 days from today. No hidden commitments.
-                      </p>
-                    </div>
+                      </motion.p>
+                    </motion.div>
                   ) : (
-                    <form onSubmit={handleClaimPass} className="space-y-3.5 font-['Inter']">
-                      <div className="text-center space-y-0.5">
-                        <h4 className="font-['Outfit'] text-xl font-bold text-white">
+                    <motion.form variants={containerStagger} initial="hidden" animate="visible" onSubmit={handleClaimPass} className="space-y-3.5 font-['Inter']">
+                      <motion.div variants={vipFieldItemVariants} className="text-center space-y-0.5">
+                        <h4 className="font-['Outfit'] text-xl font-bold text-foreground">
                           Claim Digital Pass
                         </h4>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-secondary">
                           Instant confirmation • Generated in 2 seconds
                         </p>
-                      </div>
+                      </motion.div>
 
-                      <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-300 mb-1">
+                      <motion.div variants={vipFieldItemVariants}>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">
                           Full Name *
                         </label>
                         <input
@@ -1225,12 +1653,12 @@ export default function FitnessCalculatorClient() {
                           value={passData.name}
                           onChange={(e) => setPassData({ ...passData, name: e.target.value })}
                           placeholder="e.g. Jordan Miller"
-                          className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/15 text-white text-xs sm:text-sm focus:border-active outline-none placeholder-gray-500 transition-all"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-searchbox-bg border border-slate-200 dark:border-brand-500/25 text-foreground text-xs sm:text-sm focus:border-active focus:ring-1 focus:ring-active/20 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-all shadow-2xs"
                         />
-                      </div>
+                      </motion.div>
 
-                      <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-300 mb-1">
+                      <motion.div variants={vipFieldItemVariants}>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">
                           Email Address *
                         </label>
                         <input
@@ -1239,12 +1667,12 @@ export default function FitnessCalculatorClient() {
                           value={passData.email}
                           onChange={(e) => setPassData({ ...passData, email: e.target.value })}
                           placeholder="jordan@example.com"
-                          className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/15 text-white text-xs sm:text-sm focus:border-active outline-none placeholder-gray-500 transition-all"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-searchbox-bg border border-slate-200 dark:border-brand-500/25 text-foreground text-xs sm:text-sm focus:border-active focus:ring-1 focus:ring-active/20 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-all shadow-2xs"
                         />
-                      </div>
+                      </motion.div>
 
-                      <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-300 mb-1">
+                      <motion.div variants={vipFieldItemVariants}>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">
                           Phone Number (Optional)
                         </label>
                         <input
@@ -1252,36 +1680,46 @@ export default function FitnessCalculatorClient() {
                           value={passData.phone}
                           onChange={(e) => setPassData({ ...passData, phone: e.target.value })}
                           placeholder="+1 (555) 000-0000"
-                          className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/15 text-white text-xs sm:text-sm focus:border-active outline-none placeholder-gray-500 transition-all"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-searchbox-bg border border-slate-200 dark:border-brand-500/25 text-foreground text-xs sm:text-sm focus:border-active focus:ring-1 focus:ring-active/20 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-all shadow-2xs"
                         />
-                      </div>
+                      </motion.div>
 
-                      <button
-                        type="submit"
-                        disabled={passLoading}
-                        className="w-full py-3 rounded-xl bg-active text-white font-bold text-xs sm:text-sm shadow-lg hover:opacity-90 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                      >
-                        {passLoading ? (
-                          <span>Activating Pass...</span>
-                        ) : (
-                          <>
-                            <FiZap className="w-4 h-4" />
-                            <span>Activate My VIP Pass</span>
-                          </>
-                        )}
-                      </button>
-                    </form>
+                      <motion.div variants={vipBtnItemVariants} className="pt-1">
+                        <button
+                          type="submit"
+                          disabled={passLoading}
+                          className="relative group overflow-hidden w-full py-3.5 rounded-xl bg-active text-btn-text font-bold text-xs sm:text-sm shadow-sm hover:opacity-95 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                        >
+                          <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-linear-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+                          {passLoading ? (
+                            <span className="relative z-10">Activating Pass...</span>
+                          ) : (
+                            <>
+                              <FiZap className="w-4 h-4 relative z-10" />
+                              <span className="relative z-10">Activate My VIP Pass</span>
+                            </>
+                          )}
+                        </button>
+                      </motion.div>
+                    </motion.form>
                   )}
-                </div>
+                </motion.div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </section>
 
         {/* ============================================================== */}
         {/* ATHLETE VERIFICATION: REAL BIOMETRIC OUTCOMES                  */}
+        {/* FULL SECTION WIDTH MATCHING STANDARD PAGE LAYOUT               */}
         {/* ============================================================== */}
-        <section className="mt-8 max-w-4xl mx-auto w-full">
+        <motion.section
+          ref={tickerRef}
+          initial={{ opacity: 0, y: 25 }}
+          animate={tickerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 25 }}
+          transition={{ type: "spring", stiffness: 350, damping: 28 }}
+          className="mt-8 w-full"
+        >
           <AthleteVerificationTicker
             title="ATHLETE VERIFICATION • REAL BIOMETRIC OUTCOMES"
             variant="adaptive"
@@ -1321,7 +1759,7 @@ export default function FitnessCalculatorClient() {
               },
             ]}
           />
-        </section>
+        </motion.section>
       </div>
     </div>
   );

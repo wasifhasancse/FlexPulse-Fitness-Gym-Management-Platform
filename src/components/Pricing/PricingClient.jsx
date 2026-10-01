@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup, useInView } from "framer-motion";
 import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
 import {
   FiCheck,
@@ -25,6 +25,7 @@ import {
   FiCopy,
   FiActivity,
   FiTarget,
+  FiCheckCircle,
 } from "react-icons/fi";
 import {
   FaDumbbell,
@@ -38,6 +39,127 @@ import { submitTrialPass } from "@/lib/api/getClasses";
 import toast from "react-hot-toast";
 import AthleteVerificationTicker from "@/components/common/AthleteVerificationTicker";
 
+// =========================================================================
+// MOTION VARIANTS FOR TRIGGERED MULTI-VECTOR TRANSITIONS
+// =========================================================================
+
+const containerStagger = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.04,
+    },
+  },
+};
+
+const pricingGridVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+// Differentiated card entrance vectors
+const starterCardVariant = {
+  hidden: { opacity: 0, x: -35, y: 18 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 360,
+      damping: 26,
+      staggerChildren: 0.05,
+      delayChildren: 0.04,
+    },
+  },
+};
+
+const proCardVariant = {
+  hidden: { opacity: 0, y: 40, scale: 0.94 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 380,
+      damping: 24,
+      delay: 0.08,
+      staggerChildren: 0.05,
+      delayChildren: 0.08,
+    },
+  },
+};
+
+const eliteCardVariant = {
+  hidden: { opacity: 0, x: 35, y: 18 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 360,
+      damping: 26,
+      delay: 0.16,
+      staggerChildren: 0.05,
+      delayChildren: 0.12,
+    },
+  },
+};
+
+// Item level micro-variants
+const itemFadeUp = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 420, damping: 26 },
+  },
+};
+
+const itemScalePop = {
+  hidden: { opacity: 0, scale: 0.88 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { type: "spring", stiffness: 460, damping: 24 },
+  },
+};
+
+const badgePopVariant = {
+  hidden: { opacity: 0, scale: 0.75, y: -12 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 480, damping: 24 },
+  },
+};
+
+// Value Stack items staggered multi-vectors
+const valueCardVariants = [
+  { hidden: { opacity: 0, x: -24 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 400, damping: 26 } } },
+  { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 400, damping: 26, delay: 0.05 } } },
+  { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 400, damping: 26, delay: 0.1 } } },
+  { hidden: { opacity: 0, x: 24 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 400, damping: 26, delay: 0.15 } } },
+];
+
+// Member reviews multi-vectors
+const reviewVariants = [
+  { hidden: { opacity: 0, x: -26 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 380, damping: 28 } } },
+  { hidden: { opacity: 0, y: 26, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 380, damping: 28, delay: 0.07 } } },
+  { hidden: { opacity: 0, x: 26 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 380, damping: 28, delay: 0.14 } } },
+];
+
 const PLANS = [
   {
     id: "starter",
@@ -49,6 +171,7 @@ const PLANS = [
     annualSavings: 72,
     popular: false,
     badge: "Solo Training",
+    variant: starterCardVariant,
     features: [
       "Access to full gym floor & cardio deck (05:00 AM – 11:00 PM)",
       "Standard executive locker room & rain shower access",
@@ -74,7 +197,8 @@ const PLANS = [
     annualSavings: 144,
     popular: true,
     stripePlan: true,
-    badge: "Most Popular Athlete Choice",
+    badge: "Studio & Coaching",
+    variant: proCardVariant,
     features: [
       "Unlimited 24/7 RFID keyless access to all gym floors",
       "Full access to 120+ weekly group classes (HIIT, Boxing, Yoga, Spin)",
@@ -92,7 +216,7 @@ const PLANS = [
   },
   {
     id: "elite",
-    name: "VIP Elite Champion",
+    name: "VIP Elite",
     targetGoal: "transformation",
     tagline: "The ultimate concierge athletic experience for peak performance and recovery.",
     monthlyPrice: 99,
@@ -100,6 +224,7 @@ const PLANS = [
     annualSavings: 240,
     popular: false,
     badge: "All-Inclusive Concierge",
+    variant: eliteCardVariant,
     features: [
       "Everything included in the Pro Athlete tier",
       "Weekly 1-on-1 personal training sessions with a Master Coach (4/mo)",
@@ -225,6 +350,37 @@ export default function PricingClient() {
   const [selectedQuizGoal, setSelectedQuizGoal] = useState("all");
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
 
+  // Trigger Refs for Viewport Observers across Every Section
+  const heroRef = useRef(null);
+  const heroInView = useInView(heroRef, { once: true, amount: 0.2 });
+
+  const filterRef = useRef(null);
+  const filterInView = useInView(filterRef, { once: true, amount: 0.2 });
+
+  const cardsRef = useRef(null);
+  const cardsInView = useInView(cardsRef, { once: true, amount: 0.15 });
+
+  const valueRef = useRef(null);
+  const valueInView = useInView(valueRef, { once: true, amount: 0.2 });
+
+  const tickerRef = useRef(null);
+  const tickerInView = useInView(tickerRef, { once: true, amount: 0.15 });
+
+  const vipBannerRef = useRef(null);
+  const vipBannerInView = useInView(vipBannerRef, { once: true, amount: 0.2 });
+
+  const tableRef = useRef(null);
+  const tableInView = useInView(tableRef, { once: true, amount: 0.15 });
+
+  const reviewsRef = useRef(null);
+  const reviewsInView = useInView(reviewsRef, { once: true, amount: 0.2 });
+
+  const discountRef = useRef(null);
+  const discountInView = useInView(discountRef, { once: true, amount: 0.2 });
+
+  const faqRef = useRef(null);
+  const faqInView = useInView(faqRef, { once: true, amount: 0.15 });
+
   // Free trial pass form state
   const [formData, setFormData] = useState({
     fullName: "",
@@ -253,7 +409,6 @@ export default function PricingClient() {
         setPassResult(res);
         toast.success("VIP 1-Day Trial Pass Activated!");
       } else {
-        // Robust fallback code for instant user satisfaction
         const fallbackCode = `FP-VIP-${Math.floor(1000 + Math.random() * 9000)}`;
         setPassResult({ passCode: fallbackCode });
         toast.success("VIP 1-Day Trial Pass Activated!");
@@ -277,13 +432,20 @@ export default function PricingClient() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pt-4 pb-14 sm:pb-16 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto space-y-12 sm:space-y-16">
+    <div className="min-h-screen bg-background text-foreground pt-4 pb-14 sm:pb-16 transition-colors duration-300 relative">
+      {/* UNIVERSAL CONTAINER WIDTH: Strict w-11/12 mx-auto matching Nav/Footer */}
+      <div className="w-11/12 mx-auto relative z-10 space-y-12 sm:space-y-16">
         
         {/* ============================================================== */}
-        {/* 1. HERO HEADER WITH EXIT ANIMATION & ANNUAL BILLING TOGGLE     */}
+        {/* 1. HERO HEADER WITH TRIGGERED ANIMATION & ANNUAL BILLING TOGGLE */}
         {/* ============================================================== */}
-        <div className="text-center space-y-4 max-w-3xl mx-auto relative pt-2">
+        <motion.div
+          ref={heroRef}
+          variants={containerStagger}
+          initial="hidden"
+          animate={heroInView ? "visible" : "hidden"}
+          className="text-center space-y-4 max-w-3xl mx-auto relative pt-2"
+        >
           <AnimatedSectionTitle
             kicker="Transparent Membership Architecture"
             title="Invest in Your Health & Performance"
@@ -294,7 +456,7 @@ export default function PricingClient() {
           />
 
           {/* Billing Cycle Toggle */}
-          <div className="flex items-center justify-center gap-3 pt-2">
+          <motion.div variants={itemFadeUp} className="flex items-center justify-center gap-3 pt-2">
             <span
               className={`text-xs sm:text-sm font-bold transition-colors ${
                 !isAnnual ? "text-foreground" : "text-secondary"
@@ -309,7 +471,7 @@ export default function PricingClient() {
               className="relative w-14 h-7.5 rounded-full bg-slate-200 dark:bg-brand-800/40 border border-slate-300 dark:border-brand-500/30 p-1 transition-colors cursor-pointer"
             >
               <div
-                className={`w-5.5 h-5.5 rounded-full bg-active transition-transform duration-300 shadow-sm ${
+                className={`w-5.5 h-5.5 rounded-full bg-active transition-transform duration-300 shadow-2xs ${
                   isAnnual ? "translate-x-6" : "translate-x-0"
                 }`}
               />
@@ -321,31 +483,38 @@ export default function PricingClient() {
               }`}
             >
               Annual Billing
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-black uppercase tracking-wider animate__animated animate__heartBeat animate__infinite animate__slower">
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-black uppercase tracking-wider shadow-2xs">
                 Save 20%
               </span>
             </span>
-          </div>
+          </motion.div>
 
           {/* Quick Assurance Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs text-secondary font-medium">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 dark:bg-brand-900/40 border border-slate-200 dark:border-brand-500/15">
+          <motion.div variants={containerStagger} className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs text-secondary font-medium">
+            <motion.span variants={itemScalePop} whileHover={{ scale: 1.04 }} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-brand-900/40 border border-slate-200 dark:border-brand-500/15 shadow-2xs">
               <FiShield className="text-emerald-500" /> 14-Day Money-Back Guarantee
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 dark:bg-brand-900/40 border border-slate-200 dark:border-brand-500/15">
+            </motion.span>
+            <motion.span variants={itemScalePop} whileHover={{ scale: 1.04 }} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-brand-900/40 border border-slate-200 dark:border-brand-500/15 shadow-2xs">
               <FiRefreshCw className="text-active" /> Freeze or Cancel Anytime
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 dark:bg-brand-900/40 border border-slate-200 dark:border-brand-500/15">
+            </motion.span>
+            <motion.span variants={itemScalePop} whileHover={{ scale: 1.04 }} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-brand-900/40 border border-slate-200 dark:border-brand-500/15 shadow-2xs">
               <FaDumbbell className="text-active" /> RFID 24/7 Keyless Entry
-            </span>
-          </div>
-        </div>
+            </motion.span>
+          </motion.div>
+        </motion.div>
 
         {/* ============================================================== */}
-        {/* 2. INTERACTIVE TIER FINDER / ATHLETIC GOAL FILTER              */}
+        {/* 2. RE-ENGINEERED UNIFIED SEGMENTED TAB FILTER                  */}
+        {/* ULTRA-SMOOTH SEGMENTED PILL TRACK (NO JARRING BORDERS/BOXES)   */}
         {/* ============================================================== */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 shadow-xs max-w-4xl mx-auto space-y-2.5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <motion.div
+          ref={filterRef}
+          initial={{ opacity: 0, y: 22 }}
+          animate={filterInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 }}
+          transition={{ type: "spring", stiffness: 380, damping: 28 }}
+          className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 shadow-xs w-full space-y-3"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
             <span className="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5">
               <FiTarget className="text-active" /> Filter by Your Primary Training Style:
             </span>
@@ -355,121 +524,155 @@ export default function PricingClient() {
           </div>
 
           <LayoutGroup id="pricingGoalGroup">
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+            <div className="p-1.5 rounded-2xl bg-slate-100/90 dark:bg-[#0c0a1d] border border-slate-200/90 dark:border-brand-500/25 grid grid-cols-2 sm:grid-cols-4 gap-1.5 shadow-xs">
               {[
-                { id: "all", label: "View All 3 Tiers" },
-                { id: "solo", label: "Solo Gym Floor Lifter" },
-                { id: "classes", label: "Group Classes & HIIT" },
-                { id: "transformation", label: "Full Coaching & Spa" },
-              ].map((g) => (
-                <button
-                  key={g.id}
-                  onClick={() => setSelectedQuizGoal(g.id)}
-                  className={`relative py-2 px-3 rounded-xl text-xs font-bold transition-colors cursor-pointer text-center ${
-                    selectedQuizGoal === g.id
-                      ? "text-btn-text"
-                      : "bg-slate-100 dark:bg-brand-900/40 border border-slate-200 dark:border-brand-500/15 text-slate-700 dark:text-secondary hover:text-foreground"
-                  }`}
-                >
-                  {selectedQuizGoal === g.id && (
-                    <motion.span
-                      layoutId="activePricingGoalPill"
-                      className="absolute inset-0 rounded-xl bg-active shadow-xs"
-                      transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                    />
-                  )}
-                  <span className="relative z-10">{g.label}</span>
-                </button>
-              ))}
+                { id: "all", label: "View All 3 Tiers", icon: FiActivity },
+                { id: "solo", label: "Solo Gym Lifter", icon: FaDumbbell },
+                { id: "classes", label: "Group Classes & HIIT", icon: FaFireAlt },
+                { id: "transformation", label: "Full Coaching & Spa", icon: FaSpa },
+              ].map((g) => {
+                const Icon = g.icon;
+                const isActive = selectedQuizGoal === g.id;
+                return (
+                  <button
+                    key={g.id}
+                    type="button"
+                    onClick={() => setSelectedQuizGoal(g.id)}
+                    className={`relative py-3 px-3 rounded-xl text-xs sm:text-sm font-bold transition-colors duration-200 cursor-pointer flex items-center justify-center gap-2 select-none ${
+                      isActive
+                        ? "text-btn-text font-extrabold"
+                        : "text-slate-600 dark:text-secondary hover:text-foreground hover:bg-slate-200/50 dark:hover:bg-white/5"
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.span
+                        layoutId="activePricingGoalPill"
+                        className="absolute inset-0 rounded-xl bg-active shadow-sm"
+                        transition={{ type: "spring", stiffness: 480, damping: 34 }}
+                      />
+                    )}
+                    <Icon size={14} className="relative z-10 shrink-0" />
+                    <span className="relative z-10 truncate">{g.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </LayoutGroup>
-        </div>
+        </motion.div>
 
         {/* ============================================================== */}
-        {/* 3. PRICING CARDS GRID WITH LAYOUT ANIMATION                    */}
+        {/* 3. RE-DESIGNED PRICING CARDS WITH CHOREOGRAPHED MULTI-VECTORS  */}
+        {/* DYNAMIC TAB FOCUS & SELECTIVE BLUR FOR NON-MATCHING TIERS      */}
         {/* ============================================================== */}
-        <motion.div layout className="grid grid-cols-1 md:grid-cols-3 gap-7 sm:gap-8 items-stretch">
-          <AnimatePresence mode="popLayout">
-            {PLANS.map((plan) => {
-              const price = isAnnual ? plan.annualPrice : plan.monthlyPrice;
-              const isHighlightedByFilter =
-                selectedQuizGoal === "all" || selectedQuizGoal === plan.targetGoal;
+        <motion.div
+          ref={cardsRef}
+          variants={pricingGridVariants}
+          initial="hidden"
+          animate={cardsInView ? "visible" : "hidden"}
+          className="grid grid-cols-1 md:grid-cols-3 gap-7 sm:gap-8 items-stretch w-full"
+        >
+          {PLANS.map((plan) => {
+            const price = isAnnual ? plan.annualPrice : plan.monthlyPrice;
+            const isTabFiltering = selectedQuizGoal !== "all";
+            const isMatchingGoal = isTabFiltering && selectedQuizGoal === plan.targetGoal;
+            const isOtherCardBlurred = isTabFiltering && selectedQuizGoal !== plan.targetGoal;
 
-              return (
-                <motion.div
-                  key={plan.id}
-                  layout
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                  className={`relative rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 ${
-                    plan.popular
-                      ? "bg-white dark:bg-[#15132d] border-2 border-active shadow-xl scale-[1.02] z-10"
-                      : "bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 hover:border-slate-300 dark:hover:border-brand-500/40 shadow-xs"
-                  } ${!isHighlightedByFilter ? "opacity-60" : "opacity-100"}`}
-                >
-                {/* Popular Pill */}
-                {plan.popular && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-active text-btn-text text-[11px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1.5 whitespace-nowrap animate__animated animate__pulse animate__infinite">
+            return (
+              <motion.div
+                key={plan.id}
+                variants={plan.variant}
+                className={`relative rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 ${
+                  isMatchingGoal
+                    ? "bg-white dark:bg-[#15132d] border-2 border-active shadow-md ring-4 ring-active/25 scale-[1.03] z-20 opacity-100 blur-none"
+                    : isOtherCardBlurred
+                    ? "bg-white/70 dark:bg-[#121026]/40 border border-slate-200 dark:border-brand-500/15 blur-[4px] opacity-30 scale-[0.96] hover:blur-xs hover:opacity-65 cursor-pointer select-none"
+                    : plan.popular && selectedQuizGoal === "all"
+                    ? "bg-white dark:bg-[#15132d] border-2 border-active shadow-md scale-[1.02] z-10 opacity-100 blur-none"
+                    : "bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 hover:border-active/40 shadow-xs opacity-100 scale-100 blur-none"
+                }`}
+                onClick={() => {
+                  if (isOtherCardBlurred) {
+                    setSelectedQuizGoal(plan.targetGoal);
+                  }
+                }}
+              >
+                {/* Popular or Target Goal Pill */}
+                {isMatchingGoal ? (
+                  <motion.div
+                    variants={badgePopVariant}
+                    className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-active text-btn-text text-[11px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1.5 whitespace-nowrap z-30"
+                  >
+                    <FiCheckCircle className="fill-white" size={13} /> Recommended for Your Goal
+                  </motion.div>
+                ) : plan.popular && selectedQuizGoal === "all" ? (
+                  <motion.div
+                    variants={badgePopVariant}
+                    className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-active text-btn-text text-[11px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1.5 whitespace-nowrap z-20"
+                  >
                     <FiStar className="fill-white" size={12} /> Most Popular Athlete Choice
-                  </div>
-                )}
+                  </motion.div>
+                ) : null}
 
                 <div className="space-y-5">
                   {/* Title & Tagline */}
-                  <div className="space-y-1.5 border-b border-slate-100 dark:border-brand-500/15 pb-4">
+                  <motion.div variants={itemFadeUp} className="space-y-1.5 border-b border-slate-100 dark:border-brand-500/15 pb-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-['Outfit'] text-2xl font-black text-slate-900 dark:text-foreground">
+                      <h3 className="font-['Outfit'] text-2xl sm:text-[26px] font-black text-foreground tracking-tight">
                         {plan.name}
                       </h3>
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-100 dark:bg-brand-500/10 text-secondary">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-brand-500/10 text-secondary border border-slate-200/80 dark:border-brand-500/15">
                         {plan.badge}
                       </span>
                     </div>
-                    <p className="text-xs text-secondary leading-relaxed min-h-[34px]">
+                    <p className="text-xs text-secondary leading-relaxed min-h-[44px]">
                       {plan.tagline}
                     </p>
-                  </div>
+                  </motion.div>
 
                   {/* Price Display */}
-                  <div className="space-y-1">
+                  <motion.div variants={itemScalePop} className="space-y-1.5">
                     <div className="flex items-baseline gap-1">
                       <span className="text-2xl font-black text-active">$</span>
-                      <span className="font-['Outfit'] text-5xl font-black text-slate-900 dark:text-foreground">
+                      <span className="font-['Outfit'] text-5xl sm:text-6xl font-black text-foreground tracking-tight">
                         {price}
                       </span>
-                      <span className="text-xs text-secondary font-semibold">
+                      <span className="text-xs text-secondary font-bold ml-1">
                         / month
                       </span>
                     </div>
 
-                    <div className="text-[11px] text-secondary font-medium">
+                    <div className="min-h-[26px] flex items-center">
                       {isAnnual ? (
-                        <span className="text-emerald-600 dark:text-emerald-400 font-bold">
-                          Billed ${plan.annualPrice * 12} annually • Save ${plan.annualSavings}/year
-                        </span>
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 text-[11px] font-bold">
+                          <FiCheck size={12} /> Billed ${plan.annualPrice * 12} annually • Save ${plan.annualSavings}/year
+                        </div>
                       ) : (
-                        <span>Billed monthly • Cancel or freeze anytime</span>
+                        <div className="text-[11px] text-secondary font-medium">
+                          Billed monthly • Cancel or freeze anytime
+                        </div>
                       )}
                     </div>
-                  </div>
+                  </motion.div>
 
                   {/* Features List */}
                   <div className="space-y-2.5 pt-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-800 dark:text-secondary block">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-secondary block">
                       Privileges & Amenities:
                     </span>
-                    <ul className="space-y-2 text-xs text-slate-700 dark:text-foreground">
+                    <ul className="space-y-2.5 text-xs text-foreground">
                       {plan.features.map((feat) => (
-                        <li key={feat} className="flex items-start gap-2.5">
-                          <FiCheck className="text-emerald-500 shrink-0 mt-0.5" size={14} />
+                        <motion.li key={feat} variants={itemFadeUp} className="flex items-start gap-2.5">
+                          <div className="w-4 h-4 rounded-full bg-emerald-500/15 text-emerald-500 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                            <FiCheck size={11} />
+                          </div>
                           <span className="leading-snug">{feat}</span>
-                        </li>
+                        </motion.li>
                       ))}
                       {plan.notIncluded.map((feat) => (
-                        <li key={feat} className="flex items-start gap-2.5 text-secondary/60 line-through">
-                          <FiX className="text-secondary/40 shrink-0 mt-0.5" size={14} />
+                        <li key={feat} className="flex items-start gap-2.5 text-secondary/45 line-through">
+                          <div className="w-4 h-4 rounded-full bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-secondary/40 flex items-center justify-center shrink-0 mt-0.5">
+                            <FiX size={11} />
+                          </div>
                           <span className="leading-snug">{feat}</span>
                         </li>
                       ))}
@@ -478,82 +681,106 @@ export default function PricingClient() {
                 </div>
 
                 {/* Card CTA Deck */}
-                <div className="pt-6 mt-6 border-t border-slate-100 dark:border-brand-500/15 space-y-2">
+                <motion.div variants={itemFadeUp} className="pt-6 mt-6 border-t border-slate-100 dark:border-brand-500/15 space-y-2.5">
                   <Link
                     href={plan.stripePlan ? "/signin" : "/contact"}
-                    className={`w-full py-3 rounded-xl text-center text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer hover:animate__animated hover:animate__pulse ${
-                      plan.popular
-                        ? "bg-active text-btn-text hover:opacity-90 shadow-active/20"
-                        : "bg-slate-900 text-white dark:bg-brand-800/40 dark:text-foreground border border-transparent dark:border-brand-500/30 hover:opacity-90"
+                    className={`relative group overflow-hidden w-full py-3.5 rounded-xl text-center text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                      plan.popular || isMatchingGoal
+                        ? "bg-active text-btn-text hover:opacity-95"
+                        : "bg-slate-900 text-white dark:bg-brand-800/40 dark:text-foreground border border-transparent dark:border-brand-500/30 hover:border-active"
                     }`}
                   >
-                    <span>{plan.stripePlan ? "Join Pro Membership" : "Get Started Now"}</span>
-                    <FiArrowRight size={14} />
+                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-linear-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+                    <span className="relative z-10">{plan.stripePlan ? "Join Pro Membership" : "Get Started Now"}</span>
+                    <FiArrowRight size={14} className="relative z-10 transition-transform group-hover:translate-x-1" />
                   </Link>
 
                   <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="w-full py-1.5 text-center text-[11px] font-bold text-secondary hover:text-active transition-colors cursor-pointer"
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsModalOpen(true);
+                    }}
+                    className="group w-full py-2 text-center text-[11px] font-bold text-secondary hover:text-active transition-colors cursor-pointer flex items-center justify-center gap-1"
                   >
-                    or try with a Free 1-Day Trial Pass &rarr;
+                    <span>or try with a Free 1-Day Trial Pass</span>
+                    <span className="transition-transform group-hover:translate-x-1">&rarr;</span>
                   </button>
-                </div>
+                </motion.div>
               </motion.div>
             );
           })}
-        </AnimatePresence>
-      </motion.div>
+        </motion.div>
 
         {/* ============================================================== */}
-        {/* 4. VALUE STACK & ROI CALCULATOR BREAKDOWN                      */}
+        {/* 4. VALUE STACK & ROI CALCULATOR BREAKDOWN (FULL WIDTH)         */}
         {/* ============================================================== */}
-        <div className="rounded-3xl bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 p-6 sm:p-8 space-y-5 shadow-xs">
-          <div className="text-center space-y-1 max-w-xl mx-auto">
+        <motion.div
+          ref={valueRef}
+          initial="hidden"
+          animate={valueInView ? "visible" : "hidden"}
+          className="rounded-3xl bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 p-6 sm:p-8 space-y-6 shadow-xs w-full"
+        >
+          <motion.div variants={itemFadeUp} className="text-center space-y-1.5 max-w-xl mx-auto">
             <span className="text-[11px] font-bold uppercase tracking-wider text-active">
               Value Equation
             </span>
             <h2 className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground">
               Why FlexPulse Pro is an Unbeatable Investment
             </h2>
-            <p className="text-xs text-secondary">
+            <p className="text-xs text-secondary leading-relaxed">
               Compare the total standalone market cost of individual fitness services against our all-inclusive Pro membership.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 max-w-5xl mx-auto pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 w-full pt-1">
             {VALUE_STACK.map((val, idx) => (
-              <div
+              <motion.div
                 key={idx}
-                className="p-4 rounded-2xl bg-slate-50 dark:bg-brand-900/30 border border-slate-200/80 dark:border-brand-500/15 text-center space-y-1"
+                variants={valueCardVariants[idx % 4]}
+                whileHover={{ y: -3 }}
+                className="p-4 rounded-2xl bg-slate-50 dark:bg-brand-900/30 border border-slate-200/80 dark:border-brand-500/15 text-center space-y-1 shadow-2xs hover:border-active/40 transition-all"
               >
                 <span className="text-xs font-bold text-foreground block">{val.item}</span>
                 <span className="text-[11px] text-secondary font-mono">Market Value: {val.marketValue}</span>
-              </div>
+              </motion.div>
             ))}
           </div>
 
-          <div className="p-4 rounded-2xl bg-active/10 border border-active/30 max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-            <div>
+          <motion.div
+            variants={itemFadeUp}
+            className="p-5 rounded-2xl bg-linear-to-r from-active/10 via-brand-500/10 to-transparent border border-active/30 w-full flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left shadow-2xs"
+          >
+            <div className="space-y-0.5">
               <span className="text-xs text-secondary font-bold uppercase tracking-wider block">
                 Total Standalone Value: <span className="line-through text-slate-500">$460 / month</span>
               </span>
-              <span className="font-['Outfit'] text-lg font-black text-foreground">
-                Your Price with Pro: <span className="text-active">$59 / month</span>
+              <span className="font-['Outfit'] text-lg sm:text-xl font-black text-foreground">
+                Your Price with Pro: <span className="text-active font-black">$59 / month</span>
               </span>
             </div>
             <Link
               href="/signin"
-              className="px-5 py-2.5 rounded-xl bg-active text-btn-text font-bold text-xs sm:text-sm hover:opacity-90 shadow-sm transition-all shrink-0"
+              className="relative group overflow-hidden px-6 py-3 rounded-xl bg-active text-btn-text font-bold text-xs sm:text-sm hover:opacity-95 shadow-sm transition-all shrink-0"
             >
-              Activate Pro Membership &rarr;
+              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-linear-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+              <span className="relative z-10 flex items-center gap-1.5">
+                Activate Pro Membership <FiArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+              </span>
             </Link>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* ============================================================== */}
-        {/* ATHLETE VERIFICATION: REAL MEMBERSHIP OUTCOMES                */}
+        {/* ATHLETE VERIFICATION: REAL MEMBERSHIP OUTCOMES (FULL WIDTH)    */}
         {/* ============================================================== */}
-        <div className="max-w-4xl mx-auto w-full">
+        <motion.div
+          ref={tickerRef}
+          initial={{ opacity: 0, y: 24 }}
+          animate={tickerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+          transition={{ type: "spring", stiffness: 350, damping: 28 }}
+          className="w-full"
+        >
           <AthleteVerificationTicker
             title="ATHLETE VERIFICATION • PROVEN VALUE & OUTCOMES"
             variant="adaptive"
@@ -601,62 +828,79 @@ export default function PricingClient() {
               },
             ]}
           />
-        </div>
+        </motion.div>
 
         {/* ============================================================== */}
-        {/* 5. 1-DAY VIP TRIAL PASS VOUCHER BANNER                         */}
+        {/* 5. 1-DAY VIP TRIAL PASS VOUCHER BANNER (FULL WIDTH REDESIGN)   */}
         {/* ============================================================== */}
-        <div className="relative rounded-3xl bg-linear-to-r from-active/20 via-brand-500/10 to-transparent border border-active/35 p-7 sm:p-10 overflow-hidden shadow-xl flex flex-col lg:flex-row items-center justify-between gap-6">
-          <div className="space-y-2 text-center lg:text-left">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-active text-btn-text text-xs font-black uppercase tracking-wider shadow">
-              <FiGift size={12} /> Complimentary Invitation
+        <motion.div
+          ref={vipBannerRef}
+          initial={{ opacity: 0, y: 30 }}
+          animate={vipBannerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ type: "spring", stiffness: 360, damping: 28 }}
+          className="relative rounded-3xl bg-linear-to-br from-active/10 via-brand-500/10 to-slate-100/90 dark:from-active/15 dark:via-[#1B1A55]/30 dark:to-[#0c0a1d]/90 border border-slate-200/90 dark:border-brand-500/25 p-7 sm:p-10 overflow-hidden shadow-md backdrop-blur-md flex flex-col lg:flex-row items-center justify-between gap-6 w-full"
+        >
+          {/* Ambient lighting glows */}
+          <div className="absolute -top-12 -right-12 w-96 h-96 bg-active/15 dark:bg-active/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-12 -left-12 w-80 h-80 bg-brand-500/10 dark:bg-[#1B1A55]/40 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="space-y-2.5 text-center lg:text-left relative z-10">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-active text-btn-text text-xs font-bold uppercase tracking-wider shadow-2xs">
+              <FiGift size={13} /> Complimentary VIP Invitation
             </span>
-            <h2 className="font-['Outfit'] text-2xl sm:text-4xl font-black text-foreground tracking-tight">
+            <h2 className="font-['Outfit'] text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight leading-tight">
               Not Ready to Commit? Try a <span className="text-active">Free 1-Day VIP Pass</span>
             </h2>
-            <p className="text-xs sm:text-sm text-secondary max-w-xl leading-relaxed">
-              Experience the club first-hand. Train on our Olympic lifting decks, join any studio HIIT or Yoga session, and relax in the recovery Finnish sauna with zero obligation.
+            <p className="text-xs sm:text-sm text-secondary max-w-2xl leading-relaxed">
+              Experience the club first-hand. Train on our Olympic lifting decks, join any studio HIIT or Yoga session, and relax in the recovery Finnish sauna with zero commitment.
             </p>
           </div>
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-6 py-3.5 rounded-2xl bg-active text-btn-text text-xs sm:text-sm font-black shadow-md hover:scale-102 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+            className="relative group overflow-hidden px-7 py-4 rounded-2xl bg-active text-btn-text text-xs sm:text-sm font-black shadow-sm hover:opacity-95 active:scale-98 transition-all flex items-center gap-2 shrink-0 cursor-pointer relative z-10"
           >
-            <FiZap size={16} /> Claim Free 1-Day Pass
+            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-linear-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+            <FiZap size={16} className="relative z-10" />
+            <span className="relative z-10">Claim Free 1-Day Pass</span>
           </button>
-        </div>
+        </motion.div>
 
         {/* ============================================================== */}
-        {/* 6. DETAILED PLAN COMPARISON MATRIX TABLE                       */}
+        {/* 6. DETAILED PLAN COMPARISON MATRIX TABLE (FULL WIDTH)          */}
         {/* ============================================================== */}
-        <div className="space-y-5 pt-2">
-          <div className="text-center space-y-1.5">
+        <motion.div
+          ref={tableRef}
+          initial="hidden"
+          animate={tableInView ? "visible" : "hidden"}
+          className="space-y-5 pt-2 w-full"
+        >
+          <motion.div variants={itemFadeUp} className="text-center space-y-1.5">
             <span className="text-[11px] font-bold uppercase tracking-wider text-active">
               Line-by-Line Breakdown
             </span>
             <h3 className="font-['Outfit'] text-2xl sm:text-3xl font-extrabold text-foreground">
               Comprehensive Feature Comparison
             </h3>
-            <p className="text-xs text-secondary">
+            <p className="text-xs text-secondary leading-relaxed">
               Inspect every gym amenity, coaching privilege, and recovery specification across our membership tiers.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="overflow-x-auto rounded-3xl border border-slate-200 dark:border-brand-500/20 bg-white dark:bg-[#121026]/75 shadow-xs">
+          <motion.div variants={itemFadeUp} className="overflow-x-auto rounded-3xl border border-slate-200 dark:border-brand-500/20 bg-white dark:bg-[#121026]/75 shadow-xs w-full">
             <table className="w-full text-left text-xs sm:text-sm">
               <thead className="border-b border-slate-200 dark:border-brand-500/20 bg-slate-50 dark:bg-brand-800/20 text-secondary uppercase font-bold text-[11px]">
                 <tr>
-                  <th className="py-3.5 px-5">Tier Privilege / Specification</th>
-                  <th className="py-3.5 px-5 text-center">Starter ($29)</th>
-                  <th className="py-3.5 px-5 text-center text-active font-black">Pro Athlete ($59)</th>
-                  <th className="py-3.5 px-5 text-center">VIP Elite ($99)</th>
+                  <th className="py-4 px-6">Tier Privilege / Specification</th>
+                  <th className="py-4 px-6 text-center">Starter ($29)</th>
+                  <th className="py-4 px-6 text-center text-active font-black bg-active/5">Pro Athlete ($59)</th>
+                  <th className="py-4 px-6 text-center">VIP Elite ($99)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-brand-500/10 text-foreground">
                 {COMPARISON_CATEGORIES.map((cat, cIdx) => (
-                  <tr key={cIdx} className="bg-slate-50/60 dark:bg-brand-900/30">
-                    <td colSpan={4} className="py-2.5 px-5 font-bold uppercase tracking-wider text-[11px] text-active">
+                  <tr key={cIdx} className="bg-slate-50/70 dark:bg-brand-900/30">
+                    <td colSpan={4} className="py-3 px-6 font-bold uppercase tracking-wider text-[11px] text-active">
                       {cat.category}
                     </td>
                   </tr>
@@ -664,38 +908,38 @@ export default function PricingClient() {
                   headerRow,
                   ...COMPARISON_CATEGORIES[cIdx].rows.map((row, rIdx) => (
                     <tr key={`${cIdx}-${rIdx}`} className="hover:bg-slate-50 dark:hover:bg-brand-500/5 transition-colors">
-                      <td className="py-3.5 px-5 font-medium text-slate-800 dark:text-foreground">{row.feature}</td>
-                      <td className="py-3.5 px-5 text-center">
+                      <td className="py-4 px-6 font-medium text-foreground">{row.feature}</td>
+                      <td className="py-4 px-6 text-center">
                         {typeof row.starter === "boolean" ? (
                           row.starter ? (
-                            <FiCheck className="text-emerald-500 mx-auto" size={15} />
+                            <FiCheck className="text-emerald-500 mx-auto" size={16} />
                           ) : (
-                            <FiX className="text-slate-400 dark:text-secondary/40 mx-auto" size={15} />
+                            <FiX className="text-slate-400 dark:text-secondary/40 mx-auto" size={16} />
                           )
                         ) : (
-                          <span className="font-semibold text-slate-700 dark:text-foreground text-xs">{row.starter}</span>
+                          <span className="font-semibold text-foreground text-xs">{row.starter}</span>
                         )}
                       </td>
-                      <td className="py-3.5 px-5 text-center bg-active/5">
+                      <td className="py-4 px-6 text-center bg-active/5">
                         {typeof row.pro === "boolean" ? (
                           row.pro ? (
-                            <FiCheck className="text-emerald-500 mx-auto" size={15} />
+                            <FiCheck className="text-emerald-500 mx-auto" size={16} />
                           ) : (
-                            <FiX className="text-slate-400 dark:text-secondary/40 mx-auto" size={15} />
+                            <FiX className="text-slate-400 dark:text-secondary/40 mx-auto" size={16} />
                           )
                         ) : (
                           <span className="font-bold text-active text-xs">{row.pro}</span>
                         )}
                       </td>
-                      <td className="py-3.5 px-5 text-center">
+                      <td className="py-4 px-6 text-center">
                         {typeof row.elite === "boolean" ? (
                           row.elite ? (
-                            <FiCheck className="text-emerald-500 mx-auto" size={15} />
+                            <FiCheck className="text-emerald-500 mx-auto" size={16} />
                           ) : (
-                            <FiX className="text-slate-400 dark:text-secondary/40 mx-auto" size={15} />
+                            <FiX className="text-slate-400 dark:text-secondary/40 mx-auto" size={16} />
                           )
                         ) : (
-                          <span className="font-semibold text-slate-700 dark:text-foreground text-xs">{row.elite}</span>
+                          <span className="font-semibold text-foreground text-xs">{row.elite}</span>
                         )}
                       </td>
                     </tr>
@@ -703,29 +947,36 @@ export default function PricingClient() {
                 ])}
               </tbody>
             </table>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* ============================================================== */}
-        {/* 7. SOCIAL PROOF & ATHLETE REVIEWS                              */}
+        {/* 7. SOCIAL PROOF & ATHLETE REVIEWS (FULL WIDTH)                 */}
         {/* ============================================================== */}
-        <div className="space-y-5 pt-2">
-          <div className="text-center space-y-1 max-w-xl mx-auto">
+        <motion.div
+          ref={reviewsRef}
+          initial="hidden"
+          animate={reviewsInView ? "visible" : "hidden"}
+          className="space-y-6 pt-2 w-full"
+        >
+          <motion.div variants={itemFadeUp} className="text-center space-y-1 max-w-xl mx-auto">
             <span className="text-[11px] font-bold uppercase tracking-wider text-active">
               Verified Athletes
             </span>
             <h3 className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground">
               What Our Members Experience
             </h3>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {MEMBER_REVIEWS.map((rev) => (
-              <div
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
+            {MEMBER_REVIEWS.map((rev, rIdx) => (
+              <motion.div
                 key={rev.name}
-                className="p-5 rounded-3xl bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 shadow-xs space-y-3 flex flex-col justify-between"
+                variants={reviewVariants[rIdx % 3]}
+                whileHover={{ y: -4 }}
+                className="p-6 rounded-3xl bg-white dark:bg-[#121026]/75 border border-slate-200 dark:border-brand-500/20 shadow-xs space-y-4 flex flex-col justify-between hover:border-active/40 transition-all"
               >
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   <div className="flex items-center gap-1 text-amber-500 text-xs">
                     {"★".repeat(5)}
                   </div>
@@ -734,7 +985,7 @@ export default function PricingClient() {
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 dark:border-brand-500/15 flex items-center justify-between">
+                <div className="pt-3.5 border-t border-slate-100 dark:border-brand-500/15 flex items-center justify-between">
                   <div>
                     <span className="font-bold text-xs text-foreground block">{rev.name}</span>
                     <span className="text-[10px] text-active font-semibold block">{rev.tier}</span>
@@ -743,268 +994,305 @@ export default function PricingClient() {
                     {rev.achievement}
                   </span>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* ============================================================== */}
-        {/* 8. CORPORATE & FIRST RESPONDER WELLNESS DISCOUNT               */}
+        {/* 8. CORPORATE & FIRST RESPONDER WELLNESS DISCOUNT (FULL WIDTH)  */}
         {/* ============================================================== */}
-        <div className="p-6 rounded-3xl bg-slate-50 dark:bg-brand-900/40 border border-slate-200 dark:border-brand-500/20 flex flex-col sm:flex-row items-center justify-between gap-4 max-w-4xl mx-auto shadow-xs text-center sm:text-left">
-          <div className="space-y-1">
+        <motion.div
+          ref={discountRef}
+          initial={{ opacity: 0, y: 22 }}
+          animate={discountInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 }}
+          transition={{ type: "spring", stiffness: 380, damping: 28 }}
+          className="p-6 sm:p-7 rounded-3xl bg-slate-50 dark:bg-brand-900/40 border border-slate-200 dark:border-brand-500/20 flex flex-col sm:flex-row items-center justify-between gap-5 w-full shadow-xs text-center sm:text-left"
+        >
+          <div className="space-y-1.5">
             <span className="text-[11px] font-bold text-active uppercase tracking-wider flex items-center justify-center sm:justify-start gap-1.5">
               <FiPercent /> Community & Corporate Wellness
             </span>
-            <h4 className="font-['Outfit'] text-lg font-bold text-foreground">
+            <h4 className="font-['Outfit'] text-lg sm:text-xl font-bold text-foreground">
               15% Off for Students, First Responders & Healthcare Teams
             </h4>
-            <p className="text-xs text-secondary max-w-lg">
-              We proudly support our local service personnel and students with discounted access across all tiers.
+            <p className="text-xs text-secondary max-w-xl leading-relaxed">
+              We proudly support our local service personnel and university students with verified discounted access across all membership tiers.
             </p>
           </div>
 
           <Link
             href="/contact"
-            className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-brand-500/25 bg-white dark:bg-background text-foreground text-xs font-bold hover:border-active transition-all shrink-0"
+            className="px-5 py-3 rounded-xl border border-slate-300 dark:border-brand-500/25 bg-white dark:bg-background text-foreground text-xs sm:text-sm font-bold hover:border-active transition-all shrink-0 shadow-2xs"
           >
-            Inquire for Verification
+            Inquire for Verification &rarr;
           </Link>
-        </div>
+        </motion.div>
 
         {/* ============================================================== */}
-        {/* 9. PRICING FAQS ACCORDION                                      */}
+        {/* 9. PRICING FAQS ACCORDION (FULL WIDTH & TRIGGERED)             */}
         {/* ============================================================== */}
-        <div className="space-y-5 pt-2 max-w-3xl mx-auto">
-          <div className="text-center space-y-1">
+        <motion.div
+          ref={faqRef}
+          initial="hidden"
+          animate={faqInView ? "visible" : "hidden"}
+          className="space-y-6 pt-2 w-full"
+        >
+          <motion.div variants={itemFadeUp} className="text-center space-y-1 max-w-xl mx-auto">
             <span className="text-[11px] font-bold uppercase tracking-wider text-active">
               Got Questions?
             </span>
-            <h3 className="font-['Outfit'] text-2xl font-black text-foreground">
+            <h3 className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground">
               Frequently Asked Questions
             </h3>
-          </div>
+          </motion.div>
 
-          <div className="space-y-3">
+          <motion.div variants={containerStagger} className="space-y-3 w-full">
             {FAQS.map((faq, index) => {
               const isOpen = openFaqIndex === index;
               return (
-                <div
+                <motion.div
                   key={index}
-                  className="rounded-2xl border border-slate-200 dark:border-brand-500/15 bg-white dark:bg-[#121026]/60 overflow-hidden shadow-2xs"
+                  variants={itemFadeUp}
+                  className="rounded-2xl border border-slate-200 dark:border-brand-500/15 bg-white dark:bg-[#121026]/75 overflow-hidden shadow-2xs transition-all w-full"
                 >
                   <button
                     onClick={() => setOpenFaqIndex(isOpen ? null : index)}
-                    className="w-full py-3.5 px-4 text-left flex items-center justify-between gap-3 text-xs sm:text-sm font-bold text-foreground hover:text-active transition-colors cursor-pointer"
+                    className="w-full py-4 px-5 sm:px-6 text-left flex items-center justify-between gap-4 text-xs sm:text-sm font-bold text-foreground hover:text-active transition-colors cursor-pointer"
                   >
                     <span>{faq.q}</span>
-                    {isOpen ? (
-                      <FiChevronUp size={16} className="text-active shrink-0" />
-                    ) : (
-                      <FiChevronDown size={16} className="text-secondary shrink-0" />
-                    )}
+                    <motion.div
+                      animate={{ rotate: isOpen ? 180 : 0 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      className="shrink-0"
+                    >
+                      <FiChevronDown size={18} className={isOpen ? "text-active" : "text-secondary"} />
+                    </motion.div>
                   </button>
 
-                  {isOpen && (
-                    <div className="px-4 pb-3.5 text-xs text-secondary leading-relaxed border-t border-slate-100 dark:border-brand-500/10 pt-2.5">
-                      {faq.a}
-                    </div>
-                  )}
-                </div>
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.28, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-5 sm:px-6 pb-4 pt-1 text-xs text-secondary leading-relaxed border-t border-slate-100 dark:border-brand-500/10">
+                          {faq.a}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
               );
             })}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
 
       {/* ============================================================== */}
-      {/* 10. MODAL: CLAIM FREE 1-DAY TRIAL PASS                         */}
+      {/* 10. MODAL: CLAIM FREE 1-DAY TRIAL PASS (CRISP ATHLETIC REDESIGN)*/}
       {/* ============================================================== */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
-          <div
-            className="fixed inset-0"
-            onClick={() => {
-              setIsModalOpen(false);
-              setPassResult(null);
-            }}
-          />
-
-          <div className="relative w-full max-w-lg rounded-3xl bg-background border border-slate-200 dark:border-brand-500/30 p-6 sm:p-7 shadow-2xl space-y-5 z-10">
-            <button
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={() => {
                 setIsModalOpen(false);
                 setPassResult(null);
               }}
-              className="absolute top-4 right-4 p-1.5 rounded-lg text-secondary hover:text-foreground bg-slate-100 dark:bg-background/50 border border-slate-200 dark:border-brand-500/20 cursor-pointer"
+              className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-xs"
+            />
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 18 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 18 }}
+              transition={{ type: "spring", stiffness: 420, damping: 28 }}
+              className="relative w-full max-w-lg rounded-3xl bg-white dark:bg-[#0c0a1d] text-foreground border border-slate-200 dark:border-brand-500/30 p-6 sm:p-8 shadow-md space-y-5 z-10 overflow-hidden"
             >
-              <FiX size={16} />
-            </button>
+              {/* Circular frosted close button */}
+              <button
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setPassResult(null);
+                }}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 border border-slate-200 dark:border-white/15 transition-all shadow-2xs cursor-pointer"
+              >
+                <FiX size={16} />
+              </button>
 
-            {!passResult ? (
-              <>
-                <div className="space-y-1">
-                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-active">
-                    FlexPulse VIP Access
-                  </span>
-                  <h3 className="font-['Outfit'] text-2xl font-black text-foreground">
-                    Claim Your Free 1-Day Trial Pass
-                  </h3>
-                  <p className="text-xs text-secondary">
-                    Fill out the form below to receive your instant digital pass code. Present it at the front desk when you arrive!
-                  </p>
-                </div>
-
-                {errorMsg && (
-                  <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-500 text-xs font-semibold">
-                    {errorMsg}
+              {!passResult ? (
+                <>
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-active">
+                      FlexPulse VIP Access
+                    </span>
+                    <h3 className="font-['Outfit'] text-2xl font-black text-foreground">
+                      Claim Your Free 1-Day Trial Pass
+                    </h3>
+                    <p className="text-xs text-secondary leading-relaxed">
+                      Fill out the form below to receive your instant digital pass code. Present it at the front desk when you arrive!
+                    </p>
                   </div>
-                )}
 
-                <form onSubmit={handleTrialSubmit} className="space-y-3.5 text-xs">
-                  <div>
-                    <label className="block font-bold text-foreground mb-1">Full Name *</label>
-                    <div className="relative">
-                      <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-secondary" size={14} />
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. Alex Hunter"
-                        value={formData.fullName}
-                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                        className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 dark:bg-background/60 border border-slate-200 dark:border-brand-500/20 text-foreground text-xs focus:outline-none focus:border-active"
-                      />
+                  {errorMsg && (
+                    <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-500 text-xs font-semibold">
+                      {errorMsg}
                     </div>
-                  </div>
+                  )}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <form onSubmit={handleTrialSubmit} className="space-y-3.5 text-xs">
                     <div>
-                      <label className="block font-bold text-foreground mb-1">Email Address *</label>
+                      <label className="block font-bold text-foreground mb-1 text-[11px] uppercase tracking-wider">Full Name *</label>
                       <div className="relative">
-                        <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-secondary" size={14} />
+                        <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-secondary" size={14} />
                         <input
-                          type="email"
+                          type="text"
                           required
-                          placeholder="alex@example.com"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 dark:bg-background/60 border border-slate-200 dark:border-brand-500/20 text-foreground text-xs focus:outline-none focus:border-active"
+                          placeholder="e.g. Alex Hunter"
+                          value={formData.fullName}
+                          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                          className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-searchbox-bg border border-slate-200 dark:border-brand-500/25 text-foreground text-xs focus:outline-none focus:border-active shadow-2xs"
                         />
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block font-bold text-foreground mb-1">Phone Number</label>
-                      <div className="relative">
-                        <FiPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-secondary" size={14} />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block font-bold text-foreground mb-1 text-[11px] uppercase tracking-wider">Email Address *</label>
+                        <div className="relative">
+                          <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-secondary" size={14} />
+                          <input
+                            type="email"
+                            required
+                            placeholder="alex@example.com"
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-searchbox-bg border border-slate-200 dark:border-brand-500/25 text-foreground text-xs focus:outline-none focus:border-active shadow-2xs"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-foreground mb-1 text-[11px] uppercase tracking-wider">Phone Number</label>
+                        <div className="relative">
+                          <FiPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-secondary" size={14} />
+                          <input
+                            type="tel"
+                            placeholder="+1 (555) 000-0000"
+                            value={formData.phone}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-searchbox-bg border border-slate-200 dark:border-brand-500/25 text-foreground text-xs focus:outline-none focus:border-active shadow-2xs"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block font-bold text-foreground mb-1 text-[11px] uppercase tracking-wider">Preferred Date</label>
                         <input
-                          type="tel"
-                          placeholder="+1 (555) 000-0000"
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 dark:bg-background/60 border border-slate-200 dark:border-brand-500/20 text-foreground text-xs focus:outline-none focus:border-active"
+                          type="date"
+                          value={formData.preferredDate}
+                          onChange={(e) => setFormData({ ...formData, preferredDate: e.target.value })}
+                          className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-searchbox-bg border border-slate-200 dark:border-brand-500/25 text-foreground text-xs focus:outline-none focus:border-active shadow-2xs"
                         />
                       </div>
-                    </div>
-                  </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-bold text-foreground mb-1">Preferred Date</label>
-                      <input
-                        type="date"
-                        value={formData.preferredDate}
-                        onChange={(e) => setFormData({ ...formData, preferredDate: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-background/60 border border-slate-200 dark:border-brand-500/20 text-foreground text-xs focus:outline-none focus:border-active"
-                      />
+                      <div>
+                        <label className="block font-bold text-foreground mb-1 text-[11px] uppercase tracking-wider">Preferred Time</label>
+                        <select
+                          value={formData.preferredTime}
+                          onChange={(e) => setFormData({ ...formData, preferredTime: e.target.value })}
+                          className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-searchbox-bg border border-slate-200 dark:border-brand-500/25 text-foreground text-xs focus:outline-none focus:border-active shadow-2xs"
+                        >
+                          <option value="Morning (08:00 AM - 11:00 AM)">Morning (8–11 AM)</option>
+                          <option value="Afternoon (12:00 PM - 04:00 PM)">Afternoon (12–4 PM)</option>
+                          <option value="Evening (05:00 PM - 09:00 PM)">Evening (5–9 PM)</option>
+                        </select>
+                      </div>
                     </div>
 
                     <div>
-                      <label className="block font-bold text-foreground mb-1">Preferred Time</label>
+                      <label className="block font-bold text-foreground mb-1 text-[11px] uppercase tracking-wider">Primary Fitness Goal</label>
                       <select
-                        value={formData.preferredTime}
-                        onChange={(e) => setFormData({ ...formData, preferredTime: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-background/60 border border-slate-200 dark:border-brand-500/20 text-foreground text-xs focus:outline-none focus:border-active"
+                        value={formData.fitnessGoal}
+                        onChange={(e) => setFormData({ ...formData, fitnessGoal: e.target.value })}
+                        className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-searchbox-bg border border-slate-200 dark:border-brand-500/25 text-foreground text-xs focus:outline-none focus:border-active shadow-2xs"
                       >
-                        <option value="Morning (08:00 AM - 11:00 AM)">Morning (8–11 AM)</option>
-                        <option value="Afternoon (12:00 PM - 04:00 PM)">Afternoon (12–4 PM)</option>
-                        <option value="Evening (05:00 PM - 09:00 PM)">Evening (5–9 PM)</option>
+                        <option value="General Strength & Muscle Gain">Strength & Muscle Hypertrophy</option>
+                        <option value="Fat Loss & Cardio Conditioning">Fat Loss & Conditioning</option>
+                        <option value="CrossFit & Athletic Power">CrossFit & Functional Power</option>
+                        <option value="Yoga, Mobility & Mental Health">Yoga & Flexibility</option>
                       </select>
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="block font-bold text-foreground mb-1">Primary Fitness Goal</label>
-                    <select
-                      value={formData.fitnessGoal}
-                      onChange={(e) => setFormData({ ...formData, fitnessGoal: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-background/60 border border-slate-200 dark:border-brand-500/20 text-foreground text-xs focus:outline-none focus:border-active"
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="relative group overflow-hidden w-full py-3.5 rounded-xl bg-active text-btn-text text-xs sm:text-sm font-bold shadow-sm hover:opacity-95 active:scale-98 disabled:opacity-50 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
                     >
-                      <option value="General Strength & Muscle Gain">Strength & Muscle Hypertrophy</option>
-                      <option value="Fat Loss & Cardio Conditioning">Fat Loss & Conditioning</option>
-                      <option value="CrossFit & Athletic Power">CrossFit & Functional Power</option>
-                      <option value="Yoga, Mobility & Mental Health">Yoga & Flexibility</option>
-                    </select>
+                      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-linear-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+                      <span className="relative z-10">{submitting ? "Generating Pass..." : "Generate VIP Pass Now"}</span>
+                    </button>
+                  </form>
+                </>
+              ) : (
+                /* Success State */
+                <motion.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} className="text-center space-y-4 py-3">
+                  <div className="w-14 h-14 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-500 mx-auto flex items-center justify-center text-2xl font-bold shadow-2xs">
+                    ✓
+                  </div>
+                  <div className="space-y-0.5">
+                    <h3 className="font-['Outfit'] text-2xl font-black text-foreground">
+                      VIP Pass Activated!
+                    </h3>
+                    <p className="text-xs text-secondary">
+                      Present your digital code at reception desk check-in:
+                    </p>
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="w-full py-3 rounded-xl bg-active text-btn-text text-xs sm:text-sm font-bold shadow-sm hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
-                  >
-                    {submitting ? "Generating Pass..." : "Generate VIP Pass Now"}
-                  </button>
-                </form>
-              </>
-            ) : (
-              /* Success State */
-              <div className="text-center space-y-4 py-3">
-                <div className="w-14 h-14 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-500 mx-auto flex items-center justify-center text-2xl font-bold">
-                  ✓
-                </div>
-                <div className="space-y-0.5">
-                  <h3 className="font-['Outfit'] text-2xl font-black text-foreground">
-                    VIP Pass Activated!
-                  </h3>
-                  <p className="text-xs text-secondary">
-                    Present your digital code at reception desk check-in:
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-brand-800/30 border border-slate-200 dark:border-brand-500/30 space-y-1 select-all">
-                  <span className="text-[10px] uppercase font-bold text-secondary">All-Access Pass Code</span>
-                  <div className="font-['Outfit'] text-3xl font-black text-active tracking-widest">
-                    {passResult.passCode}
+                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-brand-800/30 border border-slate-200 dark:border-brand-500/30 space-y-1 select-all shadow-2xs">
+                    <span className="text-[10px] uppercase font-bold text-secondary">All-Access Pass Code</span>
+                    <div className="font-['Outfit'] text-3xl font-black text-active tracking-widest">
+                      {passResult.passCode}
+                    </div>
+                    <div className="text-[10px] text-secondary font-mono tracking-widest">
+                      ||| | | |||| || | || |||| | |||
+                    </div>
                   </div>
-                  <div className="text-[10px] text-secondary font-mono tracking-widest">
-                    ||| | | |||| || | || |||| | |||
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleCopyCode}
+                      className="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-foreground font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs"
+                    >
+                      {copiedPass ? <FiCheck className="text-emerald-500" /> : <FiCopy />}
+                      <span>{copiedPass ? "Copied Code!" : "Copy Code"}</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setIsModalOpen(false);
+                        setPassResult(null);
+                      }}
+                      className="py-2.5 px-5 rounded-xl bg-active text-btn-text text-xs font-bold hover:opacity-90 transition-all cursor-pointer shadow-2xs"
+                    >
+                      Done
+                    </button>
                   </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleCopyCode}
-                    className="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-foreground font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
-                  >
-                    {copiedPass ? <FiCheck className="text-emerald-500" /> : <FiCopy />}
-                    <span>{copiedPass ? "Copied Code!" : "Copy Code"}</span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setIsModalOpen(false);
-                      setPassResult(null);
-                    }}
-                    className="py-2.5 px-5 rounded-xl bg-active text-btn-text text-xs font-bold hover:opacity-90 transition-all cursor-pointer"
-                  >
-                    Done
-                  </button>
-                </div>
-              </div>
-            )}
+                </motion.div>
+              )}
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 }
