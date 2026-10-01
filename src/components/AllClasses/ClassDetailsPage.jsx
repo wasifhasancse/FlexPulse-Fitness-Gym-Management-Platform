@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "@heroui/react";
+import { motion, AnimatePresence, useInView } from "framer-motion";
 import {
   FiClock,
   FiCalendar,
@@ -40,6 +41,8 @@ import {
   FaCcDiscover,
 } from "react-icons/fa";
 import { SiStripe } from "react-icons/si";
+
+const TRANSITION_EASE = [0.16, 1, 0.3, 1];
 
 // Category-specific high-resolution image galleries
 const GALLERY_PRESETS = {
@@ -196,10 +199,45 @@ export default function ClassDetailsPageLayout({
   const [isProcessingStripe, setIsProcessingStripe] = useState(false);
   const [autoRenew, setAutoRenew] = useState(true);
 
+  // Staged Viewport Gating Refs & States
+  const heroRef = useRef(null);
+  const contentRef = useRef(null);
+  const bookingRef = useRef(null);
+
+  const isHeroInView = useInView(heroRef, { once: true, amount: 0.1 });
+  const isContentInView = useInView(contentRef, { once: true, amount: 0.08 });
+  const isBookingInView = useInView(bookingRef, { once: true, amount: 0.08 });
+
+  const [heroTriggered, setHeroTriggered] = useState(false);
+  const [contentTriggered, setContentTriggered] = useState(false);
+  const [bookingTriggered, setBookingTriggered] = useState(false);
+
+  useEffect(() => {
+    if (isHeroInView) {
+      const t = setTimeout(() => setHeroTriggered(true), 150);
+      return () => clearTimeout(t);
+    }
+  }, [isHeroInView]);
+
+  useEffect(() => {
+    if (isContentInView) {
+      const t = setTimeout(() => setContentTriggered(true), 200);
+      return () => clearTimeout(t);
+    }
+  }, [isContentInView]);
+
+  useEffect(() => {
+    if (isBookingInView) {
+      const t = setTimeout(() => setBookingTriggered(true), 250);
+      return () => clearTimeout(t);
+    }
+  }, [isBookingInView]);
+
   // Determine category key for curated photo preset
-  const catKey = Object.keys(GALLERY_PRESETS).find(
-    (k) => (data.category || "").toLowerCase().includes(k.toLowerCase())
-  ) || "Weights";
+  const catKey =
+    Object.keys(GALLERY_PRESETS).find((k) =>
+      (data.category || "").toLowerCase().includes(k.toLowerCase())
+    ) || "Weights";
 
   const galleryPresets = GALLERY_PRESETS[catKey] || GALLERY_PRESETS.Weights;
 
@@ -277,7 +315,8 @@ export default function ClassDetailsPageLayout({
 
   const studio = getStudio(data.category);
   const coachName =
-    data.authorName || (data.author && data.author !== "trainer" ? data.author : "Coach Marcus Vance");
+    data.authorName ||
+    (data.author && data.author !== "trainer" ? data.author : "Coach Marcus Vance");
 
   const totalSlots = Number(data.slot) || 20;
   const bookedCount = Number(bookingCountData?.bookingCount || data.bookingCount || 0);
@@ -415,42 +454,70 @@ export default function ClassDetailsPageLayout({
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300 pb-24">
-      
       {/* Lightbox Modal for Full-Resolution Image Inspection */}
-      {lightboxOpen && (
-        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 sm:p-8 animate-fadeIn">
-          <button
-            onClick={() => setLightboxOpen(false)}
-            className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 hover:bg-active text-white flex items-center justify-center transition-all cursor-pointer z-50"
-            title="Close viewer"
+      <AnimatePresence>
+        {lightboxOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 sm:p-8"
           >
-            <FiX className="w-6 h-6" />
-          </button>
+            <motion.button
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              exit={{ scale: 0, rotate: 180 }}
+              transition={{ type: "spring", stiffness: 220 }}
+              onClick={() => setLightboxOpen(false)}
+              className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 hover:bg-active text-white flex items-center justify-center transition-all cursor-pointer z-50 shadow-xs"
+              title="Close viewer"
+            >
+              <FiX className="w-6 h-6" />
+            </motion.button>
 
-          <div className="relative w-full max-w-5xl h-[70vh] rounded-3xl overflow-hidden border border-white/15 shadow-2xl">
-            <Image
-              src={currentHeroImage.url}
-              alt={currentHeroImage.label}
-              fill
-              unoptimized
-              className="object-contain"
-            />
-          </div>
+            <motion.div
+              initial={{ scale: 0.92, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.92, y: 20 }}
+              transition={{ duration: 0.4, ease: TRANSITION_EASE }}
+              className="relative w-full max-w-5xl h-[70vh] rounded-3xl overflow-hidden border border-brand-500/20 shadow-md"
+            >
+              <Image
+                src={currentHeroImage.url}
+                alt={currentHeroImage.label}
+                fill
+                unoptimized
+                className="object-contain"
+              />
+            </motion.div>
 
-          <div className="mt-6 text-center max-w-xl text-white">
-            <span className="text-xs font-bold uppercase tracking-widest text-active block mb-1">
-              {currentHeroImage.tag} • High Resolution Studio Capture
-            </span>
-            <h3 className="font-['Outfit'] text-xl font-bold">{currentHeroImage.label}</h3>
-            <p className="text-xs text-white/70 mt-1">{currentHeroImage.desc}</p>
-          </div>
-        </div>
-      )}
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mt-6 text-center max-w-xl text-white"
+            >
+              <span className="text-xs font-bold uppercase tracking-widest text-active block mb-1">
+                {currentHeroImage.tag} • High Resolution Studio Capture
+              </span>
+              <h3 className="font-['Outfit'] text-xl font-bold">{currentHeroImage.label}</h3>
+              <p className="text-xs text-white/70 mt-1">{currentHeroImage.desc}</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Top Breadcrumb & Quick Action Navigation */}
-      <div className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+      {/* ============================================================ */}
+      {/* SECTION 1: Top Breadcrumb & Quick Action Navigation Bar      */}
+      {/* ============================================================ */}
+      <div className="border-b border-brand-500/20 bg-brand-500/[0.02]">
+        <div className="w-11/12 mx-auto relative z-10 py-3.5 flex items-center justify-between gap-4">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, ease: TRANSITION_EASE }}
+            className="flex items-center gap-2 text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3]"
+          >
             <Link
               href="/all-classes"
               className="inline-flex items-center gap-1.5 font-bold text-foreground hover:text-active transition-colors cursor-pointer"
@@ -458,19 +525,24 @@ export default function ClassDetailsPageLayout({
               <FiArrowLeft className="w-4 h-4" />
               <span>All Classes</span>
             </Link>
-            <span className="text-slate-300 dark:text-slate-600">/</span>
-            <span className="text-slate-400 truncate max-w-[150px] sm:max-w-xs">{data.category}</span>
-            <span className="text-slate-300 dark:text-slate-600">/</span>
+            <span className="text-brand-500/30">/</span>
+            <span className="truncate max-w-[150px] sm:max-w-xs">{data.category}</span>
+            <span className="text-brand-500/30">/</span>
             <span className="text-foreground font-semibold truncate max-w-[200px] sm:max-w-sm">
               {data.className}
             </span>
-          </div>
+          </motion.div>
 
-          <div className="flex items-center gap-2">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, ease: TRANSITION_EASE, delay: 0.1 }}
+            className="flex items-center gap-2"
+          >
             <button
               type="button"
               onClick={handleCopyLink}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-white/[0.05] border border-slate-200 dark:border-white/10 hover:border-active/40 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-foreground transition-all cursor-pointer shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-searchbox-bg hover:bg-searchbox-hover border border-brand-500/20 hover:border-active/50 text-xs font-semibold text-foreground transition-all cursor-pointer shadow-2xs active:scale-95"
               title="Share class link"
             >
               <FiShare2 className="w-3.5 h-3.5" />
@@ -481,10 +553,10 @@ export default function ClassDetailsPageLayout({
               type="button"
               onClick={handleFavoriteToggle}
               disabled={favLoading}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer shadow-xs ${
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer shadow-2xs active:scale-95 ${
                 isFavorite
                   ? "bg-rose-500/10 text-rose-500 border-rose-500/30"
-                  : "bg-white dark:bg-white/[0.05] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-foreground"
+                  : "bg-searchbox-bg hover:bg-searchbox-hover border-brand-500/20 text-foreground hover:border-active/50"
               }`}
             >
               {isFavorite ? (
@@ -494,19 +566,31 @@ export default function ClassDetailsPageLayout({
               )}
               <span>{isFavorite ? "Bookmarked" : "Bookmark"}</span>
             </button>
-          </div>
+          </motion.div>
         </div>
       </div>
 
-      {/* Hero Visual Gallery Stage */}
-      <section className="relative overflow-hidden pt-6 pb-12 sm:pb-16 bg-gradient-to-b from-slate-100/60 via-background to-background dark:from-[#131126]/70 dark:via-background dark:to-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+      {/* ============================================================ */}
+      {/* SECTION 2: Hero Visual Gallery Stage                         */}
+      {/* ============================================================ */}
+      <section
+        ref={heroRef}
+        className="relative overflow-hidden pt-6 pb-8 sm:pb-12 bg-gradient-to-b from-brand-500/5 via-background to-background"
+      >
+        <div className="w-11/12 mx-auto relative z-10">
           {/* Main Hero Media Stage */}
-          <div className="relative w-full h-[360px] sm:h-[480px] md:h-[540px] rounded-3xl overflow-hidden shadow-2xl border border-slate-200/80 dark:border-white/10 group">
-            
-            {/* Background Glow */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-active/30 to-purple-600/30 blur-2xl opacity-40 pointer-events-none -z-10" />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.97, y: 24 }}
+            animate={
+              heroTriggered
+                ? { opacity: 1, scale: 1, y: 0 }
+                : { opacity: 0, scale: 0.97, y: 24 }
+            }
+            transition={{ duration: 0.85, ease: TRANSITION_EASE }}
+            className="relative w-full h-[360px] sm:h-[480px] md:h-[540px] rounded-3xl overflow-hidden shadow-md border border-brand-500/20 group"
+          >
+            {/* Background Ambient Glow */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-active/20 to-purple-600/20 blur-2xl opacity-40 pointer-events-none -z-10" />
 
             <Image
               src={currentHeroImage.url}
@@ -523,51 +607,115 @@ export default function ClassDetailsPageLayout({
             {/* Top Overlay Badges */}
             <div className="absolute top-6 inset-x-6 flex items-center justify-between z-10 flex-wrap gap-2">
               <div className="flex items-center gap-2">
-                <span className="px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider backdrop-blur-md bg-black/60 text-white border border-white/20 shadow-md">
+                <motion.span
+                  initial={{ opacity: 0, y: -16, x: -12 }}
+                  animate={
+                    heroTriggered
+                      ? { opacity: 1, y: 0, x: 0 }
+                      : { opacity: 0, y: -16, x: -12 }
+                  }
+                  transition={{ duration: 0.5, delay: 0.15 }}
+                  className="px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider backdrop-blur-md bg-black/70 text-white border border-white/20 shadow-2xs"
+                >
                   {data.category || "Fitness"}
-                </span>
+                </motion.span>
 
-                <span className="px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md bg-active text-white border border-white/20 shadow-md shadow-active/30 flex items-center gap-1.5">
+                <motion.span
+                  initial={{ opacity: 0, y: -18 }}
+                  animate={
+                    heroTriggered ? { opacity: 1, y: 0 } : { opacity: 0, y: -18 }
+                  }
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md bg-active text-btn-text border border-white/20 shadow-2xs flex items-center gap-1.5"
+                >
                   <FiZap className="w-3.5 h-3.5" />
                   <span>{data.difficultyLevel || data.level || "Intermediate"}</span>
-                </span>
+                </motion.span>
 
-                <span className="px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md bg-black/50 text-white/90 border border-white/15 hidden md:inline-flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <motion.span
+                  initial={{ opacity: 0, y: -18 }}
+                  animate={
+                    heroTriggered ? { opacity: 1, y: 0 } : { opacity: 0, y: -18 }
+                  }
+                  transition={{ duration: 0.5, delay: 0.25 }}
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md bg-black/60 text-white/90 border border-white/15 hidden md:inline-flex items-center gap-1.5 shadow-2xs"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   <span>{currentHeroImage.tag}</span>
-                </span>
+                </motion.span>
               </div>
 
               {/* Fullscreen Expand Action */}
-              <div className="flex items-center gap-2">
+              <motion.div
+                initial={{ opacity: 0, x: 16, y: -16 }}
+                animate={
+                  heroTriggered
+                    ? { opacity: 1, x: 0, y: 0 }
+                    : { opacity: 0, x: 16, y: -16 }
+                }
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="flex items-center gap-2"
+              >
                 <button
                   type="button"
                   onClick={() => setLightboxOpen(true)}
-                  className="px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md bg-black/60 hover:bg-active text-white border border-white/20 transition-all cursor-pointer flex items-center gap-1.5 shadow-md"
+                  className="px-3.5 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md bg-black/60 hover:bg-active text-white border border-white/20 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
                   title="Expand to Fullscreen View"
                 >
                   <FiMaximize2 className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Inspect 4K View</span>
                 </button>
-              </div>
+              </motion.div>
             </div>
 
             {/* Bottom Title & Session Overview Overlay */}
             <div className="absolute bottom-6 sm:bottom-8 inset-x-6 sm:inset-x-8 z-10">
               <div className="max-w-4xl">
-                <h1 className="font-['Outfit'] text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.08] mb-3 drop-shadow-md">
+                <motion.h1
+                  initial={{ opacity: 0, y: 28, filter: "blur(4px)" }}
+                  animate={
+                    heroTriggered
+                      ? { opacity: 1, y: 0, filter: "blur(0px)" }
+                      : { opacity: 0, y: 28, filter: "blur(4px)" }
+                  }
+                  transition={{ duration: 0.65, delay: 0.3, ease: TRANSITION_EASE }}
+                  className="font-['Outfit'] text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.08] mb-3 drop-shadow-sm"
+                >
                   {data.className}
-                </h1>
+                </motion.h1>
 
                 {/* Subtitle / Image caption description */}
-                <p className="text-xs sm:text-sm text-white/80 line-clamp-1 max-w-2xl mb-4">
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={
+                    heroTriggered ? { opacity: 1, y: 0 } : { opacity: 0, y: -10 }
+                  }
+                  transition={{ duration: 0.55, delay: 0.38, ease: TRANSITION_EASE }}
+                  className="text-xs sm:text-sm text-white/80 line-clamp-1 max-w-2xl mb-4 font-['Inter']"
+                >
                   {currentHeroImage.desc}
-                </p>
+                </motion.p>
 
                 {/* Coach & Meta Ribbon */}
-                <div className="flex flex-wrap items-center gap-3 sm:gap-5 text-white/90 text-xs sm:text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-active/20 border border-active/50 flex items-center justify-center font-bold text-active relative">
+                <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-white/90 text-xs sm:text-sm">
+                  <motion.div
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={
+                      heroTriggered ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 }
+                    }
+                    transition={{ duration: 0.5, delay: 0.44 }}
+                    className="flex items-center gap-2"
+                  >
+                    <motion.div
+                      initial={{ scale: 0.7, rotate: -10 }}
+                      animate={
+                        heroTriggered
+                          ? { scale: 1, rotate: 0 }
+                          : { scale: 0.7, rotate: -10 }
+                      }
+                      transition={{ type: "spring", stiffness: 220, delay: 0.46 }}
+                      className="w-8 h-8 rounded-full overflow-hidden bg-active/20 border border-active/50 flex items-center justify-center font-bold text-active relative shadow-2xs"
+                    >
                       {data.authorImage ? (
                         <Image
                           src={data.authorImage}
@@ -579,49 +727,79 @@ export default function ClassDetailsPageLayout({
                       ) : (
                         coachName.charAt(0)
                       )}
-                    </div>
+                    </motion.div>
                     <div>
                       <span className="font-bold text-white block leading-tight">{coachName}</span>
                       <span className="text-[10px] text-white/70">Master CSCS Coach</span>
                     </div>
-                  </div>
+                  </motion.div>
 
                   <div className="h-4 w-px bg-white/20 hidden sm:block" />
 
-                  <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-3 py-1 rounded-xl border border-white/10">
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={
+                      heroTriggered ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }
+                    }
+                    transition={{ duration: 0.5, delay: 0.5 }}
+                    className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-3 py-1 rounded-xl border border-white/10 shadow-2xs"
+                  >
                     <FaStar className="w-3.5 h-3.5 text-amber-400" />
                     <span className="font-bold text-white">{rating}</span>
                     <span className="text-white/60 text-xs">({reviewCount} reviews)</span>
-                  </div>
+                  </motion.div>
 
                   <div className="h-4 w-px bg-white/20 hidden sm:block" />
 
-                  <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-3 py-1 rounded-xl border border-white/10">
+                  <motion.div
+                    initial={{ opacity: 0, x: 12 }}
+                    animate={
+                      heroTriggered ? { opacity: 1, x: 0 } : { opacity: 0, x: 12 }
+                    }
+                    transition={{ duration: 0.5, delay: 0.54 }}
+                    className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-3 py-1 rounded-xl border border-white/10 shadow-2xs"
+                  >
                     <FiClock className="w-3.5 h-3.5 text-active" />
                     <span className="font-semibold text-white">{data.duration || 60} Mins</span>
-                  </div>
+                  </motion.div>
 
-                  <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-3 py-1 rounded-xl border border-white/10">
+                  <motion.div
+                    initial={{ opacity: 0, x: 16 }}
+                    animate={
+                      heroTriggered ? { opacity: 1, x: 0 } : { opacity: 0, x: 16 }
+                    }
+                    transition={{ duration: 0.5, delay: 0.58 }}
+                    className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-3 py-1 rounded-xl border border-white/10 shadow-2xs"
+                  >
                     <FiMapPin className="w-3.5 h-3.5 text-active" />
                     <span className="font-semibold text-white">{studio}</span>
-                  </div>
+                  </motion.div>
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Interactive Multi-Angle Gallery Selector Deck */}
           <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
             {galleryImages.map((img, idx) => {
               const isSelected = selectedImageIdx === idx;
               return (
-                <button
+                <motion.button
                   key={idx}
+                  initial={{ opacity: 0, scale: 0.9, y: 16 }}
+                  animate={
+                    heroTriggered
+                      ? { opacity: 1, scale: 1, y: 0 }
+                      : { opacity: 0, scale: 0.9, y: 16 }
+                  }
+                  transition={{ duration: 0.5, delay: 0.35 + idx * 0.08 }}
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => setSelectedImageIdx(idx)}
                   className={`group/thumb relative h-20 sm:h-24 rounded-2xl overflow-hidden border transition-all duration-300 text-left cursor-pointer ${
                     isSelected
-                      ? "border-active ring-2 ring-active/40 scale-[1.02] shadow-lg shadow-active/20"
-                      : "border-slate-200/80 dark:border-white/10 opacity-75 hover:opacity-100 hover:border-active/40"
+                      ? "border-active ring-2 ring-active/40 scale-[1.02] shadow-xs"
+                      : "border-brand-500/20 opacity-75 hover:opacity-100 hover:border-active/40 shadow-2xs"
                   }`}
                 >
                   <Image
@@ -640,568 +818,728 @@ export default function ClassDetailsPageLayout({
                       {img.label}
                     </span>
                   </div>
-                </button>
+                </motion.button>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* Main Content Workspace Layout */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* ============================================================ */}
+      {/* SECTION 3: Main Content Workspace Layout                     */}
+      {/* ============================================================ */}
+      <main ref={contentRef} className="w-11/12 mx-auto relative z-10 pt-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          
           {/* Left Column (Content, Tabs, Curriculum) */}
-          <div className="lg:col-span-8 space-y-10">
-            
-            {/* Interactive Tab Navigation */}
-            <div className="border-b border-slate-200/80 dark:border-white/[0.08] flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <div className="lg:col-span-8 space-y-8">
+            {/* Interactive Tab Navigation Rail */}
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={
+                contentTriggered ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }
+              }
+              transition={{ duration: 0.55, ease: TRANSITION_EASE }}
+              className="border-b border-brand-500/20 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none"
+            >
               {[
-                { id: "overview", label: "Overview & Adaptations" },
-                { id: "telemetry", label: "Biometrics & Heart Zone" },
+                { id: "overview", label: "Overview & Stimulus" },
+                { id: "telemetry", label: "Biometrics & Zones" },
                 { id: "timeline", label: "Session Anatomy" },
                 { id: "coach", label: "Master Coach" },
-                { id: "amenities", label: "Recovery Suite Perks" },
+                { id: "amenities", label: "Recovery Perks" },
                 { id: "faqs", label: "Athlete FAQs" },
-                { id: "reviews", label: `Athlete Reviews (${rating}★)` },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-3 font-['Inter'] text-sm font-bold whitespace-nowrap border-b-2 transition-all cursor-pointer ${
-                    activeTab === tab.id
-                      ? "border-active text-active"
-                      : "border-transparent text-slate-500 dark:text-slate-400 hover:text-foreground hover:border-slate-300 dark:hover:border-white/20"
-                  }`}
+                { id: "reviews", label: `Reviews (${rating}★)` },
+              ].map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`relative px-4 py-3 font-['Inter'] text-sm font-bold whitespace-nowrap transition-colors cursor-pointer rounded-xl ${
+                      isActive
+                        ? "text-active"
+                        : "text-[#535C91] dark:text-[#9290C3] hover:text-foreground"
+                    }`}
+                  >
+                    <span>{tab.label}</span>
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeClassDetailsTab"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-active rounded-full"
+                        transition={{ duration: 0.3, ease: TRANSITION_EASE }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </motion.div>
+
+            {/* TAB PANELS WITH ANIMATEPRESENCE */}
+            <AnimatePresence mode="wait">
+              {/* TAB 1: OVERVIEW & OBJECTIVES */}
+              {activeTab === "overview" && (
+                <motion.div
+                  key="overview"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.45, ease: TRANSITION_EASE }}
+                  className="space-y-8"
                 >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            {/* TAB 1: OVERVIEW & OBJECTIVES */}
-            {activeTab === "overview" && (
-              <div className="space-y-8 animate-fadeIn">
-                <div>
-                  <h2 className="font-['Outfit'] text-2xl font-black text-foreground mb-3">
-                    Curriculum Overview
-                  </h2>
-                  <p className="font-['Inter'] text-base text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-                    {data.description ||
-                      "Engineered for high-output athletes looking to optimize functional power, core integrity, and metabolic endurance through progressive overload and certified form guidance."}
-                  </p>
-                </div>
-
-                {/* 4 Core Physiological Adaptations */}
-                <div>
-                  <h3 className="font-['Outfit'] text-xl font-bold text-foreground mb-4">
-                    Target Physiological Stimulus
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/10 shadow-xs hover:border-active/30 transition-all">
-                      <div className="w-9 h-9 rounded-xl bg-active/10 text-active flex items-center justify-center font-bold mb-3">
-                        <FaDumbbell className="w-4 h-4" />
-                      </div>
-                      <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-1">
-                        Hypertrophy & Kinetic Power
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Stimulate high-threshold motor units using multi-joint compound movement patterns and controlled tempo eccentrics.
-                      </p>
-                    </div>
-
-                    <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/10 shadow-xs hover:border-active/30 transition-all">
-                      <div className="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center font-bold mb-3">
-                        <FaFire className="w-4 h-4" />
-                      </div>
-                      <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-1">
-                        Anaerobic Threshold & VO2 Peak
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Sustain power outputs near the lactate turn-point to expand cardiovascular engine volume and recovery speed.
-                      </p>
-                    </div>
-
-                    <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/10 shadow-xs hover:border-active/30 transition-all">
-                      <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold mb-3">
-                        <FiActivity className="w-4 h-4" />
-                      </div>
-                      <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-1">
-                        Neuromuscular Coordination
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Improve bar velocity, rotational balance, and bilateral symmetry through real-time coach cueing and optical tracking.
-                      </p>
-                    </div>
-
-                    <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/10 shadow-xs hover:border-active/30 transition-all">
-                      <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center font-bold mb-3">
-                        <FiShield className="w-4 h-4" />
-                      </div>
-                      <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-1">
-                        Joint Resilience & Longevity
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Loaded mobility protocols protecting spinal integrity, knee patellofemoral tracking, and shoulder capsules.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Athlete Requirements & Prerequisites */}
-                <div className="p-6 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/10">
-                  <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-3">
-                    Athlete Preparation & Prerequisites
-                  </h4>
-                  <ul className="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-                    <li className="flex items-start gap-2.5">
-                      <FiCheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                      <span>Comfortable with baseline cardiovascular endurance and compound bodyweight squats and lunges.</span>
-                    </li>
-                    <li className="flex items-start gap-2.5">
-                      <FiCheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                      <span>Arrive 10 minutes early for digital heart telemetry syncing and shoe verification.</span>
-                    </li>
-                    <li className="flex items-start gap-2.5">
-                      <FiCheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                      <span>Coaches adapt regressions and progressions to match individual injury histories and experience levels.</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 2: TELEMETRY & BIOMETRICS */}
-            {activeTab === "telemetry" && (
-              <div className="space-y-8 animate-fadeIn">
-                <div>
-                  <h2 className="font-['Outfit'] text-2xl font-black text-foreground mb-2">
-                    Biometric Profile & Live Telemetry
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-                    Real-time metabolic readouts calibrated by our sports science coaching team.
-                  </p>
-                </div>
-
-                {/* Intensity Meter & Gauge */}
-                <div className="p-6 rounded-3xl bg-white dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/10 shadow-sm space-y-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                      <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                        Metabolic Demand Index
-                      </span>
-                      <h3 className="font-['Outfit'] text-xl font-bold text-foreground mt-0.5">
-                        {intensityInfo.label}
-                      </h3>
-                    </div>
-
-                    {/* Visual 5-Bar Intensity Meter */}
-                    <div className="flex items-center gap-1.5">
-                      {[1, 2, 3, 4, 5].map((bar) => (
-                        <div
-                          key={bar}
-                          className={`w-6 sm:w-7 h-3 rounded-md transition-all duration-500 ${
-                            bar <= intensityInfo.bars
-                              ? "bg-active shadow-sm shadow-active/40"
-                              : "bg-slate-200 dark:bg-white/10"
-                          }`}
-                        />
-                      ))}
-                      <span className="text-xs font-bold text-active ml-2">
-                        Level {intensityInfo.bars}/5
-                      </span>
-                    </div>
+                  <div>
+                    <motion.h2
+                      initial={{ opacity: 0, y: 14, filter: "blur(3px)" }}
+                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      transition={{ duration: 0.5 }}
+                      className="font-['Outfit'] text-2xl font-black text-foreground mb-3"
+                    >
+                      Curriculum Overview
+                    </motion.h2>
+                    <motion.p
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.08 }}
+                      className="font-['Inter'] text-base text-[#535C91] dark:text-[#9290C3] leading-relaxed font-normal"
+                    >
+                      {data.description ||
+                        "Engineered for high-output athletes looking to optimize functional power, core integrity, and metabolic endurance through progressive overload and certified form guidance."}
+                    </motion.p>
                   </div>
 
-                  {/* 3 Telemetry Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.04] border border-slate-100 dark:border-white/5">
-                      <div className="flex items-center gap-2 text-active mb-1.5">
-                        <FaHeartbeat className="w-4 h-4 animate-pulse" />
-                        <span className="text-[11px] font-bold uppercase tracking-wider">
-                          Target Heart Zone
-                        </span>
-                      </div>
-                      <span className="font-['Outfit'] text-lg font-black text-foreground block">
-                        {intensityInfo.hr}
-                      </span>
-                      <span className="text-[11px] text-slate-400">Live telemetry display</span>
-                    </div>
-
-                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.04] border border-slate-100 dark:border-white/5">
-                      <div className="flex items-center gap-2 text-amber-500 mb-1.5">
-                        <FaFire className="w-4 h-4" />
-                        <span className="text-[11px] font-bold uppercase tracking-wider">
-                          Est. Energy Burn
-                        </span>
-                      </div>
-                      <span className="font-['Outfit'] text-lg font-black text-foreground block">
-                        {intensityInfo.cals}
-                      </span>
-                      <span className="text-[11px] text-slate-400">Based on 75kg athlete</span>
-                    </div>
-
-                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.04] border border-slate-100 dark:border-white/5">
-                      <div className="flex items-center gap-2 text-emerald-500 mb-1.5">
-                        <FiUsers className="w-4 h-4" />
-                        <span className="text-[11px] font-bold uppercase tracking-wider">
-                          Supervision Ratio
-                        </span>
-                      </div>
-                      <span className="font-['Outfit'] text-lg font-black text-foreground block">
-                        1 : {totalSlots} Max
-                      </span>
-                      <span className="text-[11px] text-slate-400">Direct coach cueing</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Technical Equipment Provided */}
-                <div className="p-6 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/10">
-                  <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-3">
-                    Studio Equipment Provided & Verified
-                  </h4>
-                  <div className="flex flex-wrap gap-2.5">
-                    {equipmentList.map((item) => (
-                      <span
-                        key={item}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/10 text-xs font-semibold text-foreground shadow-xs"
+                  {/* 4 Core Physiological Adaptations */}
+                  <div>
+                    <h3 className="font-['Outfit'] text-xl font-bold text-foreground mb-4">
+                      Target Physiological Stimulus
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                        className="p-5 rounded-2xl bg-white dark:bg-[#070F2B] border border-brand-500/20 shadow-xs hover:border-active/40 transition-all"
                       >
-                        <FiCheck className="w-4 h-4 text-emerald-500" />
-                        <span>{item}</span>
-                      </span>
+                        <div className="w-9 h-9 rounded-xl bg-active/10 text-active flex items-center justify-center font-bold mb-3 shadow-2xs">
+                          <FaDumbbell className="w-4 h-4" />
+                        </div>
+                        <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-1">
+                          Hypertrophy & Kinetic Power
+                        </h4>
+                        <p className="text-xs text-[#535C91] dark:text-[#9290C3] leading-relaxed">
+                          Stimulate high-threshold motor units using multi-joint compound movement patterns and controlled tempo eccentrics.
+                        </p>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.16 }}
+                        className="p-5 rounded-2xl bg-white dark:bg-[#070F2B] border border-brand-500/20 shadow-xs hover:border-active/40 transition-all"
+                      >
+                        <div className="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center font-bold mb-3 shadow-2xs">
+                          <FaFire className="w-4 h-4" />
+                        </div>
+                        <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-1">
+                          Anaerobic Threshold & VO2 Peak
+                        </h4>
+                        <p className="text-xs text-[#535C91] dark:text-[#9290C3] leading-relaxed">
+                          Sustain power outputs near the lactate turn-point to expand cardiovascular engine volume and recovery speed.
+                        </p>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.22 }}
+                        className="p-5 rounded-2xl bg-white dark:bg-[#070F2B] border border-brand-500/20 shadow-xs hover:border-active/40 transition-all"
+                      >
+                        <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold mb-3 shadow-2xs">
+                          <FiActivity className="w-4 h-4" />
+                        </div>
+                        <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-1">
+                          Neuromuscular Coordination
+                        </h4>
+                        <p className="text-xs text-[#535C91] dark:text-[#9290C3] leading-relaxed">
+                          Improve bar velocity, rotational balance, and bilateral symmetry through real-time coach cueing and optical tracking.
+                        </p>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.28 }}
+                        className="p-5 rounded-2xl bg-white dark:bg-[#070F2B] border border-brand-500/20 shadow-xs hover:border-active/40 transition-all"
+                      >
+                        <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center font-bold mb-3 shadow-2xs">
+                          <FiShield className="w-4 h-4" />
+                        </div>
+                        <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-1">
+                          Joint Resilience & Longevity
+                        </h4>
+                        <p className="text-xs text-[#535C91] dark:text-[#9290C3] leading-relaxed">
+                          Loaded mobility protocols protecting spinal integrity, knee patellofemoral tracking, and shoulder capsules.
+                        </p>
+                      </motion.div>
+                    </div>
+                  </div>
+
+                  {/* Athlete Requirements & Prerequisites */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.97, y: 16 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ duration: 0.55, delay: 0.32 }}
+                    className="p-6 rounded-2xl bg-brand-500/5 dark:bg-[#1B1A55]/15 border border-brand-500/20 shadow-2xs"
+                  >
+                    <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-3">
+                      Athlete Preparation & Prerequisites
+                    </h4>
+                    <ul className="space-y-3 text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3]">
+                      <li className="flex items-start gap-2.5">
+                        <FiCheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                        <span>Comfortable with baseline cardiovascular endurance and compound bodyweight squats and lunges.</span>
+                      </li>
+                      <li className="flex items-start gap-2.5">
+                        <FiCheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                        <span>Arrive 10 minutes early for digital heart telemetry syncing and shoe verification.</span>
+                      </li>
+                      <li className="flex items-start gap-2.5">
+                        <FiCheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                        <span>Coaches adapt regressions and progressions to match individual injury histories and experience levels.</span>
+                      </li>
+                    </ul>
+                  </motion.div>
+                </motion.div>
+              )}
+
+              {/* TAB 2: TELEMETRY & BIOMETRICS */}
+              {activeTab === "telemetry" && (
+                <motion.div
+                  key="telemetry"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.45, ease: TRANSITION_EASE }}
+                  className="space-y-8"
+                >
+                  <div>
+                    <h2 className="font-['Outfit'] text-2xl font-black text-foreground mb-2">
+                      Biometric Profile & Live Telemetry
+                    </h2>
+                    <p className="text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3]">
+                      Real-time metabolic readouts calibrated by our sports science coaching team.
+                    </p>
+                  </div>
+
+                  {/* Intensity Meter & Gauge */}
+                  <div className="p-6 rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 shadow-xs space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#535C91] dark:text-[#9290C3]">
+                          Metabolic Demand Index
+                        </span>
+                        <h3 className="font-['Outfit'] text-xl font-bold text-foreground mt-0.5">
+                          {intensityInfo.label}
+                        </h3>
+                      </div>
+
+                      {/* Visual 5-Bar Intensity Meter */}
+                      <div className="flex items-center gap-1.5">
+                        {[1, 2, 3, 4, 5].map((bar) => (
+                          <div
+                            key={bar}
+                            className={`w-6 sm:w-7 h-3 rounded-md transition-all duration-500 ${
+                              bar <= intensityInfo.bars
+                                ? "bg-active shadow-2xs"
+                                : "bg-brand-500/10 dark:bg-white/10"
+                            }`}
+                          />
+                        ))}
+                        <span className="text-xs font-bold text-active ml-2">
+                          Level {intensityInfo.bars}/5
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 3 Telemetry Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                      <motion.div
+                        initial={{ opacity: 0, x: -18 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.45 }}
+                        className="p-4 rounded-2xl bg-brand-500/5 dark:bg-[#090814]/80 border border-brand-500/20 shadow-2xs"
+                      >
+                        <div className="flex items-center gap-2 text-active mb-1.5">
+                          <FaHeartbeat className="w-4 h-4 animate-pulse" />
+                          <span className="text-[11px] font-bold uppercase tracking-wider">
+                            Target Heart Zone
+                          </span>
+                        </div>
+                        <span className="font-['Outfit'] text-lg font-black text-foreground block">
+                          {intensityInfo.hr}
+                        </span>
+                        <span className="text-[11px] text-[#535C91] dark:text-[#9290C3]">Live telemetry display</span>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.45, delay: 0.08 }}
+                        className="p-4 rounded-2xl bg-brand-500/5 dark:bg-[#090814]/80 border border-brand-500/20 shadow-2xs"
+                      >
+                        <div className="flex items-center gap-2 text-amber-500 mb-1.5">
+                          <FaFire className="w-4 h-4" />
+                          <span className="text-[11px] font-bold uppercase tracking-wider">
+                            Est. Energy Burn
+                          </span>
+                        </div>
+                        <span className="font-['Outfit'] text-lg font-black text-foreground block">
+                          {intensityInfo.cals}
+                        </span>
+                        <span className="text-[11px] text-[#535C91] dark:text-[#9290C3]">Based on 75kg athlete</span>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, x: 18 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.45, delay: 0.16 }}
+                        className="p-4 rounded-2xl bg-brand-500/5 dark:bg-[#090814]/80 border border-brand-500/20 shadow-2xs"
+                      >
+                        <div className="flex items-center gap-2 text-emerald-500 mb-1.5">
+                          <FiUsers className="w-4 h-4" />
+                          <span className="text-[11px] font-bold uppercase tracking-wider">
+                            Supervision Ratio
+                          </span>
+                        </div>
+                        <span className="font-['Outfit'] text-lg font-black text-foreground block">
+                          1 : {totalSlots} Max
+                        </span>
+                        <span className="text-[11px] text-[#535C91] dark:text-[#9290C3]">Direct coach cueing</span>
+                      </motion.div>
+                    </div>
+                  </div>
+
+                  {/* Technical Equipment Provided */}
+                  <div className="p-6 rounded-2xl bg-white dark:bg-[#070F2B] border border-brand-500/20 shadow-xs">
+                    <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-3">
+                      Studio Equipment Provided & Verified
+                    </h4>
+                    <div className="flex flex-wrap gap-2.5">
+                      {equipmentList.map((item, idx) => (
+                        <motion.span
+                          key={item}
+                          initial={{ opacity: 0, scale: 0.85 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.4, delay: idx * 0.05 }}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-searchbox-bg border border-brand-500/20 text-xs font-semibold text-foreground shadow-2xs"
+                        >
+                          <FiCheck className="w-4 h-4 text-emerald-500" />
+                          <span>{item}</span>
+                        </motion.span>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* TAB 3: SESSION TIMELINE */}
+              {activeTab === "timeline" && (
+                <motion.div
+                  key="timeline"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.45, ease: TRANSITION_EASE }}
+                  className="space-y-6"
+                >
+                  <div>
+                    <h2 className="font-['Outfit'] text-2xl font-black text-foreground mb-2">
+                      How This {data.duration || 60}-Minute Protocol Unfolds
+                    </h2>
+                    <p className="text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3]">
+                      Minute-by-minute athletic progression to balance maximal stimulus with neuromuscular safety.
+                    </p>
+                  </div>
+
+                  <div className="relative pl-6 sm:pl-8 space-y-6 before:absolute before:left-2 sm:before:left-3 before:top-3 before:bottom-3 before:w-0.5 before:bg-active/30">
+                    {[
+                      {
+                        step: 1,
+                        time: "00:00 - 00:10 • Dynamic Primer",
+                        title: "CNS Activation & Loaded Mobility",
+                        desc: "Band-resisted hip mobilization, thoracic extension flossing, and progressive heart rate acceleration into Zone 2.",
+                      },
+                      {
+                        step: 2,
+                        time: "00:10 - 00:35 • Calibrated Core Engine",
+                        title: "Primary Working Complexes & Overload",
+                        desc: "Main athletic complexes targeting technical movement excellence, velocity tracking, and progressive resistance working sets.",
+                      },
+                      {
+                        step: 3,
+                        time: "00:35 - 00:45 • Metabolic Finisher",
+                        title: "High-Cadence Anaerobic Output",
+                        desc: "High-density team intervals utilizing sleds, aqua bags, or assault bikes pushing VO2 max output.",
+                      },
+                      {
+                        step: 4,
+                        time: "00:45 - 00:50 • Parasympathetic Shift",
+                        title: "Box Breathing & Cold Plunge Transition",
+                        desc: "Controlled box breathing, spinal decompression, and direct guidance to the Cold Plunge suite for immediate recovery.",
+                        highlight: true,
+                      },
+                    ].map((phase, idx) => (
+                      <motion.div
+                        key={phase.step}
+                        initial={{ opacity: 0, x: -24 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: idx * 0.1 }}
+                        className="relative"
+                      >
+                        <div
+                          className={`absolute -left-6 sm:-left-8 top-1 w-5 h-5 rounded-full text-white text-[10px] font-black flex items-center justify-center ring-4 ring-background shadow-2xs ${
+                            phase.highlight ? "bg-emerald-500" : "bg-active"
+                          }`}
+                        >
+                          {phase.step}
+                        </div>
+                        <div className="p-5 rounded-2xl bg-white dark:bg-[#070F2B] border border-brand-500/20 shadow-xs">
+                          <span
+                            className={`text-xs font-black uppercase tracking-wider block mb-1 ${
+                              phase.highlight ? "text-emerald-500" : "text-active"
+                            }`}
+                          >
+                            {phase.time}
+                          </span>
+                          <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-1">
+                            {phase.title}
+                          </h4>
+                          <p className="text-xs text-[#535C91] dark:text-[#9290C3] leading-relaxed">
+                            {phase.desc}
+                          </p>
+                        </div>
+                      </motion.div>
                     ))}
                   </div>
-                </div>
-              </div>
-            )}
+                </motion.div>
+              )}
 
-            {/* TAB 3: SESSION TIMELINE */}
-            {activeTab === "timeline" && (
-              <div className="space-y-6 animate-fadeIn">
-                <div>
-                  <h2 className="font-['Outfit'] text-2xl font-black text-foreground mb-2">
-                    How This {data.duration || 60}-Minute Protocol Unfolds
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-                    Minute-by-minute athletic progression to balance maximal stimulus with neuromuscular safety.
-                  </p>
-                </div>
-
-                <div className="relative pl-6 sm:pl-8 space-y-6 before:absolute before:left-2 sm:before:left-3 before:top-3 before:bottom-3 before:w-0.5 before:bg-active/30">
-                  <div className="relative">
-                    <div className="absolute -left-6 sm:-left-8 top-1 w-5 h-5 rounded-full bg-active text-white text-[10px] font-black flex items-center justify-center ring-4 ring-background">
-                      1
-                    </div>
-                    <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 shadow-xs">
-                      <span className="text-xs font-black text-active uppercase tracking-wider block mb-1">
-                        00:00 - 00:10 • Dynamic Primer
-                      </span>
-                      <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-1">
-                        CNS Activation & Loaded Mobility
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Band-resisted hip mobilization, thoracic extension flossing, and progressive heart rate acceleration into Zone 2.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="relative">
-                    <div className="absolute -left-6 sm:-left-8 top-1 w-5 h-5 rounded-full bg-active text-white text-[10px] font-black flex items-center justify-center ring-4 ring-background">
-                      2
-                    </div>
-                    <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 shadow-xs">
-                      <span className="text-xs font-black text-active uppercase tracking-wider block mb-1">
-                        00:10 - 00:35 • Calibrated Core Engine
-                      </span>
-                      <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-1">
-                        Primary Working Complexes & Overload
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Main athletic complexes targeting technical movement excellence, velocity tracking, and progressive resistance working sets.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="relative">
-                    <div className="absolute -left-6 sm:-left-8 top-1 w-5 h-5 rounded-full bg-active text-white text-[10px] font-black flex items-center justify-center ring-4 ring-background">
-                      3
-                    </div>
-                    <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 shadow-xs">
-                      <span className="text-xs font-black text-active uppercase tracking-wider block mb-1">
-                        00:35 - 00:45 • Metabolic Finisher
-                      </span>
-                      <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-1">
-                        High-Cadence Anaerobic Output
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        High-density team intervals utilizing sleds, aqua bags, or assault bikes pushing VO2 max output.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="relative">
-                    <div className="absolute -left-6 sm:-left-8 top-1 w-5 h-5 rounded-full bg-emerald-500 text-white text-[10px] font-black flex items-center justify-center ring-4 ring-background">
-                      4
-                    </div>
-                    <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 shadow-xs">
-                      <span className="text-xs font-black text-emerald-500 uppercase tracking-wider block mb-1">
-                        00:45 - 00:50 • Parasympathetic Shift
-                      </span>
-                      <h4 className="font-['Outfit'] font-bold text-base text-foreground mb-1">
-                        Box Breathing & Cold Plunge Transition
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Controlled box breathing, spinal decompression, and direct guidance to the Cold Plunge suite for immediate recovery.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 4: MASTER COACH */}
-            {activeTab === "coach" && (
-              <div className="space-y-6 animate-fadeIn">
-                <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-6">
-                  <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden bg-active/20 border-2 border-active shrink-0 shadow-lg">
-                    {data.authorImage ? (
-                      <Image
-                        src={data.authorImage}
-                        alt={coachName}
-                        fill
-                        unoptimized
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center font-['Outfit'] text-3xl font-black text-active">
-                        {coachName.charAt(0)}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="text-center sm:text-left space-y-2 flex-1">
-                    <div className="flex items-center justify-center sm:justify-start gap-2">
-                      <h3 className="font-['Outfit'] text-2xl font-black text-foreground">
-                        {coachName}
-                      </h3>
-                      <FiCheckCircle className="w-5 h-5 text-active" title="Certified CSCS Coach" />
-                    </div>
-
-                    <p className="text-xs font-bold uppercase tracking-wider text-active">
-                      Senior Strength & Conditioning Specialist (CSCS)
-                    </p>
-
-                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed pt-1">
-                      Over 8+ years coaching collegiate athletes and competitive fitness athletes. Specializes in biomechanical bar path efficiency, kinetic chain power transfer, and injury mitigation.
-                    </p>
-
-                    <div className="pt-3 flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                      <span className="text-[11px] font-semibold px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300">
-                        USAW Level 2
-                      </span>
-                      <span className="text-[11px] font-semibold px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300">
-                        FMS Certified
-                      </span>
-                      <span className="text-[11px] font-semibold px-2.5 py-1 rounded-md bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300">
-                        Precision Nutrition L1
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 5: INCLUDED AMENITIES */}
-            {activeTab === "amenities" && (
-              <div className="space-y-6 animate-fadeIn">
-                <h2 className="font-['Outfit'] text-2xl font-black text-foreground">
-                  Complimentary Recovery Suite Privileges
-                </h2>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 flex items-start gap-4">
-                    <span className="text-2xl p-2.5 rounded-xl bg-cyan-500/10 shrink-0">❄️</span>
-                    <div>
-                      <h4 className="font-['Outfit'] font-bold text-sm text-foreground mb-1">
-                        Contrast Cold Plunge (48°F)
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Medical-grade chilled tubs immediately post-workout to attenuate inflammation and trigger norepinephrine release.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 flex items-start gap-4">
-                    <span className="text-2xl p-2.5 rounded-xl bg-amber-500/10 shrink-0">🧖</span>
-                    <div>
-                      <h4 className="font-['Outfit'] font-bold text-sm text-foreground mb-1">
-                        Finnish Cedar Sauna (195°F)
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Elevate heat-shock proteins and flush metabolic byproducts in our authentic Finnish cedar sauna chambers.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 flex items-start gap-4">
-                    <span className="text-2xl p-2.5 rounded-xl bg-active/10 shrink-0">🥤</span>
-                    <div>
-                      <h4 className="font-['Outfit'] font-bold text-sm text-foreground mb-1">
-                        Hydration & Electrolyte Tap
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Unlimited chilled Himalayan mineral water, BCAA infusions, and filtered alkaline hydration dispensers.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 flex items-start gap-4">
-                    <span className="text-2xl p-2.5 rounded-xl bg-purple-500/10 shrink-0">🚿</span>
-                    <div>
-                      <h4 className="font-['Outfit'] font-bold text-sm text-foreground mb-1">
-                        Luxury Locker Suites & Dyson Amenities
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Rainfall showers, keyless RFID locks, organic Malin+Goetz grooming essentials, and plush towels.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 6: FAQS */}
-            {activeTab === "faqs" && (
-              <div className="space-y-4 animate-fadeIn">
-                <h2 className="font-['Outfit'] text-2xl font-black text-foreground mb-4">
-                  Frequently Asked Questions
-                </h2>
-
-                {FAQS.map((faq, idx) => {
-                  const isOpen = openFaq === idx;
-                  return (
-                    <div
-                      key={idx}
-                      className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] overflow-hidden transition-all"
+              {/* TAB 4: MASTER COACH */}
+              {activeTab === "coach" && (
+                <motion.div
+                  key="coach"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.45, ease: TRANSITION_EASE }}
+                  className="space-y-6"
+                >
+                  <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 shadow-xs flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                    <motion.div
+                      initial={{ scale: 0.8, rotate: -8 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ type: "spring", stiffness: 220 }}
+                      className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden bg-active/20 border-2 border-active shrink-0 shadow-sm"
                     >
-                      <button
-                        type="button"
-                        onClick={() => setOpenFaq(isOpen ? -1 : idx)}
-                        className="w-full p-5 text-left flex items-center justify-between gap-4 font-['Outfit'] font-bold text-base text-foreground cursor-pointer hover:text-active transition-colors"
-                      >
-                        <span>{faq.q}</span>
-                        {isOpen ? (
-                          <FiChevronUp className="w-5 h-5 text-active shrink-0" />
-                        ) : (
-                          <FiChevronDown className="w-5 h-5 text-slate-400 shrink-0" />
-                        )}
-                      </button>
-
-                      {isOpen && (
-                        <div className="px-5 pb-5 text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-white/5 pt-3">
-                          {faq.a}
+                      {data.authorImage ? (
+                        <Image
+                          src={data.authorImage}
+                          alt={coachName}
+                          fill
+                          unoptimized
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center font-['Outfit'] text-3xl font-black text-active">
+                          {coachName.charAt(0)}
                         </div>
                       )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                    </motion.div>
 
-            {/* TAB 7: REVIEWS */}
-            {activeTab === "reviews" && (
-              <div className="space-y-6 animate-fadeIn">
-                <div className="flex items-center justify-between">
-                  <h2 className="font-['Outfit'] text-2xl font-black text-foreground">
-                    Athlete Feedback ({reviewCount})
-                  </h2>
-                  <div className="flex items-center gap-1.5 font-bold text-foreground">
-                    <FaStar className="w-4 h-4 text-amber-400" />
-                    <span>{rating} / 5.0 Overall</span>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {[
-                    {
-                      name: "Tariqul Islam",
-                      badge: "Club Member • 8 Months",
-                      rating: 5,
-                      date: "3 days ago",
-                      comment:
-                        "The pacing of this class is insane. The coach watched my deadlift bar path and corrected my hip hinge immediately. Hit a PR on the turf sleds afterwards!",
-                    },
-                    {
-                      name: "Elena Rostova",
-                      badge: "VIP Athlete",
-                      rating: 5,
-                      date: "1 week ago",
-                      comment:
-                        "Best high-intensity class in Dhaka. The telemetry screens kept me from slacking during the 3rd interval. Cold plunge access afterwards makes it a 10/10.",
-                    },
-                    {
-                      name: "Zubair Ahmed",
-                      badge: "Member",
-                      rating: 5,
-                      date: "2 weeks ago",
-                      comment:
-                        "Structured, disciplined, and genuinely friendly community. You leave drenched in sweat with zero wasted minutes.",
-                    },
-                  ].map((rev, i) => (
-                    <div
-                      key={i}
-                      className="p-5 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <span className="font-bold text-foreground text-sm block">
-                            {rev.name}
-                          </span>
-                          <span className="text-[11px] text-active font-semibold">
-                            {rev.badge}
-                          </span>
-                        </div>
-                        <span className="text-xs text-slate-400">{rev.date}</span>
+                    <div className="text-center sm:text-left space-y-2 flex-1">
+                      <div className="flex items-center justify-center sm:justify-start gap-2">
+                        <h3 className="font-['Outfit'] text-2xl font-black text-foreground">
+                          {coachName}
+                        </h3>
+                        <FiCheckCircle className="w-5 h-5 text-active" title="Certified CSCS Coach" />
                       </div>
-                      <div className="flex items-center gap-1 text-amber-400 mb-2">
-                        {Array.from({ length: rev.rating }).map((_, idx) => (
-                          <FaStar key={idx} className="w-3 h-3 fill-current" />
+
+                      <p className="text-xs font-bold uppercase tracking-wider text-active">
+                        Senior Strength & Conditioning Specialist (CSCS)
+                      </p>
+
+                      <p className="text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3] leading-relaxed pt-1 font-['Inter']">
+                        Over 8+ years coaching collegiate athletes and competitive fitness athletes. Specializes in biomechanical bar path efficiency, kinetic chain power transfer, and injury mitigation.
+                      </p>
+
+                      <div className="pt-3 flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                        {["USAW Level 2", "FMS Certified", "Precision Nutrition L1"].map((cert, i) => (
+                          <motion.span
+                            key={cert}
+                            initial={{ opacity: 0, scale: 0.85 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.15 + i * 0.06 }}
+                            className="text-[11px] font-semibold px-2.5 py-1 rounded-md bg-brand-500/5 dark:bg-white/10 text-foreground border border-brand-500/15 shadow-2xs"
+                          >
+                            {cert}
+                          </motion.span>
                         ))}
                       </div>
-                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                        &quot;{rev.comment}&quot;
-                      </p>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* TAB 5: INCLUDED AMENITIES */}
+              {activeTab === "amenities" && (
+                <motion.div
+                  key="amenities"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.45, ease: TRANSITION_EASE }}
+                  className="space-y-6"
+                >
+                  <h2 className="font-['Outfit'] text-2xl font-black text-foreground">
+                    Complimentary Recovery Suite Privileges
+                  </h2>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {[
+                      {
+                        emoji: "❄️",
+                        title: "Contrast Cold Plunge (48°F)",
+                        desc: "Medical-grade chilled tubs immediately post-workout to attenuate inflammation and trigger norepinephrine release.",
+                        bg: "bg-cyan-500/10",
+                      },
+                      {
+                        emoji: "🧖",
+                        title: "Finnish Cedar Sauna (195°F)",
+                        desc: "Elevate heat-shock proteins and flush metabolic byproducts in our authentic Finnish cedar sauna chambers.",
+                        bg: "bg-amber-500/10",
+                      },
+                      {
+                        emoji: "🥤",
+                        title: "Hydration & Electrolyte Tap",
+                        desc: "Unlimited chilled Himalayan mineral water, BCAA infusions, and filtered alkaline hydration dispensers.",
+                        bg: "bg-active/10",
+                      },
+                      {
+                        emoji: "🚿",
+                        title: "Luxury Locker Suites & Dyson Amenities",
+                        desc: "Rainfall showers, keyless RFID locks, organic Malin+Goetz grooming essentials, and plush towels.",
+                        bg: "bg-purple-500/10",
+                      },
+                    ].map((amenity, idx) => (
+                      <motion.div
+                        key={amenity.title}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.45, delay: idx * 0.08 }}
+                        className="p-5 rounded-2xl bg-white dark:bg-[#070F2B] border border-brand-500/20 shadow-xs flex items-start gap-4"
+                      >
+                        <span className={`text-2xl p-2.5 rounded-xl ${amenity.bg} shrink-0 shadow-2xs`}>
+                          {amenity.emoji}
+                        </span>
+                        <div>
+                          <h4 className="font-['Outfit'] font-bold text-sm text-foreground mb-1">
+                            {amenity.title}
+                          </h4>
+                          <p className="text-xs text-[#535C91] dark:text-[#9290C3] leading-relaxed">
+                            {amenity.desc}
+                          </p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* TAB 6: FAQS */}
+              {activeTab === "faqs" && (
+                <motion.div
+                  key="faqs"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.45, ease: TRANSITION_EASE }}
+                  className="space-y-4"
+                >
+                  <h2 className="font-['Outfit'] text-2xl font-black text-foreground mb-4">
+                    Frequently Asked Questions
+                  </h2>
+
+                  {FAQS.map((faq, idx) => {
+                    const isOpen = openFaq === idx;
+                    return (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: idx * 0.06 }}
+                        className="rounded-2xl border border-brand-500/20 bg-white dark:bg-[#070F2B] overflow-hidden transition-all shadow-2xs"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => setOpenFaq(isOpen ? -1 : idx)}
+                          className="w-full p-5 text-left flex items-center justify-between gap-4 font-['Outfit'] font-bold text-base text-foreground cursor-pointer hover:text-active transition-colors"
+                        >
+                          <span>{faq.q}</span>
+                          <motion.div
+                            animate={{ rotate: isOpen ? 180 : 0 }}
+                            transition={{ duration: 0.25 }}
+                            className="shrink-0"
+                          >
+                            <FiChevronDown className="w-5 h-5 text-active" />
+                          </motion.div>
+                        </button>
+
+                        <AnimatePresence>
+                          {isOpen && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.3, ease: TRANSITION_EASE }}
+                              className="px-5 pb-5 text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3] leading-relaxed border-t border-brand-500/10 pt-3"
+                            >
+                              {faq.a}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+                    );
+                  })}
+                </motion.div>
+              )}
+
+              {/* TAB 7: REVIEWS */}
+              {activeTab === "reviews" && (
+                <motion.div
+                  key="reviews"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.45, ease: TRANSITION_EASE }}
+                  className="space-y-6"
+                >
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-['Outfit'] text-2xl font-black text-foreground">
+                      Athlete Feedback ({reviewCount})
+                    </h2>
+                    <div className="flex items-center gap-1.5 font-bold text-foreground">
+                      <FaStar className="w-4 h-4 text-amber-400" />
+                      <span>{rating} / 5.0 Overall</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    {[
+                      {
+                        name: "Tariqul Islam",
+                        badge: "Club Member • 8 Months",
+                        rating: 5,
+                        date: "3 days ago",
+                        comment:
+                          "The pacing of this class is insane. The coach watched my deadlift bar path and corrected my hip hinge immediately. Hit a PR on the turf sleds afterwards!",
+                      },
+                      {
+                        name: "Elena Rostova",
+                        badge: "VIP Athlete",
+                        rating: 5,
+                        date: "1 week ago",
+                        comment:
+                          "Best high-intensity class in Dhaka. The telemetry screens kept me from slacking during the 3rd interval. Cold plunge access afterwards makes it a 10/10.",
+                      },
+                      {
+                        name: "Zubair Ahmed",
+                        badge: "Member",
+                        rating: 5,
+                        date: "2 weeks ago",
+                        comment:
+                          "Structured, disciplined, and genuinely friendly community. You leave drenched in sweat with zero wasted minutes.",
+                      },
+                    ].map((rev, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: -18 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.45, delay: i * 0.08 }}
+                        className="p-5 rounded-2xl bg-white dark:bg-[#070F2B] border border-brand-500/20 shadow-xs"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <span className="font-bold text-foreground text-sm block">
+                              {rev.name}
+                            </span>
+                            <span className="text-[11px] text-active font-semibold">
+                              {rev.badge}
+                            </span>
+                          </div>
+                          <span className="text-xs text-[#535C91] dark:text-[#9290C3]">{rev.date}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-amber-400 mb-2">
+                          {Array.from({ length: rev.rating }).map((_, idx) => (
+                            <FaStar key={idx} className="w-3 h-3 fill-current" />
+                          ))}
+                        </div>
+                        <p className="text-xs sm:text-sm text-[#535C91] dark:text-[#9290C3] leading-relaxed">
+                          &quot;{rev.comment}&quot;
+                        </p>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* Right Column (Sticky Booking Console) */}
-          <div className="lg:col-span-4">
-            <div className="sticky top-28 rounded-3xl bg-white/90 dark:bg-[#121124]/90 backdrop-blur-xl border border-slate-200/90 dark:border-white/10 shadow-2xl p-6 sm:p-7 space-y-6">
-              
+          {/* ============================================================ */}
+          {/* SECTION 4: Right Column (Sticky Booking Console)             */}
+          {/* ============================================================ */}
+          <div ref={bookingRef} className="lg:col-span-4">
+            <motion.div
+              initial={{ opacity: 0, x: 32, y: 16 }}
+              animate={
+                bookingTriggered
+                  ? { opacity: 1, x: 0, y: 0 }
+                  : { opacity: 0, x: 32, y: 16 }
+              }
+              transition={{ duration: 0.85, ease: TRANSITION_EASE }}
+              className="sticky top-28 rounded-3xl bg-white dark:bg-[#070F2B] backdrop-blur-xl border border-brand-500/20 shadow-md p-6 sm:p-7 space-y-6"
+            >
               {/* Price Banner */}
-              <div className="p-4 rounded-2xl bg-slate-100/70 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 text-center relative overflow-hidden">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.94 }}
+                animate={
+                  bookingTriggered
+                    ? { opacity: 1, scale: 1 }
+                    : { opacity: 0, scale: 0.94 }
+                }
+                transition={{ duration: 0.5, delay: 0.15 }}
+                className="p-4 rounded-2xl bg-brand-500/5 dark:bg-[#1B1A55]/20 border border-brand-500/15 text-center relative overflow-hidden shadow-2xs"
+              >
                 <div className="flex items-baseline justify-center gap-1">
                   <span className="font-['Outfit'] text-4xl font-black text-foreground">
                     ${data.price || 35}
                   </span>
-                  <span className="text-xs font-semibold text-slate-400">
+                  <span className="text-xs font-semibold text-[#535C91] dark:text-[#9290C3]">
                     / month
                   </span>
                 </div>
                 <span className="text-[11px] font-bold text-emerald-500 uppercase tracking-wider block mt-1">
                   ✓ Monthly Membership • Unlimited Access
                 </span>
-              </div>
+              </motion.div>
 
               {/* Live Seat Availability */}
-              <div>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={
+                  bookingTriggered ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }
+                }
+                transition={{ duration: 0.5, delay: 0.22 }}
+              >
                 <div className="flex items-center justify-between text-xs font-bold mb-2">
-                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <span className="text-[#535C91] dark:text-[#9290C3] flex items-center gap-1.5">
                     <FiUsers className="w-3.5 h-3.5 text-active" />
                     <span>Seat Capacity</span>
                   </span>
@@ -1211,54 +1549,90 @@ export default function ClassDetailsPageLayout({
                 </div>
 
                 {/* Progress bar */}
-                <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
-                  <div
+                <div className="w-full h-2 rounded-full bg-brand-500/10 dark:bg-white/10 overflow-hidden">
+                  <motion.div
+                    initial={{ scaleX: 0 }}
+                    animate={
+                      bookingTriggered
+                        ? { scaleX: percentFilled / 100 }
+                        : { scaleX: 0 }
+                    }
+                    transition={{ duration: 1.1, ease: TRANSITION_EASE, delay: 0.28 }}
+                    style={{ originX: 0 }}
                     className={`h-full rounded-full transition-all duration-500 ${
                       availableSlots <= 3 ? "bg-rose-500" : "bg-emerald-500"
                     }`}
-                    style={{ width: `${percentFilled}%` }}
                   />
                 </div>
 
-                <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 mt-2">
-                  <span className={availableSlots <= 3 ? "text-rose-500 font-extrabold" : "text-emerald-500"}>
-                    {availableSlots > 0 ? `⚡ ${availableSlots} seats available` : "Class Waitlist Only"}
+                <div className="flex items-center justify-between text-[11px] font-bold text-[#535C91] dark:text-[#9290C3] mt-2">
+                  <span
+                    className={
+                      availableSlots <= 3
+                        ? "text-rose-500 font-extrabold"
+                        : "text-emerald-500"
+                    }
+                  >
+                    {availableSlots > 0
+                      ? `⚡ ${availableSlots} seats available`
+                      : "Class Waitlist Only"}
                   </span>
                   <span>{percentFilled}% full</span>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Schedule Parameters Card */}
-              <div className="space-y-3.5 pt-2 border-t border-slate-100 dark:border-white/[0.08] text-xs">
-                <div className="flex items-start gap-3">
+              <div className="space-y-3.5 pt-2 border-t border-brand-500/15 text-xs">
+                <motion.div
+                  initial={{ opacity: 0, x: -14 }}
+                  animate={
+                    bookingTriggered ? { opacity: 1, x: 0 } : { opacity: 0, x: -14 }
+                  }
+                  transition={{ duration: 0.45, delay: 0.3 }}
+                  className="flex items-start gap-3"
+                >
                   <FiCalendar className="w-4 h-4 text-active shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-foreground block">Session Days</span>
-                    <span className="text-slate-500 dark:text-slate-400 font-medium">
+                    <span className="text-[#535C91] dark:text-[#9290C3] font-medium">
                       {data.classSchedule || "Mon, Wed, Fri"}
                     </span>
                   </div>
-                </div>
+                </motion.div>
 
-                <div className="flex items-start gap-3">
+                <motion.div
+                  initial={{ opacity: 0, x: -14 }}
+                  animate={
+                    bookingTriggered ? { opacity: 1, x: 0 } : { opacity: 0, x: -14 }
+                  }
+                  transition={{ duration: 0.45, delay: 0.36 }}
+                  className="flex items-start gap-3"
+                >
                   <FiClock className="w-4 h-4 text-active shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-foreground block">Commencement & Duration</span>
-                    <span className="text-slate-500 dark:text-slate-400 font-medium">
+                    <span className="text-[#535C91] dark:text-[#9290C3] font-medium">
                       {data.time || "08:00 AM"} • {data.duration || 60} Minutes
                     </span>
                   </div>
-                </div>
+                </motion.div>
 
-                <div className="flex items-start gap-3">
+                <motion.div
+                  initial={{ opacity: 0, x: -14 }}
+                  animate={
+                    bookingTriggered ? { opacity: 1, x: 0 } : { opacity: 0, x: -14 }
+                  }
+                  transition={{ duration: 0.45, delay: 0.42 }}
+                  className="flex items-start gap-3"
+                >
                   <FiMapPin className="w-4 h-4 text-active shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-foreground block">Studio Venue</span>
-                    <span className="text-slate-500 dark:text-slate-400 font-medium">
-                      {studio}, FlexPulse Main Athletic Hub
+                    <span className="text-[#535C91] dark:text-[#9290C3] font-medium">
+                      {studio}, FlexPulse HQ
                     </span>
                   </div>
-                </div>
+                </motion.div>
               </div>
 
               {/* Action Buttons */}
@@ -1266,10 +1640,13 @@ export default function ClassDetailsPageLayout({
                 {!user ? (
                   <Link
                     href={`/signin?redirect=/all-classes/${data._id}`}
-                    className="w-full inline-flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-active hover:bg-rose-600 text-white font-['Outfit'] font-black text-sm uppercase tracking-wider transition-all duration-300 shadow-lg shadow-active/30 cursor-pointer"
+                    className="w-full inline-flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-btn-bg text-btn-text font-['Outfit'] font-black text-sm uppercase tracking-wider transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer hover:-translate-y-0.5 active:scale-95 border border-white/20 relative overflow-hidden group"
                   >
-                    <span>Sign In to Book Class</span>
-                    <FiArrowRight className="w-4 h-4" />
+                    <span className="relative z-10 flex items-center gap-2">
+                      <span>Sign In to Book Class</span>
+                      <FiArrowRight className="w-4 h-4" />
+                    </span>
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none" />
                   </Link>
                 ) : user.status === "banned" ? (
                   <button
@@ -1279,40 +1656,49 @@ export default function ClassDetailsPageLayout({
                     Action Restricted by Admin
                   </button>
                 ) : initialIsBooked ? (
-                  <div className="w-full py-4 px-6 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-500 text-center font-['Outfit'] font-black text-sm flex items-center justify-center gap-2">
+                  <div className="w-full py-4 px-6 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-500 text-center font-['Outfit'] font-black text-sm flex items-center justify-center gap-2 shadow-2xs">
                     <FiCheckCircle className="w-4 h-4" />
                     <span>You Are Registered!</span>
                   </div>
                 ) : availableSlots === 0 ? (
                   <button
                     disabled
-                    className="w-full py-4 px-6 rounded-2xl bg-slate-300 dark:bg-white/10 text-slate-500 font-['Outfit'] font-black text-sm uppercase tracking-wider cursor-not-allowed"
+                    className="w-full py-4 px-6 rounded-2xl bg-brand-500/10 text-[#535C91] dark:text-[#9290C3] font-['Outfit'] font-black text-sm uppercase tracking-wider cursor-not-allowed border border-brand-500/15"
                   >
                     Class Fully Booked (Waitlist)
                   </button>
                 ) : (
-                  <button
+                  <motion.button
                     type="button"
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.96 }}
                     onClick={() => {
                       setIsProcessingStripe(false);
                       setIsReceiptModalOpen(true);
                     }}
-                    className="w-full py-4 px-6 rounded-2xl bg-active hover:bg-rose-600 text-white font-['Outfit'] font-black text-sm uppercase tracking-wider transition-all duration-300 shadow-xl shadow-active/30 cursor-pointer flex items-center justify-center gap-2 hover:scale-[1.02]"
+                    className="w-full py-4 px-6 rounded-2xl bg-btn-bg text-btn-text font-['Outfit'] font-black text-sm uppercase tracking-wider transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer flex items-center justify-center gap-2 border border-white/20 relative overflow-hidden group"
                   >
-                    <span>Confirm Registration</span>
-                    <FiArrowRight className="w-4 h-4" />
-                  </button>
+                    <span className="relative z-10 flex items-center gap-2">
+                      <span>Confirm Registration</span>
+                      <FiArrowRight className="w-4 h-4" />
+                    </span>
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none" />
+                  </motion.button>
                 )}
 
-                {/* Bookmark Button */}
-                <button
+                {/* Bookmark Button (Type 2 Secondary Glass CTA) */}
+                <motion.button
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={bookingTriggered ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                  transition={{ duration: 0.45, delay: 0.5 }}
                   type="button"
                   onClick={handleFavoriteToggle}
                   disabled={favLoading}
-                  className={`w-full py-3 px-4 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                  whileTap={{ scale: 0.95 }}
+                  className={`w-full py-3 px-4 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-95 ${
                     isFavorite
                       ? "bg-rose-500/10 text-rose-500 border-rose-500/30"
-                      : "bg-slate-100/80 dark:bg-white/[0.04] text-foreground border-slate-200 dark:border-white/10 hover:border-active/40"
+                      : "bg-searchbox-bg hover:bg-searchbox-hover text-foreground border-brand-500/20 hover:border-active/50"
                   }`}
                 >
                   {favLoading ? (
@@ -1328,356 +1714,544 @@ export default function ClassDetailsPageLayout({
                       <span>Save for Later</span>
                     </>
                   )}
-                </button>
+                </motion.button>
               </div>
 
               {/* Guarantees */}
-              <div className="pt-4 border-t border-slate-100 dark:border-white/[0.08] space-y-2 text-[11px] text-slate-500 dark:text-slate-400">
-                <div className="flex items-center gap-2">
-                  <FiCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  <span>Free cancellation up to 12 hours prior</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FiCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  <span>Digital RFID turnstile entry on mobile</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FiCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  <span>Sauna & Cold Plunge pass included</span>
-                </div>
+              <div className="pt-4 border-t border-brand-500/15 space-y-2 text-[11px] text-[#535C91] dark:text-[#9290C3]">
+                {[
+                  "Free cancellation up to 12 hours prior",
+                  "Digital RFID turnstile entry on mobile",
+                  "Sauna & Cold Plunge pass included",
+                ].map((item, gIdx) => (
+                  <motion.div
+                    key={item}
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={bookingTriggered ? { opacity: 1, x: 0 } : { opacity: 0, x: -12 }}
+                    transition={{ duration: 0.4, delay: 0.54 + gIdx * 0.06 }}
+                    className="flex items-center gap-2"
+                  >
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={bookingTriggered ? { scale: 1 } : { scale: 0 }}
+                      transition={{ type: "spring", stiffness: 220, delay: 0.56 + gIdx * 0.06 }}
+                    >
+                      <FiCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    </motion.div>
+                    <span>{item}</span>
+                  </motion.div>
+                ))}
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </main>
 
-      {/* Decorated Pre-Checkout Payment Receipt & Stripe Gateway Modal */}
-      {isReceiptModalOpen && (
-        <div
-          onClick={(e) => {
-            if (e.target === e.currentTarget && !isProcessingStripe) {
-              setIsReceiptModalOpen(false);
-              setIsProcessingStripe(false);
-            }
-          }}
-          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 cursor-pointer"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="cursor-default relative w-full max-w-xl max-h-[92vh] flex flex-col rounded-3xl bg-white dark:bg-[#121124] border border-slate-200/90 dark:border-white/10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] overflow-hidden my-auto animate-fadeIn"
+      {/* ============================================================ */}
+      {/* SECTION 5: Decorated Pre-Checkout Payment Receipt Modal      */}
+      {/* ============================================================ */}
+      <AnimatePresence>
+        {isReceiptModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget && !isProcessingStripe) {
+                setIsReceiptModalOpen(false);
+                setIsProcessingStripe(false);
+              }
+            }}
+            className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 cursor-pointer"
           >
-            
-            {/* 1. FIXED MODAL HEADER (Never cut off) */}
-            <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-white/10 flex items-center justify-between shrink-0 bg-slate-50/70 dark:bg-white/[0.02]">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-active/10 text-active flex items-center justify-center font-bold text-lg shrink-0 border border-active/20">
-                  <FiShield className="w-5 h-5" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-active block">
-                    Official Registration Invoice & Receipt
-                  </span>
-                  <h3 className="font-['Outfit'] text-lg sm:text-xl font-black text-foreground">
-                    Review Payment Receipt
-                  </h3>
-                </div>
-              </div>
-
-              {/* Close Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsReceiptModalOpen(false);
-                  setIsProcessingStripe(false);
-                }}
-                disabled={isProcessingStripe}
-                className="w-8 h-8 rounded-full bg-slate-200/70 dark:bg-white/10 hover:bg-active hover:text-white flex items-center justify-center text-slate-500 transition-colors cursor-pointer disabled:opacity-40"
-                title="Close receipt preview"
-              >
-                <FiX className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* 2. SCROLLABLE RECEIPT BODY */}
-            <div className="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1 overscroll-contain">
-              {/* Declared Payment Gateway: Stripe */}
-              <div className="p-4 rounded-2xl bg-[#635BFF]/5 dark:bg-[#635BFF]/10 border border-[#635BFF]/20 space-y-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-[#635BFF] text-white flex items-center justify-center font-bold text-lg shadow-sm">
-                      <SiStripe className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <span className="font-['Outfit'] font-black text-sm text-foreground block">
-                        Stripe™ Certified Payment Gateway
-                      </span>
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                        256-Bit Encrypted Secure Checkout
-                      </span>
-                    </div>
-                  </div>
-
-                  <span className="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-wider border border-emerald-500/20">
-                    PCI-DSS Level 1
-                  </span>
-                </div>
-
-                {/* Supported Payment Methods Grid */}
-                <div className="pt-2.5 border-t border-[#635BFF]/15 space-y-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                    Supported Payment Networks & Wallets:
-                  </span>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-xs font-semibold text-[#1A1F71] dark:text-white shadow-2xs">
-                      <FaCcVisa className="w-3.5 h-3.5 text-[#1A1F71] dark:text-white" /> Visa
-                    </span>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-xs font-semibold text-[#EB001B] dark:text-white shadow-2xs">
-                      <FaCcMastercard className="w-3.5 h-3.5 text-[#EB001B]" /> Mastercard
-                    </span>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-xs font-semibold text-foreground shadow-2xs">
-                      <FaApplePay className="w-4 h-4" /> Apple Pay
-                    </span>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-xs font-semibold text-[#006FCF] dark:text-white shadow-2xs">
-                      <FaCcAmex className="w-3.5 h-3.5 text-[#006FCF]" /> Amex
-                    </span>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-xs font-semibold text-foreground shadow-2xs">
-                      <FaGooglePay className="w-4 h-4 text-amber-500" /> Google Pay
-                    </span>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-xs font-semibold text-[#FF6600] shadow-2xs">
-                      <FaCcDiscover className="w-3.5 h-3.5 text-[#FF6600]" /> Discover
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Athlete & Class Details Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5 space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-slate-400 block">
-                    Registered Athlete
-                  </span>
-                  <p className="font-bold text-foreground text-sm truncate">
-                    {userName || user?.name || "Athlete"}
-                  </p>
-                  <p className="text-slate-500 dark:text-slate-400 truncate">
-                    {userEmail || user?.email}
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5 space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-slate-400 block">
-                    Scheduled Session
-                  </span>
-                  <p className="font-bold text-foreground text-sm truncate">
-                    {data.className}
-                  </p>
-                  <p className="text-slate-500 dark:text-slate-400">
-                    {data.classSchedule || "Mon, Wed, Fri"} • {data.time || "08:00 AM"}
-                  </p>
-                </div>
-              </div>
-
-              {/* Interactive Auto-Renewal Preference Selector */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/90 dark:border-white/10 space-y-2.5">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-base shrink-0 transition-all ${
-                        autoRenew
-                          ? "bg-emerald-500/15 text-emerald-600 border border-emerald-500/30"
-                          : "bg-slate-200 dark:bg-white/10 text-slate-500 border border-slate-300 dark:border-white/15"
-                      }`}
-                    >
-                      <FiRepeat className={`w-4 h-4 ${autoRenew ? "animate-spin duration-3000" : ""}`} />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-['Outfit'] font-black text-sm text-foreground">
-                          Monthly Auto-Renewal
-                        </span>
-                        <span
-                          className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                            autoRenew
-                              ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
-                              : "bg-slate-200 dark:bg-white/10 text-slate-500"
-                          }`}
-                        >
-                          {autoRenew ? "Enabled" : "Disabled"}
-                        </span>
-                      </div>
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">
-                        {autoRenew
-                          ? "Renews every 30 days automatically. Cancel anytime with zero fees."
-                          : "One-time 30-day class pass. Will NOT renew automatically."}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Toggle Switch */}
-                  <button
-                    type="button"
-                    onClick={() => setAutoRenew(!autoRenew)}
-                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                      autoRenew ? "bg-active" : "bg-slate-300 dark:bg-white/20"
-                    }`}
-                    role="switch"
-                    aria-checked={autoRenew}
-                    title="Toggle auto-renewal preference"
+            <motion.div
+              initial={{ scale: 0.9, y: 24 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 24 }}
+              transition={{ duration: 0.4, ease: TRANSITION_EASE }}
+              onClick={(e) => e.stopPropagation()}
+              className="cursor-default relative w-full max-w-xl max-h-[92vh] flex flex-col rounded-3xl bg-white dark:bg-[#070F2B] border border-brand-500/20 shadow-md overflow-hidden my-auto"
+            >
+              {/* 1. FIXED MODAL HEADER */}
+              <div className="p-4 sm:p-5 border-b border-brand-500/15 flex items-center justify-between shrink-0 bg-brand-500/5 dark:bg-[#090814]/50">
+                <div className="flex items-center gap-3">
+                  <motion.div
+                    initial={{ scale: 0, rotate: -20 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.1 }}
+                    className="w-10 h-10 rounded-2xl bg-active/10 text-active flex items-center justify-center font-bold text-lg shrink-0 border border-active/20 shadow-2xs"
                   >
-                    <span
-                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                        autoRenew ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between text-[10px] pt-2 border-t border-slate-200/70 dark:border-white/5 text-slate-400">
-                  <span>Billing Mode: {autoRenew ? "Recurring Monthly Subscription" : "Single 30-Day Pass"}</span>
-                  <span className={autoRenew ? "text-emerald-500 font-semibold" : "text-amber-500 font-semibold"}>
-                    {autoRenew ? "✓ Cancel anytime with 1 click" : "✓ No renewal obligation"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Itemized Billing Ledger */}
-              <div className="rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden text-xs">
-                <div className="bg-slate-50 dark:bg-white/[0.03] px-4 py-2 font-bold uppercase text-[10px] text-slate-400 border-b border-slate-200 dark:border-white/10 flex justify-between">
-                  <span>Description</span>
-                  <span>Amount</span>
-                </div>
-                <div className="p-3.5 space-y-2 divide-y divide-slate-100 dark:divide-white/5">
-                  <div className="flex justify-between pt-1">
-                    <div>
-                      <strong className="text-foreground block font-['Outfit'] font-bold">
-                        {data.className} (Monthly Membership Pass)
-                      </strong>
-                      <span className="text-[11px] text-slate-400">
-                        Led by {coachName} • Unlimited monthly sessions
-                      </span>
-                    </div>
-                    <span className="font-mono font-bold text-foreground">
-                      ${data.price || 35}.00 / mo
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between pt-2">
-                    <div>
-                      <span className="text-foreground block">Sauna & Cold Plunge Pass</span>
-                      <span className="text-[11px] text-slate-400">Post-workout hydrotherapy</span>
-                    </div>
-                    <span className="font-mono text-emerald-500 font-semibold">
-                      Included ($0.00)
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between pt-2">
-                    <div>
-                      <span className="text-foreground block">Sanitized Towel & Digital Locker</span>
-                      <span className="text-[11px] text-slate-400">Full facility amenity access</span>
-                    </div>
-                    <span className="font-mono text-emerald-500 font-semibold">
-                      Included ($0.00)
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between pt-2">
-                    <div>
-                      <span className="text-foreground block">Stripe Processing & Turnstile Gate</span>
-                      <span className="text-[11px] text-slate-400">Instant turnstile confirmation</span>
-                    </div>
-                    <span className="font-mono text-emerald-500 font-semibold">
-                      FREE ($0.00)
-                    </span>
-                  </div>
-                </div>
-
-                {/* Total Row */}
-                <div className="bg-slate-50 dark:bg-white/[0.04] p-3.5 border-t border-slate-200 dark:border-white/10 flex items-center justify-between">
+                    <FiShield className="w-5 h-5" />
+                  </motion.div>
                   <div>
-                    <span className="font-['Outfit'] font-bold text-sm text-foreground block">
-                      {autoRenew ? "Total Amount Due (Month 1)" : "Total Amount Due (Single Pass)"}
-                    </span>
-                    <span className="text-[11px] text-slate-400">
-                      {autoRenew
-                        ? "Billed monthly • Automatic Stripe renewal, cancel anytime"
-                        : "One-time payment • Valid for 30 days, no auto-renewal"}
-                    </span>
+                    <motion.span
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 0.12 }}
+                      className="text-[10px] font-black uppercase tracking-widest text-active block"
+                    >
+                      Official Registration Invoice &amp; Receipt
+                    </motion.span>
+                    <motion.h3
+                      initial={{ opacity: 0, y: 14, filter: "blur(3px)" }}
+                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      transition={{ duration: 0.5, delay: 0.16 }}
+                      className="font-['Outfit'] text-lg sm:text-xl font-black text-foreground"
+                    >
+                      Review Payment Receipt
+                    </motion.h3>
                   </div>
-                  <span className="font-['Outfit'] text-2xl font-black text-active font-mono">
-                    ${data.price || 35}.00 USD {autoRenew ? <span className="text-sm font-normal text-slate-400">/ mo</span> : <span className="text-xs font-normal text-slate-400">(once)</span>}
-                  </span>
                 </div>
-              </div>
-            </div>
 
-            {/* 3. FIXED MODAL ACTION FOOTER (Always visible and clickable) */}
-            <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-white/10 bg-slate-50/90 dark:bg-[#151329] shrink-0 space-y-2.5">
-              <div className="flex flex-col-reverse sm:flex-row items-center gap-3">
-                {/* Back Button */}
-                <button
+                {/* Close Button */}
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.7, rotate: 90 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  transition={{ duration: 0.4, delay: 0.18 }}
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
                   type="button"
                   onClick={() => {
                     setIsReceiptModalOpen(false);
                     setIsProcessingStripe(false);
                   }}
                   disabled={isProcessingStripe}
-                  className="group/back w-full sm:w-auto h-[50px] px-6 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.08] text-foreground font-['Outfit'] font-bold text-sm transition-all duration-200 cursor-pointer shrink-0 flex items-center justify-center gap-2 shadow-xs hover:border-slate-300 dark:hover:border-white/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-8 h-8 rounded-full bg-brand-500/10 hover:bg-active hover:text-white flex items-center justify-center text-foreground transition-colors cursor-pointer disabled:opacity-40 shadow-2xs"
+                  title="Close receipt preview"
                 >
-                  <FiArrowLeft className="w-4 h-4 text-slate-400 group-hover/back:-translate-x-0.5 transition-transform" />
-                  <span>Back</span>
-                </button>
-
-                {/* Primary Stripe Checkout Button */}
-                <button
-                  type="button"
-                  onClick={handleContinueToStripe}
-                  disabled={isProcessingStripe}
-                  className="group/pay w-full sm:flex-1 h-[50px] px-6 rounded-2xl bg-gradient-to-r from-active via-rose-600 to-red-600 hover:from-rose-600 hover:to-active text-white font-['Outfit'] font-black text-sm uppercase tracking-wider transition-all duration-300 shadow-xl shadow-active/35 hover:shadow-active/50 cursor-pointer flex items-center justify-center gap-2.5 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-85 disabled:cursor-wait"
-                >
-                  {isProcessingStripe ? (
-                    <>
-                      <svg
-                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        />
-                      </svg>
-                      <span>Connecting to Stripe...</span>
-                    </>
-                  ) : (
-                    <>
-                      <SiStripe className="w-4 h-4 text-white" />
-                      <span>Continue to Stripe</span>
-                      <FiArrowRight className="w-4 h-4 text-white group-hover/pay:translate-x-0.5 transition-transform" />
-                    </>
-                  )}
-                </button>
+                  <FiX className="w-4 h-4" />
+                </motion.button>
               </div>
 
-              <p className="text-[10px] text-center text-slate-400 pt-0.5 flex items-center justify-center gap-1.5">
-                <span>🔒 Protected by Stripe 256-bit encryption</span>
-                <span>•</span>
-                <span>Monthly recurring pass • Cancel anytime</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+              {/* 2. SCROLLABLE RECEIPT BODY */}
+              <div className="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1 overscroll-contain">
+                {/* Declared Payment Gateway: Stripe */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: 14 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2, ease: TRANSITION_EASE }}
+                  className="p-4 rounded-2xl bg-[#635BFF]/5 dark:bg-[#635BFF]/10 border border-[#635BFF]/20 space-y-3 shadow-2xs"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <motion.div
+                        initial={{ scale: 0.6 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", stiffness: 240, damping: 20, delay: 0.24 }}
+                        className="w-9 h-9 rounded-xl bg-[#635BFF] text-white flex items-center justify-center font-bold text-lg shadow-2xs"
+                      >
+                        <SiStripe className="w-5 h-5" />
+                      </motion.div>
+                      <motion.div
+                        initial={{ opacity: 0, x: -14 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.45, delay: 0.26 }}
+                      >
+                        <span className="font-['Outfit'] font-black text-sm text-foreground block">
+                          Stripe™ Certified Payment Gateway
+                        </span>
+                        <span className="text-[11px] text-[#535C91] dark:text-[#9290C3]">
+                          256-Bit Encrypted Secure Checkout
+                        </span>
+                      </motion.div>
+                    </div>
+
+                    <motion.span
+                      initial={{ opacity: 0, scale: 0.8, y: -8 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      transition={{ type: "spring", stiffness: 220, delay: 0.28 }}
+                      className="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-wider border border-emerald-500/20 shadow-2xs"
+                    >
+                      PCI-DSS Level 1
+                    </motion.span>
+                  </div>
+
+                  {/* Supported Payment Methods Grid */}
+                  <div className="pt-2.5 border-t border-[#635BFF]/15 space-y-1.5">
+                    <motion.span
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: 0.3 }}
+                      className="text-[10px] font-bold uppercase tracking-wider text-[#535C91] dark:text-[#9290C3] block"
+                    >
+                      Supported Payment Networks &amp; Wallets:
+                    </motion.span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {[
+                        { name: "Visa", icon: FaCcVisa, color: "text-[#1A1F71] dark:text-white" },
+                        { name: "Mastercard", icon: FaCcMastercard, color: "text-[#EB001B] dark:text-white" },
+                        { name: "Apple Pay", icon: FaApplePay, color: "text-foreground" },
+                        { name: "Amex", icon: FaCcAmex, color: "text-[#006FCF] dark:text-white" },
+                        { name: "Google Pay", icon: FaGooglePay, color: "text-amber-500" },
+                        { name: "Discover", icon: FaCcDiscover, color: "text-[#FF6600]" },
+                      ].map((card, cIdx) => {
+                        const Icon = card.icon;
+                        return (
+                          <motion.span
+                            key={card.name}
+                            initial={{ opacity: 0, scale: 0.8, y: 6 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            transition={{ duration: 0.35, delay: 0.32 + cIdx * 0.04 }}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-searchbox-bg border border-brand-500/20 text-xs font-semibold text-foreground shadow-2xs"
+                          >
+                            <Icon className={`w-3.5 h-3.5 ${card.color}`} /> {card.name}
+                          </motion.span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Athlete & Class Details Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <motion.div
+                    initial={{ opacity: 0, x: -20, y: 8 }}
+                    animate={{ opacity: 1, x: 0, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.38, ease: TRANSITION_EASE }}
+                    className="p-3.5 rounded-xl bg-brand-500/5 dark:bg-[#090814]/50 border border-brand-500/15 space-y-1 shadow-2xs"
+                  >
+                    <motion.span
+                      initial={{ opacity: 0, y: -6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, delay: 0.4 }}
+                      className="text-[10px] font-bold uppercase text-[#535C91] dark:text-[#9290C3] block"
+                    >
+                      Registered Athlete
+                    </motion.span>
+                    <motion.p
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: 0.42 }}
+                      className="font-bold text-foreground text-sm truncate"
+                    >
+                      {userName || user?.name || "Athlete"}
+                    </motion.p>
+                    <motion.p
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 0.44 }}
+                      className="text-[#535C91] dark:text-[#9290C3] truncate"
+                    >
+                      {userEmail || user?.email}
+                    </motion.p>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: 20, y: 8 }}
+                    animate={{ opacity: 1, x: 0, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.42, ease: TRANSITION_EASE }}
+                    className="p-3.5 rounded-xl bg-brand-500/5 dark:bg-[#090814]/50 border border-brand-500/15 space-y-1 shadow-2xs"
+                  >
+                    <motion.span
+                      initial={{ opacity: 0, y: -6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, delay: 0.44 }}
+                      className="text-[10px] font-bold uppercase text-[#535C91] dark:text-[#9290C3] block"
+                    >
+                      Scheduled Session
+                    </motion.span>
+                    <motion.p
+                      initial={{ opacity: 0, x: 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: 0.46 }}
+                      className="font-bold text-foreground text-sm truncate"
+                    >
+                      {data.className}
+                    </motion.p>
+                    <motion.p
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 0.48 }}
+                      className="text-[#535C91] dark:text-[#9290C3]"
+                    >
+                      {data.classSchedule || "Mon, Wed, Fri"} • {data.time || "08:00 AM"}
+                    </motion.p>
+                  </motion.div>
+                </div>
+
+                {/* Interactive Auto-Renewal Preference Selector */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.96, y: 16 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.46, ease: TRANSITION_EASE }}
+                  className="p-4 rounded-2xl bg-brand-500/5 dark:bg-[#090814]/50 border border-brand-500/15 space-y-2.5 shadow-2xs"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <motion.div
+                        initial={{ scale: 0.7, rotate: -30 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: "spring", stiffness: 220, delay: 0.5 }}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-base shrink-0 transition-all ${
+                          autoRenew
+                            ? "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30"
+                            : "bg-brand-500/10 text-muted-foreground border border-brand-500/20"
+                        }`}
+                      >
+                        <FiRepeat className={`w-4 h-4 ${autoRenew ? "animate-spin duration-3000" : ""}`} />
+                      </motion.div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <motion.span
+                            initial={{ opacity: 0, x: -12 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.4, delay: 0.52 }}
+                            className="font-['Outfit'] font-black text-sm text-foreground"
+                          >
+                            Monthly Auto-Renewal
+                          </motion.span>
+                          <motion.span
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ type: "spring", stiffness: 200, delay: 0.54 }}
+                            className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                              autoRenew
+                                ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                                : "bg-brand-500/10 text-muted-foreground"
+                            }`}
+                          >
+                            {autoRenew ? "Enabled" : "Disabled"}
+                          </motion.span>
+                        </div>
+                        <motion.span
+                          initial={{ opacity: 0, y: -6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4, delay: 0.56 }}
+                          className="text-[11px] text-[#535C91] dark:text-[#9290C3] block"
+                        >
+                          {autoRenew
+                            ? "Renews every 30 days automatically. Cancel anytime with zero fees."
+                            : "One-time 30-day class pass. Will NOT renew automatically."}
+                        </motion.span>
+                      </div>
+                    </div>
+
+                    {/* Toggle Switch */}
+                    <motion.button
+                      initial={{ scale: 0.85, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 220, delay: 0.58 }}
+                      whileTap={{ scale: 0.92 }}
+                      type="button"
+                      onClick={() => setAutoRenew(!autoRenew)}
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                        autoRenew ? "bg-active" : "bg-brand-500/20"
+                      }`}
+                      role="switch"
+                      aria-checked={autoRenew}
+                      title="Toggle auto-renewal preference"
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-2xs ring-0 transition duration-200 ease-in-out ${
+                          autoRenew ? "translate-x-5" : "translate-x-0"
+                        }`}
+                      />
+                    </motion.button>
+                  </div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.6 }}
+                    className="flex items-center justify-between text-[10px] pt-2 border-t border-brand-500/10 text-[#535C91] dark:text-[#9290C3]"
+                  >
+                    <span>Billing Mode: {autoRenew ? "Recurring Monthly Subscription" : "Single 30-Day Pass"}</span>
+                    <span className={autoRenew ? "text-emerald-500 font-semibold" : "text-amber-500 font-semibold"}>
+                      {autoRenew ? "✓ Cancel anytime with 1 click" : "✓ No renewal obligation"}
+                    </span>
+                  </motion.div>
+                </motion.div>
+
+                {/* Itemized Billing Ledger */}
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.54, ease: TRANSITION_EASE }}
+                  className="rounded-2xl border border-brand-500/20 overflow-hidden text-xs shadow-2xs"
+                >
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.56 }}
+                    className="bg-brand-500/5 dark:bg-[#090814]/50 px-4 py-2 font-bold uppercase text-[10px] text-[#535C91] dark:text-[#9290C3] border-b border-brand-500/15 flex justify-between"
+                  >
+                    <span>Description</span>
+                    <span>Amount</span>
+                  </motion.div>
+                  <div className="p-3.5 space-y-2 divide-y divide-brand-500/10">
+                    {[
+                      {
+                        title: `${data.className} (Monthly Membership Pass)`,
+                        sub: `Led by ${coachName} • Unlimited monthly sessions`,
+                        amt: `$${data.price || 35}.00 / mo`,
+                        highlight: false,
+                        mono: true,
+                      },
+                      {
+                        title: "Sauna & Cold Plunge Pass",
+                        sub: "Post-workout hydrotherapy",
+                        amt: "Included ($0.00)",
+                        highlight: true,
+                        mono: false,
+                      },
+                      {
+                        title: "Sanitized Towel & Digital Locker",
+                        sub: "Full facility amenity access",
+                        amt: "Included ($0.00)",
+                        highlight: true,
+                        mono: false,
+                      },
+                      {
+                        title: "Stripe Processing & Turnstile Gate",
+                        sub: "Instant turnstile confirmation",
+                        amt: "FREE ($0.00)",
+                        highlight: true,
+                        mono: false,
+                      },
+                    ].map((item, rowIdx) => (
+                      <motion.div
+                        key={item.title}
+                        initial={{ opacity: 0, x: -14 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4, delay: 0.58 + rowIdx * 0.05 }}
+                        className="flex justify-between pt-1.5"
+                      >
+                        <div>
+                          <strong className="text-foreground block font-['Outfit'] font-bold">
+                            {item.title}
+                          </strong>
+                          <span className="text-[11px] text-[#535C91] dark:text-[#9290C3]">
+                            {item.sub}
+                          </span>
+                        </div>
+                        <span
+                          className={`font-mono ${
+                            item.highlight
+                              ? "text-emerald-500 font-semibold"
+                              : "font-bold text-foreground"
+                          }`}
+                        >
+                          {item.amt}
+                        </span>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Total Row */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.45, delay: 0.78 }}
+                    className="bg-brand-500/5 dark:bg-[#090814]/70 p-3.5 border-t border-brand-500/15 flex items-center justify-between"
+                  >
+                    <div>
+                      <span className="font-['Outfit'] font-bold text-sm text-foreground block">
+                        {autoRenew ? "Total Amount Due (Month 1)" : "Total Amount Due (Single Pass)"}
+                      </span>
+                      <span className="text-[11px] text-[#535C91] dark:text-[#9290C3]">
+                        {autoRenew
+                          ? "Billed monthly • Automatic Stripe renewal, cancel anytime"
+                          : "One-time payment • Valid for 30 days, no auto-renewal"}
+                      </span>
+                    </div>
+                    <span className="font-['Outfit'] text-2xl font-black text-active font-mono">
+                      ${data.price || 35}.00 USD {autoRenew ? <span className="text-sm font-normal text-[#535C91] dark:text-[#9290C3]">/ mo</span> : <span className="text-xs font-normal text-[#535C91] dark:text-[#9290C3]">(once)</span>}
+                    </span>
+                  </motion.div>
+                </motion.div>
+              </div>
+
+              {/* 3. FIXED MODAL ACTION FOOTER */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, delay: 0.62 }}
+                className="p-4 sm:p-5 border-t border-brand-500/15 bg-brand-500/5 dark:bg-[#090814] shrink-0 space-y-2.5"
+              >
+                <div className="flex flex-col-reverse sm:flex-row items-center gap-3">
+                  {/* Back Button */}
+                  <motion.button
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.45, delay: 0.66 }}
+                    whileHover={{ y: -1 }}
+                    whileTap={{ scale: 0.96 }}
+                    type="button"
+                    onClick={() => {
+                      setIsReceiptModalOpen(false);
+                      setIsProcessingStripe(false);
+                    }}
+                    disabled={isProcessingStripe}
+                    className="w-full sm:w-auto h-[50px] px-6 rounded-2xl border border-brand-500/20 bg-searchbox-bg hover:bg-searchbox-hover text-foreground font-['Outfit'] font-bold text-sm transition-all duration-200 cursor-pointer shrink-0 flex items-center justify-center gap-2 shadow-xs hover:border-active/40 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <FiArrowLeft className="w-4 h-4 text-[#535C91] dark:text-[#9290C3]" />
+                    <span>Back</span>
+                  </motion.button>
+
+                  {/* Primary Stripe Checkout Button */}
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ type: "spring", stiffness: 220, delay: 0.7 }}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.96 }}
+                    type="button"
+                    onClick={handleContinueToStripe}
+                    disabled={isProcessingStripe}
+                    className="w-full sm:flex-1 h-[50px] px-6 rounded-2xl bg-btn-bg text-btn-text font-['Outfit'] font-black text-sm uppercase tracking-wider transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer flex items-center justify-center gap-2.5 hover:-translate-y-0.5 active:scale-95 disabled:opacity-85 disabled:cursor-wait border border-white/20 relative overflow-hidden group"
+                  >
+                    <span className="relative z-10 flex items-center gap-2.5">
+                      {isProcessingStripe ? (
+                        <>
+                          <svg
+                            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            />
+                          </svg>
+                          <span>Connecting to Stripe...</span>
+                        </>
+                      ) : (
+                        <>
+                          <SiStripe className="w-4 h-4 text-white" />
+                          <span>Continue to Stripe</span>
+                          <FiArrowRight className="w-4 h-4 text-white group-hover:translate-x-0.5 transition-transform" />
+                        </>
+                      )}
+                    </span>
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none" />
+                  </motion.button>
+                </div>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.74 }}
+                  className="text-[10px] text-center text-[#535C91] dark:text-[#9290C3] pt-0.5 flex items-center justify-center gap-1.5"
+                >
+                  <span>🔒 Protected by Stripe 256-bit encryption</span>
+                  <span>•</span>
+                  <span>Monthly recurring pass • Cancel anytime</span>
+                </motion.p>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
