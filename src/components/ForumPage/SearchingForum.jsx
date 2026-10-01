@@ -12,31 +12,33 @@ export default function SearchingForum({ totalPosts = 0 }) {
   const [search, setSearch] = useState(currentSearchParam);
   const isFirstMount = useRef(true);
 
+  const prevSearchRef = useRef(currentSearchParam);
+
   // Sync state if URL changes externally (e.g. via sidebar or browser back button)
   useEffect(() => {
     setSearch(currentSearchParam);
+    prevSearchRef.current = currentSearchParam;
   }, [currentSearchParam]);
 
   // Debounced URL update when search changes
   useEffect(() => {
-    if (isFirstMount.current) {
-      isFirstMount.current = false;
+    if (search === prevSearchRef.current) {
       return;
     }
 
     const timeout = setTimeout(() => {
-      const params = new URLSearchParams(searchParams.toString());
+      prevSearchRef.current = search;
+      const params = new URLSearchParams(searchParams ? searchParams.toString() : "");
       if (search.trim()) {
         params.set("search", search.trim());
       } else {
         params.delete("search");
       }
-      // Reset page to 1 when changing search keyword
-      params.set("page", "1");
+      params.delete("page");
 
       const queryString = params.toString();
       router.replace(`/forum${queryString ? `?${queryString}` : ""}`, { scroll: false });
-    }, 300);
+    }, 350);
 
     return () => clearTimeout(timeout);
   }, [search, router, searchParams]);
