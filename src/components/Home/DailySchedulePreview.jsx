@@ -844,14 +844,14 @@ export default function DailySchedulePreview() {
                     initial="hidden"
                     animate={cardsTriggered ? "visible" : "hidden"}
                     exit={{ opacity: 0, scale: 0.94, y: 16, transition: { duration: 0.3 } }}
-                    className="group relative rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1 flex flex-col lg:flex-row lg:items-center justify-between gap-5 shadow-xs hover:shadow-md"
+                    className="group relative rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#070F2B] border border-brand-500/20 hover:border-active/60 transition-all duration-300 ease-out hover:-translate-y-1 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6 shadow-xs hover:shadow-md"
                   >
-                    {/* Left Column: Time & Discipline */}
-                    <div className="flex items-start sm:items-center gap-4 sm:gap-6 min-w-64">
+                    {/* Left Column: Time & Discipline / Class Info */}
+                    <div className="flex-1 min-w-0 flex items-start sm:items-center gap-4 sm:gap-6 pr-0 lg:pr-4">
                       {/* Time Block: Spring pop from left */}
                       <motion.div
                         variants={timeBlockVariants}
-                        className="p-3.5 rounded-2xl bg-searchbox-bg border border-brand-500/20 text-center shrink-0 w-24 shadow-2xs"
+                        className="p-3 sm:p-3.5 rounded-2xl bg-searchbox-bg border border-brand-500/20 text-center shrink-0 w-22 sm:w-24 shadow-2xs"
                       >
                         <span className="block text-base sm:text-lg font-black font-['Outfit'] text-foreground group-hover:text-active transition-colors leading-tight">
                           {item.time}
@@ -864,7 +864,7 @@ export default function DailySchedulePreview() {
                         </motion.span>
                       </motion.div>
 
-                      <div className="space-y-1">
+                      <div className="space-y-1 min-w-0">
                         {/* Discipline Tag: Slide down from top */}
                         <motion.span
                           variants={disciplineVariants}
@@ -875,7 +875,7 @@ export default function DailySchedulePreview() {
                         {/* Class Title: Upward sweep with de-blur */}
                         <motion.h3
                           variants={scheduleTitleVariants}
-                          className="font-['Outfit'] text-base sm:text-lg font-bold text-foreground group-hover:text-active transition-colors leading-snug"
+                          className="font-['Outfit'] text-base sm:text-lg font-bold text-foreground group-hover:text-active transition-colors leading-snug line-clamp-1"
                         >
                           {item.title}
                         </motion.h3>
@@ -897,8 +897,8 @@ export default function DailySchedulePreview() {
                       </div>
                     </div>
 
-                    {/* Middle Column: Instructor Profile */}
-                    <div className="flex items-center gap-3 min-w-52">
+                    {/* Middle Column: Instructor Profile (Fixed Width for Perfect Column Alignment) */}
+                    <div className="w-full sm:w-48 lg:w-48 xl:w-52 shrink-0 flex items-center gap-3">
                       {/* Coach Avatar: Spring scale pop with slight rotation */}
                       <motion.div
                         variants={coachAvatarVariants}
@@ -913,32 +913,32 @@ export default function DailySchedulePreview() {
                         />
                       </motion.div>
                       {/* Coach Info: Gentle slide from right */}
-                      <motion.div variants={coachInfoVariants}>
-                        <p className="font-['Outfit'] text-xs sm:text-sm font-bold text-foreground leading-tight">
+                      <motion.div variants={coachInfoVariants} className="min-w-0">
+                        <p className="font-['Outfit'] text-xs sm:text-sm font-bold text-foreground leading-tight truncate">
                           {item.coach}
                         </p>
-                        <p className="font-['Inter'] text-[11px] text-secondary">
+                        <p className="font-['Inter'] text-[11px] text-secondary truncate">
                           {item.coachRole}
                         </p>
                       </motion.div>
                     </div>
 
                     {/* Right Column: Capacity Meter & Action CTA */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between lg:justify-end gap-4 min-w-64 pt-3 sm:pt-0 border-t sm:border-t-0 border-brand-500/15">
-                      {/* Capacity Meter */}
-                      <motion.div variants={capacityBarVariants} className="space-y-1.5 w-full sm:w-36">
-                        <div className="flex items-center justify-between text-[11px] font-['Inter']">
-                          <span className="font-semibold text-secondary">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between lg:justify-end gap-4 sm:gap-6 shrink-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-brand-500/15">
+                      {/* Capacity Meter (Fixed Width with Guaranteed Single-Line Status Badge) */}
+                      <motion.div variants={capacityBarVariants} className="space-y-1.5 w-full sm:w-44 lg:w-48 shrink-0">
+                        <div className="flex items-center justify-between text-xs font-['Inter'] gap-2">
+                          <span className="font-semibold text-secondary whitespace-nowrap text-[11px]">
                             {item.enrolled}/{item.capacity} Spots
                           </span>
                           <motion.span
                             variants={statusBadgeVariants}
-                            className={`font-bold text-[10px] uppercase px-1.5 py-0.5 rounded shadow-2xs ${
+                            className={`font-black text-[9.5px] uppercase tracking-wider px-2 py-0.5 rounded-md whitespace-nowrap shrink-0 shadow-2xs ${
                               isWaitlist
-                                ? "bg-rose-500/10 text-rose-500 border border-rose-500/20"
+                                ? "bg-rose-500/10 text-rose-500 border border-rose-500/25"
                                 : isFillingFast
-                                ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                                : "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                                ? "bg-amber-500/10 text-amber-500 border border-amber-500/25"
+                                : "bg-emerald-500/10 text-emerald-500 border border-emerald-500/25"
                             }`}
                           >
                             {item.status}
@@ -955,18 +955,18 @@ export default function DailySchedulePreview() {
                         </div>
                       </motion.div>
 
-                      {/* Action CTA Button: Diagonal spring pop from bottom-right */}
-                      <motion.div variants={actionBtnVariants}>
+                      {/* Action CTA Button: Uniform Width & Height */}
+                      <motion.div variants={actionBtnVariants} className="shrink-0 w-full sm:w-auto">
                         <Link
                           href="/schedule"
-                          className={`inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md whitespace-nowrap active:scale-95 ${
+                          className={`inline-flex items-center justify-center gap-1.5 w-full sm:w-36 h-10 px-4 rounded-xl font-extrabold text-xs sm:text-sm transition-all duration-300 cursor-pointer shadow-xs hover:shadow-md whitespace-nowrap active:scale-95 group/btn ${
                             isWaitlist
-                              ? "bg-searchbox-bg hover:bg-searchbox-hover text-foreground border border-brand-500/20"
-                              : "bg-btn-bg text-btn-text hover:brightness-105"
+                              ? "bg-searchbox-bg hover:bg-searchbox-hover text-foreground border border-brand-500/20 hover:border-active/40"
+                              : "bg-btn-bg text-btn-text hover:brightness-105 border border-white/20"
                           }`}
                         >
                           <span>{isWaitlist ? "Join Waitlist" : "Reserve Slot"}</span>
-                          <FiArrowRight className="w-3.5 h-3.5" />
+                          <FiArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
                         </Link>
                       </motion.div>
                     </div>

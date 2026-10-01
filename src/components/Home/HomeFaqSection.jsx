@@ -547,12 +547,18 @@ export default function HomeFaqSection() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
-          className="rounded-3xl p-7 sm:p-10 bg-linear-to-r from-brand-800/30 via-[#1B1A55]/40 to-brand-800/30 border border-slate-200/80 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm hover:shadow-md transition-all duration-300"
+          className="group relative overflow-hidden rounded-3xl p-7 sm:p-10 bg-linear-to-br from-white via-slate-50 to-rose-50/20 dark:from-[#121026] dark:via-[#161334] dark:to-[#1c1842] border border-slate-200/90 dark:border-white/10 hover:border-active/40 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs hover:shadow-md transition-all duration-300"
         >
-          <div className="flex items-center gap-4">
+          {/* Subtle Top Glowing Line on Hover */}
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-active/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          
+          {/* Ambient Radial Accent Glow */}
+          <div className="absolute -right-20 -bottom-20 w-60 h-60 bg-active/5 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="flex items-center gap-4 relative z-10">
             <motion.div 
               variants={bannerIconVariants}
-              className="w-12 h-12 rounded-2xl bg-active/20 flex items-center justify-center text-active shrink-0 border border-active/30 shadow-xs"
+              className="w-12 h-12 rounded-2xl bg-active/20 flex items-center justify-center text-active shrink-0 border border-active/30 shadow-xs group-hover:scale-105 group-hover:rotate-3 transition-transform duration-300"
             >
               <FiMessageSquare className="w-6 h-6 text-active" />
             </motion.div>

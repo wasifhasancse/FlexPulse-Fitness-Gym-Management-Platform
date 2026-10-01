@@ -145,6 +145,17 @@ body {
   animation-play-state: paused;
 }
 
+.animate-marquee-payments {
+  display: flex;
+  width: max-content;
+  animation: marquee 26s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-payments:hover {
+  animation-play-state: paused;
+}
+
 .animate-marquee-slow {
   display: flex;
   width: max-content;
