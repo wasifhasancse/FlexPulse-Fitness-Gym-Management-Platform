@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useInView } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
@@ -21,6 +21,8 @@ import { FaDumbbell, FaFire, FaWater } from "react-icons/fa";
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
+
+const TRANSITION_EASE = [0.16, 1, 0.3, 1];
 
 const CATEGORIES = [
   "All Amenities",
@@ -43,70 +45,70 @@ const FACILITIES = [
     desc: "Equipped with certified 20kg IWF/IPF barbells, calibrated steel plates, chalk stands, and sound-dampening deadlift platforms designed for maximal load safety.",
     perks: [
       "Calibrated Eleiko competition barbells & steel plates",
-      "12 Custom power racks with sound-dampening drop platforms",
-      "Jerk boxes, safety squat bars & Olympic chains",
-      "Integrated chalk stations & calibrated bar path telemetry"
-    ]
-  },
-  {
-    id: "cold-plunge",
-    title: "Sub-Zero Cold Plunge & Contrast Suite",
-    category: "Recovery & Hydrotherapy",
-    badge: "Recovery Protocol",
-    badgeColor: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
-    spec: "Continuous 38°F - 42°F",
-    temp: "Commercial UV-C Sanitized",
-    image: "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?q=80&w=1200&auto=format&fit=crop",
-    desc: "Triple-filtered sub-zero immersion baths engineered to clear metabolic waste, blunt systemic inflammation, and stimulate parasympathetic nervous restoration.",
-    perks: [
-      "Continuous 38°F-42°F digital temperature precision lock",
-      "UV-C sanitized continuous filtration & ozone purification",
-      "Guided breathwork timers & heart-rate contrast cycles",
-      "Private contrast suites with mineral hot stone soak"
+      "Shock-absorbing acoustic vulcanized rubber flooring",
+      "Adjustable safety straps & zero-friction roller j-cups",
+      "Olympic lifting chalk reservoirs at every station"
     ]
   },
   {
     id: "metcon-turf",
-    title: "High-Velocity Turf & Ergometer Track",
+    title: "High-Speed MetCon Sprint Turf",
     category: "Cardio & MetCon Turf",
-    badge: "Endurance & Agility",
-    badgeColor: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
-    spec: "35-Meter Prowler Sprint Lane",
-    temp: "Biometric Heart-Rate Sync",
+    badge: "50-Meter Sprint Track",
+    badgeColor: "bg-amber-500/15 text-amber-500 dark:text-amber-400 border-amber-500/30",
+    spec: "Speed Sleds & Prowlers",
+    temp: "High-Airflow 66°F",
     image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1200&auto=format&fit=crop",
-    desc: "Heavy-duty sprint turf flanked by Concept2 SkiErgs, BikeErgs, curved motorless treadmills, and dynamic prowler sleds for non-impact metabolic conditioning.",
+    desc: "A dedicated 50-meter indoor astroturf lane designed for sled drives, farmer carries, acceleration sprints, and anaerobic conditioning.",
     perks: [
-      "35-Meter high-traction sprint lane & Torque Tank sleds",
-      "Woodway Curve motorless anaerobic treadmills",
-      "Full Concept2 fleet: SkiErgs, RowErgs & BikeErgs",
-      "Interactive heart-rate wall telemetry sync"
+      "Continuous 50m non-directional indoor turf lane",
+      "Adjustable load push/pull steel sled prowlers",
+      "Rogue battle ropes, sandbags, and slam balls",
+      "Electronic wireless laser timing gate system"
+    ]
+  },
+  {
+    id: "contrast-plunge",
+    title: "Thermal Plunge & Cold Hydrotherapy",
+    category: "Recovery & Hydrotherapy",
+    badge: "38°F Sub-Zero Plunges",
+    badgeColor: "bg-cyan-500/15 text-cyan-500 dark:text-cyan-400 border-cyan-500/30",
+    spec: "Twin Stainless Steel Tubs",
+    temp: "Chilled 38°F / Hot 104°F",
+    image: "https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop",
+    desc: "Continuous filtration cold immersion baths alongside hot mineral recovery tubs. Stimulate rapid vasoconstriction to clear lactic acid.",
+    perks: [
+      "Sub-40°F continuous ozone-filtered cold plunge baths",
+      "Therapeutic hot soaking tub with Epsom minerals",
+      "Automated UV sanitization between member sessions",
+      "Dedicated breathwork pacing monitors & towels"
     ]
   },
   {
     id: "cedar-sauna",
-    title: "Finnish Cedar & Infrared Saunas",
+    title: "Nordic Cedar Dry Sauna & Steam",
     category: "Recovery & Hydrotherapy",
-    badge: "Longevity & Detox",
-    badgeColor: "bg-amber-500/15 text-amber-400 border-amber-500/30",
-    spec: "Dual Far-Infrared & 195°F Dry Heat",
-    temp: "Himalayan Salt Walls",
-    image: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=1200&auto=format&fit=crop",
-    desc: "Aromatic Scandinavian cedar wood saunas stimulating heat-shock proteins, vascular elasticity, and deep muscular relaxation following intense lifting sessions.",
+    badge: "190°F Finnish Heat",
+    badgeColor: "bg-rose-500/15 text-rose-500 dark:text-rose-400 border-rose-500/30",
+    spec: "Nordic Wood & Volcanic Stones",
+    temp: "Therapeutic 190°F",
+    image: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?q=80&w=1200&auto=format&fit=crop",
+    desc: "Crafted from untreated Nordic cedar and heated by Finnish volcanic stones to trigger cardiovascular vasodilation and heat-shock protein release.",
     perks: [
-      "Dual full-spectrum far-infrared & traditional 195°F heat",
-      "Aromatic Scandinavian cedar with Himalayan salt walls",
-      "Eucalyptus mist diffusers & acoustic soundproofing",
-      "Complimentary chilled eucalyptus towel service"
+      "Natural Finnish cedar aroma & volcanic rock stoves",
+      "Infrared deep-spectrum heating panels",
+      "Full spectrum chromotherapy ambient mood lighting",
+      "Eucalyptus infused cold towel service"
     ]
   },
   {
-    id: "inbody-lab",
-    title: "InBody 570 Clinical Composition Lab",
+    id: "biometric-lab",
+    title: "Clinical InBody & VO2 Diagnostic Lab",
     category: "Biometric Diagnostics",
-    badge: "Clinical Precision",
-    badgeColor: "bg-purple-500/15 text-purple-400 border-purple-500/30",
-    spec: "Multi-Frequency BIA",
-    temp: "99.2% Clinical Correlation",
+    badge: "Clinical Accuracy",
+    badgeColor: "bg-purple-500/15 text-purple-500 dark:text-purple-400 border-purple-500/30",
+    spec: "InBody 770 & Metamax VO2",
+    temp: "A/C Diagnostic Room 70°F",
     image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1200&auto=format&fit=crop",
     desc: "State-of-the-art bioelectrical impedance analysis providing segmental lean muscle mass breakdown, visceral fat rating, and extracellular water ratios.",
     perks: [
@@ -117,6 +119,162 @@ const FACILITIES = [
     ]
   }
 ];
+
+// ── Framer Motion Variants For Every Single Element ──
+const filterContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05, delayChildren: 0.08 }
+  }
+};
+const filterItemVariants = {
+  hidden: { opacity: 0, y: 14, scale: 0.94 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 220, damping: 20 }
+  }
+};
+
+const stageCardVariants = {
+  hidden: { opacity: 0, y: 35, scale: 0.97 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 1.1,
+      ease: TRANSITION_EASE,
+      staggerChildren: 0.07,
+      delayChildren: 0.1
+    }
+  }
+};
+const stageImgVariants = {
+  hidden: { opacity: 0, scale: 1.08 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 1.3, ease: TRANSITION_EASE }
+  }
+};
+const stageBadgeVariants = {
+  hidden: { opacity: 0, y: -16, scale: 0.88 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 210, damping: 20 }
+  }
+};
+const stageCategoryVariants = {
+  hidden: { opacity: 0, x: -16 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.9, ease: TRANSITION_EASE }
+  }
+};
+const stageHeadingVariants = {
+  hidden: { opacity: 0, y: 22, filter: "blur(4px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 1.1, ease: TRANSITION_EASE }
+  }
+};
+const stageDescVariants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.95, ease: "easeOut" }
+  }
+};
+const stagePerkVariants = {
+  hidden: { opacity: 0, x: -14 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.85, ease: TRANSITION_EASE }
+  }
+};
+const stageBtnVariants = {
+  hidden: { opacity: 0, y: 18, scale: 0.94 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 190, damping: 20 }
+  }
+};
+
+const hubsContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, delayChildren: 0.15 }
+  }
+};
+const hubsHeaderVariants = {
+  hidden: { opacity: 0, x: -16 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.9, ease: TRANSITION_EASE }
+  }
+};
+const hubCardVariants = {
+  hidden: { opacity: 0, y: 22, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 180,
+      damping: 20,
+      staggerChildren: 0.05
+    }
+  }
+};
+const hubThumbVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { type: "spring", stiffness: 220, damping: 20 }
+  }
+};
+const hubInfoVariants = {
+  hidden: { opacity: 0, x: -12 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.8, ease: "easeOut" }
+  }
+};
+const hubArrowVariants = {
+  hidden: { opacity: 0, scale: 0.6, rotate: -45 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    rotate: 0,
+    transition: { type: "spring", stiffness: 240, damping: 18 }
+  }
+};
+const guaranteeBannerVariants = {
+  hidden: { opacity: 0, y: 22, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 180, damping: 20 }
+  }
+};
 
 export default function FacilitiesShowcase() {
   const [activeCategory, setActiveCategory] = useState("All Amenities");
@@ -205,7 +363,7 @@ export default function FacilitiesShowcase() {
     >
       <div className="w-11/12 mx-auto relative z-10 space-y-10">
 
-        {/* ── Section Header Row ── */}
+        {/* ── Section Header Row with Triggered Entrance ── */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
             <div className="facilities-kicker inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/25 text-[11px] font-extrabold uppercase tracking-widest text-foreground font-['Outfit']">
@@ -228,7 +386,7 @@ export default function FacilitiesShowcase() {
             </p>
           </div>
 
-          {/* Quick Telemetry Strip */}
+          {/* Quick Telemetry Strip with Count-Up */}
           <div className="flex items-center gap-3 sm:gap-4 shrink-0 font-['Outfit']">
             <div className="px-4 py-3 rounded-2xl bg-brand-500/5 dark:bg-[#1B1A55]/30 border border-brand-500/15 text-center min-w-[90px]">
               <p ref={hubsValRef} className="text-2xl font-black text-active tracking-tight">4</p>
@@ -245,13 +403,22 @@ export default function FacilitiesShowcase() {
           </div>
         </div>
 
-        {/* ── Interactive Category Filter Pills ── */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+        {/* ── Interactive Category Filter Pills with Staggered Entrance ── */}
+        <motion.div
+          variants={filterContainerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar"
+        >
           {CATEGORIES.map((cat) => {
             const isActive = activeCategory === cat;
             return (
-              <button
+              <motion.button
                 key={cat}
+                variants={filterItemVariants}
+                whileHover={{ y: -2, scale: 1.02 }}
+                whileTap={{ scale: 0.96 }}
                 type="button"
                 onClick={() => setActiveCategory(cat)}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 whitespace-nowrap cursor-pointer ${
@@ -261,64 +428,91 @@ export default function FacilitiesShowcase() {
                 }`}
               >
                 {cat}
-              </button>
+              </motion.button>
             );
           })}
-        </div>
+        </motion.div>
 
-        {/* ── The Featured Facility Panoramic Showcase Stage ── */}
+        {/* ── The Featured Facility Panoramic Showcase Stage & Hubs Selector ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
 
           {/* Left Hero Card (Panoramic Photo & Specs) — 7 cols */}
-          <div className="lg:col-span-7 rounded-3xl overflow-hidden relative min-h-[380px] sm:min-h-[440px] flex flex-col justify-between p-6 sm:p-8 bg-[#070F2B] border border-brand-500/20 shadow-md group">
-            <Image
-              src={activeFacility.image}
-              alt={activeFacility.title}
-              fill
-              sizes="(max-width: 1024px) 100vw, 60vw"
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-104"
-              priority
-            />
-            {/* Vignette overlays */}
-            <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-black/20" />
-            <div className="absolute inset-0 bg-linear-to-r from-black/60 via-transparent to-transparent" />
+          <motion.div
+            variants={stageCardVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            className="lg:col-span-7 rounded-3xl overflow-hidden relative min-h-[380px] sm:min-h-[440px] flex flex-col justify-between p-6 sm:p-8 bg-[#070F2B] border border-brand-500/20 shadow-md group"
+          >
+            <motion.div variants={stageImgVariants} className="absolute inset-0">
+              <Image
+                src={activeFacility.image}
+                alt={activeFacility.title}
+                fill
+                sizes="(max-width: 1024px) 100vw, 60vw"
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-104"
+                priority
+              />
+              {/* Vignette overlays */}
+              <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-black/20" />
+              <div className="absolute inset-0 bg-linear-to-r from-black/60 via-transparent to-transparent" />
+            </motion.div>
 
             {/* Top Badges */}
             <div className="relative z-10 flex flex-wrap items-center justify-between gap-2">
-              <span className={`text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full border backdrop-blur-md ${activeFacility.badgeColor}`}>
+              <motion.span
+                variants={stageBadgeVariants}
+                className={`text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full border backdrop-blur-md ${activeFacility.badgeColor}`}
+              >
                 {activeFacility.badge}
-              </span>
-              <span className="text-[11px] font-bold text-white/90 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/15">
+              </motion.span>
+              <motion.span
+                variants={stageBadgeVariants}
+                className="text-[11px] font-bold text-white/90 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/15"
+              >
                 {activeFacility.temp}
-              </span>
+              </motion.span>
             </div>
 
-            {/* Bottom Content */}
+            {/* Bottom Content with Element-by-Element Entrance */}
             <div className="relative z-10 space-y-4 pt-12">
               <div className="space-y-1.5">
-                <span className="text-xs font-bold text-active uppercase tracking-widest font-['Outfit']">
+                <motion.span
+                  variants={stageCategoryVariants}
+                  className="text-xs font-bold text-active uppercase tracking-widest font-['Outfit'] block"
+                >
                   {activeFacility.category}
-                </span>
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-white font-['Outfit'] tracking-tight">
+                </motion.span>
+                <motion.h3
+                  variants={stageHeadingVariants}
+                  className="text-2xl sm:text-3xl font-extrabold text-white font-['Outfit'] tracking-tight"
+                >
                   {activeFacility.title}
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-300 font-['Inter'] leading-relaxed max-w-xl">
+                </motion.h3>
+                <motion.p
+                  variants={stageDescVariants}
+                  className="text-xs sm:text-sm text-gray-300 font-['Inter'] leading-relaxed max-w-xl"
+                >
                   {activeFacility.desc}
-                </p>
+                </motion.p>
               </div>
 
               {/* Perks Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-white/15">
                 {activeFacility.perks.map((perk, idx) => (
-                  <div key={idx} className="flex items-start gap-2">
+                  <motion.div
+                    key={idx}
+                    variants={stagePerkVariants}
+                    className="flex items-start gap-2"
+                  >
                     <FiCheckCircle className="w-3.5 h-3.5 text-active mt-0.5 shrink-0" />
                     <span className="text-xs text-white/90 font-medium leading-snug">{perk}</span>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
+              <motion.div variants={stageBtnVariants} className="flex flex-wrap items-center gap-3 pt-2">
                 <Link
                   href="/facilities"
                   className="px-5 py-3 rounded-2xl bg-btn-bg text-btn-text hover:brightness-105 active:scale-95 font-extrabold text-xs shadow-sm hover:shadow-md transition-all cursor-pointer flex items-center gap-2 border border-white/20"
@@ -333,22 +527,34 @@ export default function FacilitiesShowcase() {
                   <span>Explore Schedule</span>
                   <FiArrowRight className="w-3.5 h-3.5 text-active group-hover:translate-x-1 transition-transform" />
                 </Link>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Selector List (Thumbnails of Other Hubs) — 5 cols */}
-          <div className="lg:col-span-5 flex flex-col justify-between gap-3">
+          <motion.div
+            variants={hubsContainerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            className="lg:col-span-5 flex flex-col justify-between gap-3"
+          >
             <div className="space-y-3">
-              <p className="text-xs font-extrabold uppercase tracking-widest text-secondary font-['Outfit'] px-1">
+              <motion.p
+                variants={hubsHeaderVariants}
+                className="text-xs font-extrabold uppercase tracking-widest text-secondary font-['Outfit'] px-1"
+              >
                 Explore Available Hubs ({filteredFacilities.length})
-              </p>
+              </motion.p>
               <div className="space-y-3">
                 {filteredFacilities.map((fac) => {
                   const isCurrent = fac.id === activeFacility.id;
                   return (
-                    <div
+                    <motion.div
                       key={fac.id}
+                      variants={hubCardVariants}
+                      whileHover={{ scale: 1.015, x: 4 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => setActiveFacilityId(fac.id)}
                       className={`group p-3.5 rounded-2xl border transition-all duration-300 flex items-center gap-4 cursor-pointer ${
                         isCurrent
@@ -356,7 +562,10 @@ export default function FacilitiesShowcase() {
                           : "bg-card-bg hover:bg-brand-500/5 border-brand-500/15 hover:border-brand-500/30"
                       }`}
                     >
-                      <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-brand-500/20">
+                      <motion.div
+                        variants={hubThumbVariants}
+                        className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-brand-500/20"
+                      >
                         <Image
                           src={fac.image}
                           alt={fac.title}
@@ -364,8 +573,8 @@ export default function FacilitiesShowcase() {
                           sizes="64px"
                           className="object-cover group-hover:scale-110 transition-transform duration-500"
                         />
-                      </div>
-                      <div className="flex-1 min-w-0">
+                      </motion.div>
+                      <motion.div variants={hubInfoVariants} className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
                           <span className={`text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded-md border ${fac.badgeColor}`}>
                             {fac.spec}
@@ -379,34 +588,40 @@ export default function FacilitiesShowcase() {
                         <p className="text-[11px] text-secondary truncate mt-0.5">
                           {fac.category} • {fac.temp}
                         </p>
-                      </div>
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-                        isCurrent ? "bg-active text-white" : "bg-brand-500/10 text-secondary group-hover:text-foreground"
-                      }`}>
+                      </motion.div>
+                      <motion.div
+                        variants={hubArrowVariants}
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                          isCurrent ? "bg-active text-white" : "bg-brand-500/10 text-secondary group-hover:text-foreground"
+                        }`}
+                      >
                         <FiArrowRight className="w-3.5 h-3.5" />
-                      </div>
-                    </div>
+                      </motion.div>
+                    </motion.div>
                   );
                 })}
               </div>
             </div>
 
             {/* Bottom Guarantee Banner */}
-            <div className="p-4 rounded-2xl bg-brand-500/5 dark:bg-[#1B1A55]/25 border border-brand-500/15 flex items-center justify-between gap-3 text-xs">
+            <motion.div
+              variants={guaranteeBannerVariants}
+              className="p-4 rounded-2xl bg-brand-500/5 dark:bg-[#1B1A55]/25 border border-brand-500/15 flex items-center justify-between gap-3 text-xs"
+            >
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-active/10 text-active flex items-center justify-center shrink-0">
                   <FiShield className="w-4 h-4" />
                 </div>
                 <div>
                   <p className="font-bold text-foreground">Clean Environment Protocol</p>
-                  <p className="text-[11px] text-secondary">Hourly UV-C sanitation & hospital-grade HVAC</p>
+                  <p className="text-[11px] text-secondary">Hourly UV-C sanitation &amp; hospital-grade HVAC</p>
                 </div>
               </div>
               <Link href="/facilities" className="font-extrabold text-active hover:underline shrink-0 text-xs">
                 Learn More →
               </Link>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
         </div>
 

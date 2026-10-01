@@ -267,7 +267,7 @@ export default function HomeBmiQuickCalc() {
 
   const sectionRef = useRef(null);
   const consoleRef = useRef(null);
-  const isConsoleInView = useInView(consoleRef, { once: true, amount: 0.1 });
+  const isSectionInView = useInView(sectionRef, { once: true, amount: 0.1 });
   const [cardsTriggered, setCardsTriggered] = useState(false);
   const [hasAnimatedCount, setHasAnimatedCount] = useState(false);
 
@@ -275,15 +275,12 @@ export default function HomeBmiQuickCalc() {
   const bmiDisplayRef = useRef(null);
   const bmrDisplayRef = useRef(null);
 
-  // Universal Staged Viewport Delay: Trigger console transitions after 1.0s in screen viewport
+  // Trigger console transitions immediately when section enters screen viewport
   useEffect(() => {
-    if (isConsoleInView) {
-      const timer = setTimeout(() => {
-        setCardsTriggered(true);
-      }, 1000);
-      return () => clearTimeout(timer);
+    if (isSectionInView) {
+      setCardsTriggered(true);
     }
-  }, [isConsoleInView]);
+  }, [isSectionInView]);
 
   // Synchronize metric and imperial upon tab toggle
   const handleUnitSwitch = (newUnit) => {
@@ -1104,8 +1101,8 @@ export default function HomeBmiQuickCalc() {
 
               </div>
 
-              {/* Action Buttons Row */}
-              <div className="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-brand-500/15">
+              {/* Action Buttons Row with Triggered Transition */}
+              <motion.div variants={consoleBtnVariants} className="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-brand-500/15">
                 <Link
                   href={matchedClassUrl}
                   className="w-full sm:flex-1 py-3.5 px-5 rounded-2xl bg-btn-bg text-btn-text hover:brightness-105 active:scale-95 font-extrabold text-xs sm:text-sm text-center shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 border border-white/20"
@@ -1121,7 +1118,7 @@ export default function HomeBmiQuickCalc() {
                   <span>Advanced Macro Calculator</span>
                   <FiArrowRight className="w-4 h-4 text-active group-hover:translate-x-1 transition-transform" />
                 </Link>
-              </div>
+              </motion.div>
 
             </motion.div>
           </div>

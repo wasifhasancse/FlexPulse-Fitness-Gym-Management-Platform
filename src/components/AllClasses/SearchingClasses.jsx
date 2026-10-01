@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
-import { motion, LayoutGroup, AnimatePresence } from "framer-motion";
+import { useEffect, useState, useTransition, useRef } from "react";
+import { motion, LayoutGroup, AnimatePresence, useInView } from "framer-motion";
 import {
   FiSearch,
   FiX,
@@ -10,6 +10,7 @@ import {
   FiActivity,
   FiRefreshCw,
   FiChevronDown,
+  FiCheck
 } from "react-icons/fi";
 import {
   FaDumbbell,
@@ -20,6 +21,8 @@ import {
   FaLayerGroup,
   FaSpa,
 } from "react-icons/fa";
+
+const TRANSITION_EASE = [0.16, 1, 0.3, 1];
 
 const CATEGORIES = [
   { name: "All Categories", label: "All Classes", icon: FaLayerGroup },
@@ -59,10 +62,135 @@ const SORT_OPTIONS = [
   { value: "duration-desc", label: "Duration: Long to Short" },
 ];
 
+// ── Multi-Element Triggered Transition Motion Variants (per rule.md) ──
+const filterDeckVariants = {
+  hidden: { opacity: 0, y: 32, scale: 0.98 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 1.1,
+      ease: TRANSITION_EASE,
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const searchBoxVariants = {
+  hidden: { opacity: 0, x: -24 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.9, ease: TRANSITION_EASE },
+  },
+};
+
+const searchIconVariants = {
+  hidden: { opacity: 0, scale: 0, rotate: -30 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    rotate: 0,
+    transition: { type: "spring", stiffness: 220, damping: 18, delay: 0.15 },
+  },
+};
+
+const levelSegmentContainerVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.85,
+      ease: TRANSITION_EASE,
+      staggerChildren: 0.06,
+      delayChildren: 0.12,
+    },
+  },
+};
+
+const levelPillItemVariants = {
+  hidden: { opacity: 0, scale: 0.88, y: 10 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 240, damping: 20 },
+  },
+};
+
+const sortDropdownVariants = {
+  hidden: { opacity: 0, x: 24 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.9, ease: TRANSITION_EASE },
+  },
+};
+
+const dividerLineVariants = {
+  hidden: { opacity: 0, scaleX: 0 },
+  visible: {
+    opacity: 1,
+    scaleX: 1,
+    transition: { duration: 0.95, ease: TRANSITION_EASE },
+  },
+};
+
+const categoryContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+      delayChildren: 0.15,
+    },
+  },
+};
+
+const categoryItemVariants = {
+  hidden: { opacity: 0, y: 16, scale: 0.92 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 220, damping: 20 },
+  },
+};
+
+const statusRowVariants = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.85,
+      ease: "easeOut",
+      staggerChildren: 0.06,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const badgeItemVariants = {
+  hidden: { opacity: 0, scale: 0.75, y: 6 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 260, damping: 20 },
+  },
+};
+
 export default function SearchingClasses({ totalClasses = 0 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+
+  const containerRef = useRef(null);
+  const isDeckInView = useInView(containerRef, { once: true, amount: 0.15 });
 
   const urlSearch = searchParams.get("search") || "";
   const urlCategory = searchParams.get("category") || "All Categories";
@@ -71,7 +199,7 @@ export default function SearchingClasses({ totalClasses = 0 }) {
 
   const [searchInput, setSearchInput] = useState(urlSearch);
 
-  // Synchronize search input if URL changes externally (e.g. browser back/forward or reset)
+  // Synchronize search input if URL changes externally
   useEffect(() => {
     setSearchInput(urlSearch);
   }, [urlSearch]);
@@ -99,7 +227,6 @@ export default function SearchingClasses({ totalClasses = 0 }) {
       params.set("sort", nextSort);
     }
 
-    // Always reset to page 1 on active filter change
     const queryString = params.toString();
     const targetUrl = queryString ? `/all-classes?${queryString}#classes-catalog` : "/all-classes#classes-catalog";
 
@@ -146,101 +273,126 @@ export default function SearchingClasses({ totalClasses = 0 }) {
   );
 
   return (
-    <div className="w-full max-w-6xl mx-auto mb-8">
-      {/* Main Glassmorphic Control Deck */}
-      <div className="relative rounded-2xl bg-white/90 dark:bg-[#121124]/90 backdrop-blur-xl border border-slate-200/90 dark:border-white/10 shadow-sm p-4 sm:p-5 transition-all duration-300 space-y-4">
+    <div ref={containerRef} className="w-full mb-10">
+      {/* ── Main Glassmorphic Athletic Control Deck with Triggered Transitions ── */}
+      <motion.div
+        variants={filterDeckVariants}
+        initial="hidden"
+        animate={isDeckInView ? "visible" : "hidden"}
+        className="relative rounded-3xl bg-card-bg/95 dark:bg-[#070F2B]/95 backdrop-blur-xl border border-brand-500/20 shadow-sm p-4 sm:p-6 lg:p-7 transition-all duration-300 space-y-5"
+      >
         
-        {/* Row 1: Search Input & Controls */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-          {/* Search Box */}
-          <div className="relative flex-1">
-            <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-slate-400">
+        {/* Row 1: Search Input, Level Selector & Sort Options (Fully Mobile Responsive) */}
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5">
+          
+          {/* Search Box with Athletic Surface Tokens & Dedicated Triggered Transition */}
+          <motion.div variants={searchBoxVariants} className="relative flex-1 min-w-[240px]">
+            <motion.div variants={searchIconVariants} className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-secondary">
               <FiSearch className="w-4 h-4 text-active" />
-            </div>
+            </motion.div>
             <input
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search classes by name, coach, or workout..."
-              className="w-full pl-10 pr-9 py-2.5 bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 rounded-xl font-['Inter'] text-xs sm:text-sm text-foreground placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-active focus:ring-1 focus:ring-active/20 transition-all shadow-inner"
+              className="w-full pl-10 pr-9 py-3 bg-searchbox-bg hover:bg-searchbox-hover border border-brand-500/25 focus:border-active/60 focus:ring-1 focus:ring-active/20 rounded-2xl font-['Inter'] text-xs sm:text-sm text-foreground placeholder:text-secondary/70 focus:outline-none transition-all shadow-2xs"
             />
             {searchInput && (
-              <button
+              <motion.button
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
                 type="button"
                 onClick={() => {
                   setSearchInput("");
                   applyFilters({ search: "" });
                 }}
-                className="absolute inset-y-0 right-3 flex items-center justify-center my-auto w-5 h-5 rounded-full bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300 hover:bg-active hover:text-white transition-colors cursor-pointer"
+                className="absolute inset-y-0 right-3 flex items-center justify-center my-auto w-5 h-5 rounded-full bg-brand-500/10 hover:bg-active text-secondary hover:text-white transition-colors cursor-pointer"
                 title="Clear search"
               >
                 <FiX className="w-3 h-3" />
-              </button>
+              </motion.button>
             )}
-          </div>
+          </motion.div>
 
-          {/* Intensity Selector */}
-          <LayoutGroup id="allClassesDifficultyGroup">
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider hidden lg:inline mr-1">
-                Level:
-              </span>
-              {DIFFICULTY_LEVELS.map((lvl) => {
-                const isSelected = urlDifficulty === lvl.id;
-                return (
-                  <button
-                    key={lvl.id}
-                    onClick={() => handleDifficultySelect(lvl.id)}
-                    className={`relative inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-                      isSelected
-                        ? "text-white font-bold"
-                        : "bg-slate-100/90 dark:bg-white/[0.04] text-slate-600 dark:text-slate-300 hover:text-foreground hover:bg-slate-200/70 dark:hover:bg-white/[0.08] border border-slate-200/80 dark:border-white/[0.06]"
-                    }`}
+          {/* Controls Cluster: Difficulty Level Selector & Sort Dropdown */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            
+            {/* Level Selector Pills with Individual Staggered Triggered Transitions */}
+            <LayoutGroup id="allClassesDifficultyGroup">
+              <motion.div
+                variants={levelSegmentContainerVariants}
+                className="flex items-center gap-1.5 p-1 rounded-2xl bg-brand-500/5 dark:bg-[#1B1A55]/30 border border-brand-500/15 overflow-x-auto no-scrollbar"
+              >
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-secondary px-2 hidden xl:inline">
+                  Level:
+                </span>
+                {DIFFICULTY_LEVELS.map((lvl) => {
+                  const isSelected = urlDifficulty === lvl.id;
+                  return (
+                    <motion.button
+                      key={lvl.id}
+                      variants={levelPillItemVariants}
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => handleDifficultySelect(lvl.id)}
+                      className={`group/lvl relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer select-none ${
+                        isSelected
+                          ? "text-white font-extrabold"
+                          : "text-secondary hover:text-active hover:bg-active/10 dark:hover:bg-active/15 hover:border-active/40 border border-transparent"
+                      }`}
+                    >
+                      {isSelected && (
+                        <motion.span
+                          layoutId="activeAllClassesDifficultyPill"
+                          className="absolute inset-0 rounded-xl bg-active shadow-xs"
+                          transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                        />
+                      )}
+                      {lvl.dotColor && !isSelected && (
+                        <span className={`w-1.5 h-1.5 rounded-full ${lvl.dotColor} relative z-10 group-hover/lvl:scale-125 transition-transform duration-200`} />
+                      )}
+                      <span className="relative z-10">{lvl.label}</span>
+                    </motion.button>
+                  );
+                })}
+              </motion.div>
+            </LayoutGroup>
+
+            {/* Sort Dropdown with Triggered Slide */}
+            <motion.div variants={sortDropdownVariants} className="relative min-w-[170px] sm:w-auto">
+              <select
+                value={urlSort}
+                onChange={(e) => handleSortChange(e.target.value)}
+                className="w-full pl-3.5 pr-9 py-2.5 bg-searchbox-bg hover:bg-searchbox-hover border border-brand-500/25 hover:border-active/50 rounded-2xl font-['Inter'] text-xs font-bold text-foreground focus:outline-none focus:border-active/60 cursor-pointer appearance-none shadow-2xs transition-colors"
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <option
+                    key={opt.value}
+                    value={opt.value}
+                    className="bg-card-bg text-foreground py-1"
                   >
-                    {isSelected && (
-                      <motion.span
-                        layoutId="activeAllClassesDifficultyPill"
-                        className="absolute inset-0 rounded-xl bg-active shadow-xs"
-                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                      />
-                    )}
-                    {lvl.dotColor && !isSelected && (
-                      <span className={`w-1.5 h-1.5 rounded-full ${lvl.dotColor} relative z-10`} />
-                    )}
-                    <span className="relative z-10">{lvl.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </LayoutGroup>
-
-          {/* Sort Dropdown */}
-          <div className="relative min-w-[170px]">
-            <select
-              value={urlSort}
-              onChange={(e) => handleSortChange(e.target.value)}
-              className="w-full pl-3 pr-8 py-2 bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 rounded-xl font-['Inter'] text-xs font-semibold text-foreground focus:outline-none focus:border-active cursor-pointer appearance-none"
-            >
-              {SORT_OPTIONS.map((opt) => (
-                <option
-                  key={opt.value}
-                  value={opt.value}
-                  className="bg-white dark:bg-[#17152f] text-foreground"
-                >
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
-              <FiChevronDown className="w-3.5 h-3.5" />
-            </div>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-secondary">
+                <FiChevronDown className="w-3.5 h-3.5" />
+              </div>
+            </motion.div>
           </div>
         </div>
 
-        {/* Row 2: Category Tabs with Icons */}
-        <div className="pt-3 border-t border-slate-200/80 dark:border-white/[0.08]">
+        {/* Row 2: Category Filter Tabs with Divider Expansion & Staggered Entrance */}
+        <motion.div variants={dividerLineVariants} className="pt-3 border-t border-brand-500/15 origin-left">
           <LayoutGroup id="allClassesCategoryGroup">
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none no-scrollbar">
+            <motion.div
+              variants={categoryContainerVariants}
+              initial="hidden"
+              animate={isDeckInView ? "visible" : "hidden"}
+              className="flex items-center gap-2 overflow-x-auto pb-1.5 no-scrollbar scroll-smooth"
+            >
               {CATEGORIES.map((cat) => {
                 const Icon = cat.icon;
                 const isSelected =
@@ -249,41 +401,56 @@ export default function SearchingClasses({ totalClasses = 0 }) {
                     (!urlCategory || urlCategory === "All Categories" || urlCategory === "All"));
 
                 return (
-                  <button
+                  <motion.button
                     key={cat.name}
+                    variants={categoryItemVariants}
+                    whileHover={{ y: -2, scale: 1.02 }}
+                    whileTap={{ scale: 0.96 }}
+                    type="button"
                     onClick={() => handleCategorySelect(cat.name)}
-                    className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl font-['Inter'] text-xs font-semibold whitespace-nowrap transition-colors duration-200 cursor-pointer shrink-0 ${
+                    className={`group/tab relative flex items-center gap-2 px-4 py-2.5 rounded-2xl font-['Inter'] text-xs font-bold whitespace-nowrap transition-all duration-300 cursor-pointer shrink-0 select-none ${
                       isSelected
-                        ? "text-white font-bold"
-                        : "bg-slate-100/80 dark:bg-white/[0.04] text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-white/[0.06] hover:border-active/40 hover:text-foreground hover:bg-slate-200/60 dark:hover:bg-white/[0.08]"
+                        ? "text-white shadow-xs"
+                        : "bg-card-bg/90 dark:bg-[#121026] text-secondary hover:text-active hover:bg-active/10 dark:hover:bg-active/15 border border-brand-500/20 hover:border-active/60 shadow-2xs hover:shadow-xs"
                     }`}
                   >
                     {isSelected && (
                       <motion.span
                         layoutId="activeAllClassesCategoryPill"
-                        className="absolute inset-0 rounded-xl bg-active shadow-sm"
+                        className="absolute inset-0 rounded-2xl bg-active shadow-xs"
                         transition={{ type: "spring", stiffness: 450, damping: 35 }}
                       />
                     )}
-                    <Icon className={`w-3 h-3 relative z-10 ${isSelected ? "text-white" : "text-active"}`} />
+                    <Icon className={`w-3.5 h-3.5 relative z-10 transition-all duration-200 ${
+                      isSelected 
+                        ? "text-white" 
+                        : "text-secondary/70 group-hover/tab:text-active group-hover/tab:scale-115 group-hover/tab:rotate-6"
+                    }`} />
                     <span className="relative z-10">{cat.label}</span>
-                  </button>
+                  </motion.button>
                 );
               })}
-            </div>
+            </motion.div>
           </LayoutGroup>
-        </div>
+        </motion.div>
 
-        {/* Row 3: Status Summary & Active Filter Tags */}
-        <div className="pt-3 border-t border-slate-200/80 dark:border-white/[0.08] flex flex-wrap items-center justify-between gap-2.5 text-xs text-slate-500 dark:text-slate-400">
+        {/* Row 3: Status Summary & Active Filter Tags with Triggered Variants */}
+        <motion.div
+          variants={statusRowVariants}
+          className="pt-3 border-t border-brand-500/15 flex flex-wrap items-center justify-between gap-3 text-xs text-secondary"
+        >
           <div className="flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+            </span>
             <span className="font-['Inter'] text-xs">
-              Showing <strong className="text-foreground font-bold">{totalClasses}</strong> {totalClasses === 1 ? "class" : "classes"} in curriculum
+              Showing <strong className="text-foreground font-extrabold">{totalClasses}</strong> {totalClasses === 1 ? "session" : "sessions"} in performance curriculum
             </span>
             {isPending && (
-              <span className="text-active font-semibold animate-pulse ml-1 text-xs">
-                Filtering...
+              <span className="inline-flex items-center gap-1 text-active font-bold animate-pulse ml-1 text-xs">
+                <FiRefreshCw className="w-3 h-3 animate-spin" />
+                <span>Updating catalog...</span>
               </span>
             )}
           </div>
@@ -291,66 +458,86 @@ export default function SearchingClasses({ totalClasses = 0 }) {
           {/* Active Filter Badges */}
           {hasActiveFilters && (
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-secondary">
                 Active:
               </span>
+              
               {urlSearch && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-white/[0.06] text-foreground text-[11px] font-medium border border-slate-200 dark:border-white/10">
-                  &quot;{urlSearch}&quot;
+                <motion.span variants={badgeItemVariants} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-brand-500/10 border border-brand-500/20 text-foreground text-[11px] font-bold">
+                  <span>&ldquo;{urlSearch}&rdquo;</span>
                   <button
+                    type="button"
                     onClick={() => {
                       setSearchInput("");
                       applyFilters({ search: "" });
                     }}
-                    className="hover:text-active ml-0.5 cursor-pointer"
+                    className="hover:text-active cursor-pointer"
+                    title="Remove keyword filter"
                   >
                     <FiX className="w-3 h-3" />
                   </button>
-                </span>
+                </motion.span>
               )}
+
               {urlCategory && urlCategory !== "All Categories" && urlCategory !== "All" && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-white/[0.06] text-foreground text-[11px] font-medium border border-slate-200 dark:border-white/10">
-                  {urlCategory}
+                <motion.span variants={badgeItemVariants} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-active/10 border border-active/30 text-active text-[11px] font-bold">
+                  <span>{urlCategory}</span>
                   <button
-                    onClick={() => handleCategorySelect("All Categories")}
-                    className="hover:text-active ml-0.5 cursor-pointer"
+                    type="button"
+                    onClick={() => applyFilters({ category: "All Categories" })}
+                    className="hover:text-foreground cursor-pointer"
+                    title="Remove category filter"
                   >
                     <FiX className="w-3 h-3" />
                   </button>
-                </span>
+                </motion.span>
               )}
+
               {urlDifficulty && urlDifficulty !== "All" && urlDifficulty !== "All Levels" && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-white/[0.06] text-foreground text-[11px] font-medium border border-slate-200 dark:border-white/10">
-                  {urlDifficulty}
+                <motion.span variants={badgeItemVariants} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-500 dark:text-amber-400 text-[11px] font-bold">
+                  <span>{urlDifficulty}</span>
                   <button
-                    onClick={() => handleDifficultySelect("All")}
-                    className="hover:text-active ml-0.5 cursor-pointer"
+                    type="button"
+                    onClick={() => applyFilters({ difficulty: "All" })}
+                    className="hover:text-foreground cursor-pointer"
+                    title="Remove level filter"
                   >
                     <FiX className="w-3 h-3" />
                   </button>
-                </span>
+                </motion.span>
               )}
+
               {urlSort && urlSort !== "newest" && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-white/[0.06] text-foreground text-[11px] font-medium border border-slate-200 dark:border-white/10">
-                  {SORT_OPTIONS.find((s) => s.value === urlSort)?.label}
+                <motion.span variants={badgeItemVariants} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-brand-500/10 border border-brand-500/20 text-foreground text-[11px] font-bold">
+                  <span>{SORT_OPTIONS.find((s) => s.value === urlSort)?.label || urlSort}</span>
                   <button
-                    onClick={() => handleSortChange("newest")}
-                    className="hover:text-active ml-0.5 cursor-pointer"
+                    type="button"
+                    onClick={() => applyFilters({ sort: "newest" })}
+                    className="hover:text-active cursor-pointer"
+                    title="Reset sort"
                   >
                     <FiX className="w-3 h-3" />
                   </button>
-                </span>
+                </motion.span>
               )}
-              <button
+
+              {/* Strict Type 3 Filter Button for Reset */}
+              <motion.button
+                variants={badgeItemVariants}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.95 }}
+                type="button"
                 onClick={resetAllFilters}
-                className="text-[11px] font-bold text-active hover:underline ml-1 cursor-pointer"
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-transparent hover:bg-searchbox-bg text-secondary hover:text-active border border-brand-500/20 hover:border-active/40 text-[11px] font-semibold transition-all cursor-pointer"
               >
-                Clear all
-              </button>
+                <FiRefreshCw className="w-3 h-3" />
+                <span>Clear All</span>
+              </motion.button>
             </div>
           )}
-        </div>
-      </div>
+        </motion.div>
+
+      </motion.div>
     </div>
   );
 }

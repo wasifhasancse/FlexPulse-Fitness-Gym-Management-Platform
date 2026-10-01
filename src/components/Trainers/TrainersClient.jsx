@@ -3,27 +3,21 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
-import AnimatedSectionTitle from "@/components/common/AnimatedSectionTitle";
+import { motion, AnimatePresence } from "framer-motion";
+import TrainersHeroHeader from "./TrainersHeroHeader";
+import TrainersFilterDeck from "./TrainersFilterDeck";
+import TrainersGrid from "./TrainersGrid";
+import TrainersPagination from "./TrainersPagination";
+import TrainersRecruitmentBanner from "./TrainersRecruitmentBanner";
 import {
-  FiUsers,
-  FiSearch,
-  FiStar,
-  FiMail,
-  FiUserPlus,
   FiX,
   FiCheckCircle,
-  FiArrowRight,
-  FiChevronLeft,
-  FiChevronRight,
-  FiFilter,
-  FiGrid,
-  FiList,
-  FiRefreshCw,
+  FiMail,
   FiCalendar,
   FiAward,
+  FiArrowRight,
+  FiStar,
 } from "react-icons/fi";
-import ScrollAnimate from "@/components/common/ScrollAnimate";
 import { FaDumbbell } from "react-icons/fa";
 
 // Curated authentic roster of coaches across all fitness specialties
@@ -191,9 +185,9 @@ export default function TrainersClient({ initialTrainers = [] }) {
   const [viewMode, setViewMode] = useState("grid"); // "grid" | "list"
   const [selectedCoachModal, setSelectedCoachModal] = useState(null);
 
-  const gridTopRef = useRef(null);
+  const catalogTopRef = useRef(null);
 
-  // Close modal with ESC
+  // Close modal with ESC key
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
@@ -225,7 +219,7 @@ export default function TrainersClient({ initialTrainers = [] }) {
         t.image.startsWith("http");
 
       const assignedClasses = t.classes || [];
-      const specialty = t.specialty || (assignedClasses[0]?.category) || "Weights";
+      const specialty = t.specialty || assignedClasses[0]?.category || "Weights";
 
       return {
         _id: t._id,
@@ -247,7 +241,6 @@ export default function TrainersClient({ initialTrainers = [] }) {
       };
     });
 
-    // Merge curated coaches with database trainers (prevent email collision)
     const existingEmails = new Set(dbTrainers.map((t) => t.email.toLowerCase()));
     const additional = CURATED_COACHES.filter(
       (c) => !existingEmails.has(c.email.toLowerCase())
@@ -260,7 +253,7 @@ export default function TrainersClient({ initialTrainers = [] }) {
   const specialtyStats = useMemo(() => {
     const counts = { All: allTrainers.length };
     allTrainers.forEach((t) => {
-      const spec = t.specialty || "Fitness";
+      const spec = t.specialty || "Weights";
       counts[spec] = (counts[spec] || 0) + 1;
     });
 
@@ -289,7 +282,6 @@ export default function TrainersClient({ initialTrainers = [] }) {
       return matchesSpecialty && matchesSearch;
     });
 
-    // Sorting
     result.sort((a, b) => {
       if (sortBy === "classes-desc") return (b.classesCount || 0) - (a.classesCount || 0);
       if (sortBy === "rating-desc") return Number(b.rating) - Number(a.rating);
@@ -322,8 +314,8 @@ export default function TrainersClient({ initialTrainers = [] }) {
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage) {
       setCurrentPage(newPage);
-      if (gridTopRef.current) {
-        gridTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (catalogTopRef.current) {
+        catalogTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     }
   };
@@ -338,587 +330,179 @@ export default function TrainersClient({ initialTrainers = [] }) {
   const hasActiveFilters = selectedSpecialty !== "All" || searchQuery.length > 0;
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-10 sm:py-14 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto space-y-8 sm:space-y-10">
-        {/* Header Section with Exit Animation */}
-        <AnimatedSectionTitle
-          kicker="Certified Athletic Staff"
-          title="Meet Our Elite Coaches"
-          highlightText="Elite Coaches"
-          subtitle="Work with certified coaches dedicated to refining your technique, building functional strength, and achieving verified results."
-          align="center"
-          className="mb-6 sm:mb-8"
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300 pb-20">
+      {/* ── 1. Hero Header with Athletic Telemetry HUD Cockpit (Strict w-11/12 mx-auto) ── */}
+      <TrainersHeroHeader totalCoaches={allTrainers.length} />
+
+      {/* ── 2. Main Directory Catalog Area (Strict w-11/12 mx-auto matching Nav and Footer) ── */}
+      <main
+        ref={catalogTopRef}
+        id="coaches-catalog"
+        className="w-11/12 mx-auto relative z-10 pt-10 sm:pt-12 scroll-mt-24"
+      >
+        {/* Interactive Filter Deck with Dedicated Triggered Transitions & Athletic Hover */}
+        <TrainersFilterDeck
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedSpecialty={selectedSpecialty}
+          setSelectedSpecialty={setSelectedSpecialty}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          specialtyStats={specialtyStats}
+          totalItems={totalItems}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          resetAllFilters={resetAllFilters}
+          hasActiveFilters={hasActiveFilters}
         />
 
-        {/* Filter, Search & Sorting Controls Hub */}
-        <div
-          ref={gridTopRef}
-          className="bg-brand-900/60 dark:bg-[#121026]/75 border border-brand-500/20 rounded-2xl p-4 sm:p-5 backdrop-blur-md shadow-sm space-y-4"
-        >
-          {/* Top Row: Search Input & Tools */}
-          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4">
-            {/* Search Input */}
-            <div className="relative flex-1 max-w-md">
-              <FiSearch
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-secondary"
-                size={16}
-              />
-              <input
-                type="text"
-                placeholder="Search coach by name, specialty, or class..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-9 py-2.5 text-xs sm:text-sm bg-background border border-brand-500/20 rounded-xl text-foreground placeholder:text-secondary focus:outline-none focus:border-active transition-colors shadow-xs"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-foreground p-0.5"
-                >
-                  <FiX size={15} />
-                </button>
-              )}
-            </div>
+        {/* Coaches Grid with High Demand Sessions Staged Viewport Delay & Re-Animation */}
+        <TrainersGrid
+          trainers={paginatedTrainers}
+          viewMode={viewMode}
+          onOpenModal={(coach) => setSelectedCoachModal(coach)}
+          resetAllFilters={resetAllFilters}
+        />
 
-            {/* Right Tools: Sort & View Mode */}
-            <div className="flex items-center justify-between md:justify-end gap-3">
-              {/* Sort By Dropdown */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-bold text-secondary uppercase tracking-wider hidden sm:inline">
-                  Sort:
-                </span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-background border border-brand-500/20 rounded-xl px-3 py-2 text-xs font-bold text-foreground focus:outline-none focus:border-active cursor-pointer shadow-xs"
-                >
-                  <option value="classes-desc">Most Active Classes</option>
-                  <option value="rating-desc">Top Rated (⭐ 5.0)</option>
-                  <option value="experience-desc">Most Experienced</option>
-                  <option value="name-asc">Name (A - Z)</option>
-                </select>
-              </div>
+        {/* Floating Athletic Pagination Dock with Triggered Transitions */}
+        <TrainersPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          onPageChange={handlePageChange}
+        />
 
-              {/* View Switcher with Layout Animation */}
-              <LayoutGroup id="trainersViewModeGroup">
-                <div className="flex items-center bg-background/80 p-1 rounded-xl border border-brand-500/20">
-                  <button
-                    onClick={() => setViewMode("grid")}
-                    title="Grid View"
-                    className={`relative p-1.5 rounded-lg transition-colors cursor-pointer ${
-                      viewMode === "grid" ? "text-btn-text" : "text-secondary hover:text-foreground"
-                    }`}
-                  >
-                    {viewMode === "grid" && (
-                      <motion.span
-                        layoutId="activeTrainersViewModePill"
-                        className="absolute inset-0 rounded-lg bg-active shadow-xs"
-                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                      />
-                    )}
-                    <FiGrid size={15} className="relative z-10" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode("list")}
-                    title="Detailed Studio View"
-                    className={`relative p-1.5 rounded-lg transition-colors cursor-pointer ${
-                      viewMode === "list" ? "text-btn-text" : "text-secondary hover:text-foreground"
-                    }`}
-                  >
-                    {viewMode === "list" && (
-                      <motion.span
-                        layoutId="activeTrainersViewModePill"
-                        className="absolute inset-0 rounded-lg bg-active shadow-xs"
-                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                      />
-                    )}
-                    <FiList size={15} className="relative z-10" />
-                  </button>
-                </div>
-              </LayoutGroup>
-            </div>
-          </div>
+        {/* Career Opportunities / Recruitment Reassurance Banner */}
+        <TrainersRecruitmentBanner />
+      </main>
 
-          {/* Specialty Category Pills with Counts & Layout Animation */}
-          <LayoutGroup id="trainersSpecialtyGroup">
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none border-t border-brand-500/15 pt-3">
-              {specialtyStats.keys.map((spec) => {
-                const isSelected = selectedSpecialty === spec;
-                const count = specialtyStats.counts[spec] || 0;
-                return (
-                  <button
-                    key={spec}
-                    onClick={() => setSelectedSpecialty(spec)}
-                    className={`relative px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 ${
-                      isSelected
-                        ? "text-btn-text"
-                        : "bg-background/80 hover:bg-background text-secondary hover:text-foreground border border-brand-500/15"
-                    }`}
-                  >
-                    {isSelected && (
-                      <motion.span
-                        layoutId="activeTrainersSpecialtyPill"
-                        className="absolute inset-0 rounded-xl bg-active shadow-sm"
-                        transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                      />
-                    )}
-                    <span className="relative z-10">{spec}</span>
-                    <span
-                      className={`relative z-10 px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
-                        isSelected
-                          ? "bg-white/20 text-white"
-                          : "bg-brand-500/10 text-secondary"
-                      }`}
-                    >
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </LayoutGroup>
+      {/* ── Coach Dossier Details Modal ── */}
+      <AnimatePresence>
+        {selectedCoachModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0"
+              onClick={() => setSelectedCoachModal(null)}
+            />
 
-          {/* Active Filters Summary Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-brand-500/15 text-xs text-secondary">
-            <div className="flex items-center gap-2">
-              <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>
-                Showing <strong className="text-foreground">{totalItems > 0 ? startIndex + 1 : 0}–{endIndex}</strong> of{" "}
-                <strong className="text-foreground">{totalItems}</strong> coaches
-              </span>
-            </div>
-
-            {hasActiveFilters && (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={resetAllFilters}
-                  className="text-xs font-bold text-active hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  <FiRefreshCw size={12} />
-                  <span>Reset All Filters</span>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Coaches Grid or Empty State */}
-        {totalItems === 0 ? (
-          <div className="text-center py-16 bg-brand-900/30 dark:bg-[#121026]/40 border border-brand-500/20 rounded-3xl p-8 space-y-3">
-            <FiSearch size={32} className="mx-auto text-secondary opacity-60" />
-            <h3 className="font-['Outfit'] text-xl font-bold text-foreground">
-              No Coaches Match Your Search
-            </h3>
-            <p className="text-xs text-secondary max-w-sm mx-auto">
-              We couldn&apos;t find any coaching staff matching your selected criteria. Try adjusting your search query or reset filters.
-            </p>
-            <button
-              onClick={resetAllFilters}
-              className="px-4 py-2 rounded-xl bg-active text-btn-text text-xs font-bold shadow-sm hover:opacity-90 cursor-pointer"
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="relative bg-card-bg border border-brand-500/25 rounded-3xl max-w-lg w-full max-h-[85vh] overflow-y-auto shadow-md z-10 p-6 sm:p-7 space-y-5"
             >
-              Reset Filters
-            </button>
-          </div>
-        ) : viewMode === "grid" ? (
-          /* Grid View Mode */
-          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-            <AnimatePresence mode="popLayout">
-              {paginatedTrainers.map((trainer) => (
-                <ScrollAnimate key={trainer._id} className="h-full" speed="animate__faster">
-                  <motion.div
-                    layout
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                    className="group bg-brand-900/40 dark:bg-[#121026]/75 border border-brand-500/20 hover:border-active/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full"
-                  >
-                {/* Image Section */}
-                <div className="relative h-64 w-full overflow-hidden bg-brand-800/30">
-                  <Image
-                    src={trainer.image}
-                    alt={trainer.name}
-                    fill
-                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-
-                  {/* Top Badges */}
-                  <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-active text-btn-text text-[10px] font-extrabold uppercase tracking-wider shadow">
-                    {trainer.experience}
-                  </div>
-
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/65 backdrop-blur-md border border-white/10 text-amber-400 text-xs font-bold flex items-center gap-1 shadow">
-                    <FiStar className="fill-amber-400" size={11} /> {trainer.rating}
-                    <span className="text-white/60 text-[10px] font-normal">({trainer.reviewsCount})</span>
-                  </div>
-
-                  {/* Name & Specialty Over Image */}
-                  <div className="absolute bottom-3 left-3.5 right-3.5 text-white">
-                    <h3 className="font-['Outfit'] text-xl font-black tracking-tight group-hover:text-active transition-colors flex items-center gap-1.5 group-hover:animate__animated group-hover:animate__headShake">
-                      {trainer.name}
-                      <FiCheckCircle className="text-active shrink-0 animate__animated animate__bounceIn" size={15} />
-                    </h3>
-                    <p className="text-xs text-white/80 font-medium">
-                      {trainer.specialty} Coach
-                    </p>
-                  </div>
-                </div>
-
-                {/* Details Section */}
-                <div className="p-5 space-y-4 flex-1 flex flex-col justify-between">
-                  <div className="space-y-3">
-                    {/* Bio */}
-                    <p className="text-xs text-secondary leading-relaxed line-clamp-2">
-                      {trainer.bio}
-                    </p>
-
-                    {/* Classes Preview Pills */}
-                    {trainer.classes && trainer.classes.length > 0 && (
-                      <div className="space-y-1.5 pt-1">
-                        <span className="text-[10px] font-bold text-secondary uppercase tracking-wider block">
-                          Assigned Classes ({trainer.classes.length})
-                        </span>
-                        <div className="flex flex-wrap gap-1.5">
-                          {trainer.classes.slice(0, 2).map((cls, idx) => (
-                            <Link
-                              key={idx}
-                              href={`/all-classes?search=${encodeURIComponent(cls.className)}`}
-                              className="px-2.5 py-1 rounded-lg bg-brand-500/10 hover:bg-brand-500/20 border border-brand-500/15 text-[11px] font-medium text-foreground hover:text-active transition-colors flex items-center gap-1"
-                              title={`Search ${cls.className}`}
-                            >
-                              <FaDumbbell size={9} className="text-active" />
-                              <span className="truncate max-w-[130px]">{cls.className}</span>
-                            </Link>
-                          ))}
-                          {trainer.classes.length > 2 && (
-                            <button
-                              onClick={() => setSelectedCoachModal(trainer)}
-                              className="px-2 py-1 rounded-lg bg-background text-[11px] font-bold text-secondary hover:text-foreground border border-brand-500/15 cursor-pointer"
-                            >
-                              +{trainer.classes.length - 2} more
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Actions Bar */}
-                  <div className="pt-3.5 border-t border-brand-500/15 flex items-center gap-2">
-                    <Link
-                      href={`/all-classes?search=${encodeURIComponent(trainer.name)}`}
-                      className="flex-1 py-2.5 rounded-xl bg-active text-btn-text text-xs font-bold text-center hover:opacity-90 shadow-sm transition-all flex items-center justify-center gap-1.5 hover:animate__animated hover:animate__pulse"
-                    >
-                      <FaDumbbell size={11} /> Classes
-                    </Link>
-
-                    <button
-                      onClick={() => setSelectedCoachModal(trainer)}
-                      title="View Coach Dossier"
-                      className="px-3 py-2.5 rounded-xl border border-brand-500/25 bg-background hover:bg-brand-500/10 text-foreground text-xs font-bold transition-colors cursor-pointer"
-                    >
-                      Details
-                    </button>
-
-                    <Link
-                      href={`/contact?coach=${encodeURIComponent(trainer.name)}`}
-                      title="Contact Coach"
-                      className="p-2.5 rounded-xl border border-brand-500/25 bg-background hover:border-active text-secondary hover:text-active transition-colors group/mail"
-                    >
-                      <FiMail size={15} className="group-hover/mail:animate__animated group-hover/mail:animate__headShake" />
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
-            </ScrollAnimate>
-          ))}
-          </AnimatePresence>
-          </motion.div>
-        ) : (
-          /* Detailed List View Mode */
-          <div className="space-y-4">
-            {paginatedTrainers.map((trainer) => (
-              <div
-                key={trainer._id}
-                className="bg-brand-900/40 dark:bg-[#121026]/75 border border-brand-500/20 hover:border-active/50 rounded-2xl p-5 sm:p-6 backdrop-blur-md shadow-sm transition-all flex flex-col md:flex-row items-stretch gap-6"
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setSelectedCoachModal(null)}
+                className="absolute top-4 right-4 p-2 rounded-xl text-secondary hover:text-foreground hover:bg-brand-500/10 transition-colors cursor-pointer"
               >
-                {/* Photo */}
-                <div className="relative h-56 md:h-auto md:w-56 rounded-xl overflow-hidden shrink-0 bg-brand-800/30">
+                <FiX size={18} />
+              </button>
+
+              {/* Coach Header */}
+              <div className="flex items-center gap-4">
+                <div className="relative w-16 h-16 sm:w-18 sm:h-18 rounded-2xl overflow-hidden shrink-0 border border-brand-500/25 bg-brand-800/30">
                   <Image
-                    src={trainer.image}
-                    alt={trainer.name}
+                    src={selectedCoachModal.image}
+                    alt={selectedCoachModal.name}
                     fill
                     className="object-cover object-top"
                   />
-                  <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-active text-btn-text text-[10px] font-extrabold uppercase">
-                    {trainer.experience}
-                  </div>
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/65 backdrop-blur-md text-amber-400 text-xs font-bold flex items-center gap-1">
-                    <FiStar className="fill-amber-400" size={11} /> {trainer.rating}
-                  </div>
                 </div>
 
-                {/* Content */}
-                <div className="flex-1 flex flex-col justify-between space-y-3">
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div>
-                        <h3 className="font-['Outfit'] text-2xl font-black text-foreground flex items-center gap-2">
-                          {trainer.name}
-                          <FiCheckCircle className="text-active" size={17} />
-                        </h3>
-                        <p className="text-xs font-bold text-active uppercase tracking-wide">
-                          {trainer.specialty} Coach
-                        </p>
-                      </div>
-                      <span className="text-xs text-secondary font-medium">
-                        {trainer.classesCount} Classes Active
-                      </span>
-                    </div>
-
-                    <p className="text-xs sm:text-sm text-secondary leading-relaxed">
-                      {trainer.bio}
-                    </p>
-
-                    {/* Classes Tags */}
-                    {trainer.classes && trainer.classes.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {trainer.classes.map((cls, idx) => (
-                          <span
-                            key={idx}
-                            className="px-2.5 py-1 rounded-lg bg-brand-500/10 border border-brand-500/20 text-xs font-medium text-foreground flex items-center gap-1"
-                          >
-                            <FaDumbbell size={9} className="text-active" />
-                            {cls.className} (${cls.price}/mo)
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="pt-3 border-t border-brand-500/15 flex items-center justify-end gap-2">
-                    <Link
-                      href={`/all-classes?search=${encodeURIComponent(trainer.name)}`}
-                      className="px-4 py-2 rounded-xl bg-active text-btn-text text-xs font-bold hover:opacity-90 transition-opacity"
-                    >
-                      View Classes
-                    </Link>
-                    <button
-                      onClick={() => setSelectedCoachModal(trainer)}
-                      className="px-4 py-2 rounded-xl border border-brand-500/25 text-xs font-bold text-foreground hover:border-active transition-colors cursor-pointer"
-                    >
-                      Details
-                    </button>
-                    <Link
-                      href={`/contact?coach=${encodeURIComponent(trainer.name)}`}
-                      className="px-3.5 py-2 rounded-xl border border-brand-500/25 text-xs font-bold text-secondary hover:text-active transition-colors"
-                    >
-                      Contact
-                    </Link>
-                  </div>
+                <div>
+                  <h3 className="font-['Outfit'] text-xl sm:text-2xl font-black text-foreground flex items-center gap-1.5">
+                    {selectedCoachModal.name}
+                    <FiCheckCircle className="text-active" size={17} />
+                  </h3>
+                  <p className="text-xs font-bold text-active uppercase tracking-wide font-['Outfit'] mt-0.5">
+                    {selectedCoachModal.specialty} Master Coach • {selectedCoachModal.experience}
+                  </p>
+                  <p className="text-[11px] text-secondary flex items-center gap-1 mt-1 font-['Inter']">
+                    <FiMail size={12} /> {selectedCoachModal.email}
+                  </p>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
 
-        {/* Premium Segmented Pagination Bar */}
-        {totalPages > 1 && (
-          <div className="flex flex-col items-center gap-3 pt-6 border-t border-brand-500/15">
-            <nav
-              role="navigation"
-              aria-label="Coaches Directory Pagination"
-              className="inline-flex items-center gap-1.5 p-1.5 rounded-2xl bg-brand-900/50 dark:bg-[#121026]/70 border border-brand-500/20 backdrop-blur-md shadow-sm"
-            >
-              {/* Previous Button */}
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                aria-label="Previous Page"
-                className={`inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
-                  currentPage === 1
-                    ? "text-secondary/40 cursor-not-allowed"
-                    : "text-foreground hover:bg-brand-500/10"
-                }`}
-              >
-                <FiChevronLeft size={16} />
-                <span className="hidden sm:inline">Previous</span>
-              </button>
-
-              {/* Numbered Page Buttons */}
-              <div className="flex items-center gap-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNo) => {
-                  const isActive = pageNo === currentPage;
-                  return (
-                    <button
-                      key={pageNo}
-                      onClick={() => handlePageChange(pageNo)}
-                      aria-current={isActive ? "page" : undefined}
-                      className={`inline-flex items-center justify-center w-9 h-9 rounded-xl font-['Inter'] text-xs font-bold transition-all duration-200 cursor-pointer ${
-                        isActive
-                          ? "bg-active text-btn-text shadow-md shadow-active/30 scale-105"
-                          : "text-secondary hover:text-foreground hover:bg-brand-500/10"
-                      }`}
-                    >
-                      {pageNo}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Next Button */}
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                aria-label="Next Page"
-                className={`inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
-                  currentPage === totalPages
-                    ? "text-secondary/40 cursor-not-allowed"
-                    : "text-foreground hover:bg-brand-500/10"
-                }`}
-              >
-                <span className="hidden sm:inline">Next</span>
-                <FiChevronRight size={16} />
-              </button>
-            </nav>
-
-            <span className="text-[11px] text-secondary">
-              Page {currentPage} of {totalPages}
-            </span>
-          </div>
-        )}
-
-        {/* Career Opportunities Banner */}
-        <div className="rounded-2xl bg-brand-900/40 dark:bg-[#121026]/60 border border-brand-500/20 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-5 shadow-sm">
-          <div className="space-y-1 text-center md:text-left">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-active">
-              Coaching Staff Recruitment
-            </span>
-            <h2 className="font-['Outfit'] text-xl sm:text-2xl font-bold text-foreground">
-              Are You an Elite Fitness Coach?
-            </h2>
-            <p className="text-xs sm:text-sm text-secondary max-w-xl">
-              We provide world-class facilities, integrated booking telemetry, and guaranteed client flow. Join the FlexPulse coaching roster.
-            </p>
-          </div>
-
-          <Link
-            href="/dashboard/member/apply-trainer"
-            className="px-5 py-2.5 rounded-xl bg-active text-btn-text font-bold text-xs sm:text-sm shadow-sm hover:opacity-90 transition-all flex items-center gap-2 shrink-0"
-          >
-            <FiUserPlus size={15} /> Apply as a Trainer
-          </Link>
-        </div>
-      </div>
-
-      {/* Clean Coach Details Modal */}
-      {selectedCoachModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
-          <div
-            className="fixed inset-0"
-            onClick={() => setSelectedCoachModal(null)}
-          />
-
-          <div className="relative bg-background border border-brand-500/25 rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto shadow-2xl z-10 p-6 space-y-5">
-            {/* Modal Close Button */}
-            <button
-              onClick={() => setSelectedCoachModal(null)}
-              className="absolute top-4 right-4 p-1.5 rounded-lg text-secondary hover:text-foreground hover:bg-brand-500/10 transition-colors cursor-pointer"
-            >
-              <FiX size={18} />
-            </button>
-
-            {/* Coach Header */}
-            <div className="flex items-center gap-4">
-              <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-brand-500/20 bg-brand-800/30">
-                <Image
-                  src={selectedCoachModal.image}
-                  alt={selectedCoachModal.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-
-              <div>
-                <h3 className="font-['Outfit'] text-xl font-bold text-foreground flex items-center gap-1.5">
-                  {selectedCoachModal.name}
-                  <FiCheckCircle className="text-active" size={16} />
-                </h3>
-                <p className="text-xs text-active font-semibold">
-                  {selectedCoachModal.specialty} Coach • {selectedCoachModal.experience}
-                </p>
-                <p className="text-[11px] text-secondary flex items-center gap-1 mt-0.5">
-                  <FiMail size={12} /> {selectedCoachModal.email}
-                </p>
-              </div>
-            </div>
-
-            {/* Bio */}
-            <div className="space-y-1">
-              <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">
-                About Coach
-              </h4>
-              <p className="text-xs text-secondary leading-relaxed">
-                {selectedCoachModal.bio}
-              </p>
-            </div>
-
-            {/* Assigned Classes List */}
-            {selectedCoachModal.classes && selectedCoachModal.classes.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">
-                  Classes Taught ({selectedCoachModal.classes.length})
+              {/* Bio */}
+              <div className="space-y-1.5 pt-1 border-t border-brand-500/15">
+                <h4 className="text-xs font-bold text-foreground uppercase tracking-wider font-['Outfit']">
+                  Biographical Dossier
                 </h4>
-                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                  {selectedCoachModal.classes.map((cls, idx) => (
-                    <div
-                      key={idx}
-                      className="p-2.5 rounded-xl bg-brand-900/30 dark:bg-[#121026]/50 border border-brand-500/15 flex items-center justify-between text-xs"
-                    >
-                      <div>
-                        <strong className="text-foreground block">{cls.className}</strong>
-                        <span className="text-[10px] text-secondary">{cls.category || "Fitness"}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {cls.price && (
-                          <span className="text-xs font-bold text-active font-['Outfit']">
-                            ${cls.price}/mo
-                          </span>
-                        )}
-                        <Link
-                          href={cls._id ? `/all-classes/${cls._id}` : `/all-classes?search=${encodeURIComponent(cls.className)}`}
-                          className="px-2.5 py-1 rounded-lg bg-active text-btn-text text-[11px] font-bold hover:opacity-90 transition-opacity"
-                        >
-                          Book
-                        </Link>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <p className="text-xs sm:text-sm text-secondary font-['Inter'] leading-relaxed">
+                  {selectedCoachModal.bio}
+                </p>
               </div>
-            )}
 
-            {/* Modal Actions */}
-            <div className="pt-3 border-t border-brand-500/15 flex items-center justify-end gap-2">
-              <Link
-                href={`/all-classes?search=${encodeURIComponent(selectedCoachModal.name)}`}
-                className="px-3.5 py-2 rounded-xl border border-brand-500/25 text-xs font-bold text-foreground hover:border-active transition-colors"
-              >
-                All Classes by Coach
-              </Link>
-              <Link
-                href={`/contact?coach=${encodeURIComponent(selectedCoachModal.name)}`}
-                className="px-4 py-2 rounded-xl bg-active text-btn-text text-xs font-bold shadow-sm hover:opacity-90 transition-opacity flex items-center gap-1.5"
-              >
-                <FiMail size={13} /> Message Coach
-              </Link>
-            </div>
+              {/* Assigned Classes */}
+              {selectedCoachModal.classes && selectedCoachModal.classes.length > 0 && (
+                <div className="space-y-2 pt-1 border-t border-brand-500/15">
+                  <h4 className="text-xs font-bold text-foreground uppercase tracking-wider font-['Outfit']">
+                    Curriculum Classes Taught ({selectedCoachModal.classes.length})
+                  </h4>
+                  <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    {selectedCoachModal.classes.map((cls, idx) => (
+                      <div
+                        key={idx}
+                        className="p-3 rounded-2xl bg-brand-500/5 dark:bg-[#1B1A55]/30 border border-brand-500/15 flex items-center justify-between text-xs"
+                      >
+                        <div>
+                          <strong className="text-foreground block font-bold font-['Outfit'] text-sm">
+                            {cls.className}
+                          </strong>
+                          <span className="text-[10px] text-secondary font-['Inter']">
+                            {cls.category || "Fitness"} Discipline
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {cls.price && (
+                            <span className="text-sm font-black text-active font-['Outfit']">
+                              ${cls.price}/session
+                            </span>
+                          )}
+                          <Link
+                            href={
+                              cls._id
+                                ? `/all-classes/${cls._id}`
+                                : `/all-classes?search=${encodeURIComponent(cls.className)}`
+                            }
+                            className="px-3 py-1.5 rounded-xl bg-btn-bg text-btn-text text-xs font-bold shadow-xs hover:brightness-105 transition-all"
+                          >
+                            Book
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Modal Actions */}
+              <div className="pt-4 border-t border-brand-500/15 flex items-center justify-end gap-2.5">
+                <Link
+                  href={`/all-classes?search=${encodeURIComponent(selectedCoachModal.name)}`}
+                  className="px-4 py-2.5 rounded-2xl bg-searchbox-bg hover:bg-searchbox-hover border border-brand-500/25 hover:border-active/60 text-xs font-bold text-foreground transition-all"
+                >
+                  All Classes by Coach
+                </Link>
+                <Link
+                  href={`/contact?coach=${encodeURIComponent(selectedCoachModal.name)}`}
+                  className="px-5 py-2.5 rounded-2xl bg-btn-bg text-btn-text text-xs font-extrabold shadow-sm hover:shadow-md hover:brightness-105 transition-all flex items-center gap-1.5 border border-white/20"
+                >
+                  <FiMail size={13} /> Message Coach
+                </Link>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 }

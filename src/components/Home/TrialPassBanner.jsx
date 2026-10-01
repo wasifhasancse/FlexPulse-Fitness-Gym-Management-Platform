@@ -161,6 +161,16 @@ const watermarkVariants = {
   },
 };
 
+const trustTagVariants = {
+  hidden: { opacity: 0, scale: 0.85, y: 10 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 220, damping: 20 }
+  }
+};
+
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function TrialPassBanner() {
   const [isOpen, setIsOpen] = useState(false);
@@ -174,11 +184,10 @@ export default function TrialPassBanner() {
   const isActionBoxInView = useInView(actionBoxRef, { once: true, amount: 0.2 });
   const [actionBoxTriggered, setActionBoxTriggered] = useState(false);
 
-  // Staged viewport delay for right action box — 1.0s after entering viewport
+  // Trigger right action box immediately upon entering viewport
   useEffect(() => {
     if (isActionBoxInView) {
-      const timer = setTimeout(() => setActionBoxTriggered(true), 1000);
-      return () => clearTimeout(timer);
+      setActionBoxTriggered(true);
     }
   }, [isActionBoxInView]);
 
@@ -375,16 +384,20 @@ export default function TrialPassBanner() {
 
             {/* Quick trust tags */}
             <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial="hidden"
+              whileInView="visible"
               viewport={{ once: true }}
-              transition={{ duration: 1.1, delay: 0.5 }}
+              transition={{ staggerChildren: 0.1, delayChildren: 0.3 }}
               className="flex flex-wrap gap-2 pt-1"
             >
               {["No credit card needed", "Valid 7 days", "All facilities included"].map((tag, i) => (
-                <span key={i} className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-brand-500/8 dark:bg-[#1B1A55]/50 border border-brand-500/15 text-secondary">
+                <motion.span
+                  key={i}
+                  variants={trustTagVariants}
+                  className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-brand-500/8 dark:bg-[#1B1A55]/50 border border-brand-500/15 text-secondary"
+                >
                   {tag}
-                </span>
+                </motion.span>
               ))}
             </motion.div>
           </div>
