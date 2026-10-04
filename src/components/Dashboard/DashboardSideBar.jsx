@@ -174,12 +174,37 @@ const categorizedNavItems = {
   ],
 };
 
+const roleThemes = {
+  admin: {
+    badge: "bg-rose-500/10 text-rose-500 border-rose-500/20",
+    name: "Super Admin",
+    activeClass: "bg-rose-500/10 text-rose-500 border border-rose-500/20 font-bold",
+    indicatorClass: "bg-rose-500",
+    iconActive: "text-rose-500",
+  },
+  trainer: {
+    badge: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+    name: "Trainer",
+    activeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-bold",
+    indicatorClass: "bg-emerald-500",
+    iconActive: "text-emerald-500",
+  },
+  member: {
+    badge: "bg-active/10 text-active border-active/20",
+    name: "Member",
+    activeClass: "bg-active/10 text-active border border-active/20 font-bold",
+    indicatorClass: "bg-active",
+    iconActive: "text-active",
+  },
+};
+
 const DashboardSideBar = ({ isOpen, onClose }) => {
   const pathname = usePathname();
   const router = useRouter();
   const { data } = authClient.useSession();
   const user = data?.user;
   const role = (user?.role || "member").toLowerCase();
+  const currentTheme = roleThemes[role] || roleThemes.member;
   const sections =
     categorizedNavItems[role] || categorizedNavItems.member;
 
@@ -228,16 +253,16 @@ const DashboardSideBar = ({ isOpen, onClose }) => {
                     className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-['Inter'] text-xs sm:text-sm font-semibold transition-all duration-200 group relative
                       ${
                         active
-                          ? "bg-active/10 text-active border border-active/20 font-bold"
+                          ? currentTheme.activeClass
                           : "text-[#535C91] dark:text-[#9290C3] hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"
                       }`}
                   >
                     {active && (
-                      <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-md bg-active" />
+                      <span className={`absolute left-0 top-2 bottom-2 w-1 rounded-r-md ${currentTheme.indicatorClass}`} />
                     )}
                     <Icon
                       className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110
-                        ${active ? "text-active" : "text-[#535C91] dark:text-[#9290C3]"}`}
+                        ${active ? currentTheme.iconActive : "text-[#535C91] dark:text-[#9290C3]"}`}
                     />
                     <span className="tracking-tight truncate">{item.name}</span>
                   </Link>
@@ -270,9 +295,9 @@ const DashboardSideBar = ({ isOpen, onClose }) => {
                 {user?.name || "Athlete"}
               </p>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <p className="font-['Inter'] text-[10px] text-active font-semibold capitalize truncate">
-                  {role === "admin" ? "Super Admin" : role}
+                <span className={`w-1.5 h-1.5 rounded-full ${role === "admin" ? "bg-rose-500" : "bg-emerald-500"} animate-pulse`} />
+                <p className={`font-['Inter'] text-[10px] ${currentTheme.iconActive} font-semibold capitalize truncate`}>
+                  {currentTheme.name}
                 </p>
               </div>
             </div>
@@ -337,9 +362,9 @@ const DashboardSideBar = ({ isOpen, onClose }) => {
             </div>
           </Link>
 
-          {/* User Role Badge instead of PRO badge */}
-          <span className="px-2 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-md bg-active/10 text-active border border-active/20 font-['Outfit'] shrink-0">
-            {role === "admin" ? "Admin" : role === "trainer" ? "Trainer" : "Member"}
+          {/* User Role Badge */}
+          <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-md border font-['Outfit'] shrink-0 ${currentTheme.badge}`}>
+            {currentTheme.name}
           </span>
         </div>
 
@@ -398,8 +423,8 @@ const DashboardSideBar = ({ isOpen, onClose }) => {
           </Link>
 
           <div className="flex items-center gap-2 shrink-0">
-            <span className="px-2 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-md bg-active/10 text-active border border-active/20 font-['Outfit']">
-              {role === "admin" ? "Admin" : role === "trainer" ? "Trainer" : "Member"}
+            <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-md border font-['Outfit'] shrink-0 ${currentTheme.badge}`}>
+              {currentTheme.name}
             </span>
             <button
               onClick={() => onClose(false)}
