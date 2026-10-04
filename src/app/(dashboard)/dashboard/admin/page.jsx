@@ -176,7 +176,7 @@ export default function AdminDashboardPage() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="space-y-6 pb-12"
+      className="w-full space-y-6 pb-12 text-left"
     >
       {/* ======================================================== */}
       {/* 1. TOP HEADER BAR: Overview Title + Date + Filter Pills   */}
@@ -594,45 +594,70 @@ export default function AdminDashboardPage() {
         <div className="bg-white dark:bg-[#070F2B] rounded-2xl p-5 sm:p-6 border border-brand-500/15 shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
-                <FaCalendarCheck className="text-purple-500 w-4 h-4" />
+              <div className="w-11 h-11 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500 shrink-0">
+                <FaCalendarCheck className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-['Outfit'] text-2xl font-black text-foreground">
+                <h3 className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground leading-none">
                   26
                 </h3>
-                <p className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3]">
+                <p className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3] mt-1 font-medium">
                   PT Sessions Today
                 </p>
               </div>
             </div>
 
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-['Outfit'] font-extrabold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-['Outfit'] font-extrabold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-xs">
               <FaArrowUp className="w-2.5 h-2.5" />
               +11.4%
             </span>
           </div>
 
-          {/* Mini Weekly Bar Graph Mon-Sun */}
-          <div className="mt-6 pt-2">
-            <div className="flex items-end justify-between gap-1 h-16">
-              {weeklySessions.map((item, idx) => (
-                <div key={idx} className="flex-1 flex flex-col items-center gap-1 group">
-                  <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-12 flex items-end justify-center p-0.5 overflow-hidden">
-                    <div
-                      className={`w-full rounded-full transition-all duration-300 ${
-                        item.day === "Today" || idx === 3
-                          ? "bg-active"
-                          : "bg-purple-500/60 group-hover:bg-purple-500"
-                      }`}
-                      style={{ height: `${item.height}%` }}
-                    />
+          {/* Sleek Modern Weekly Bar Graph Mon-Sun */}
+          <div className="mt-6 pt-3 border-t border-brand-500/10">
+            <div className="flex items-end justify-between gap-2 h-24 px-1">
+              {weeklySessions.map((item, idx) => {
+                const isToday = item.day === "Thu" || idx === 3;
+                return (
+                  <div
+                    key={idx}
+                    className="flex-1 flex flex-col items-center gap-1.5 group relative cursor-pointer"
+                  >
+                    {/* Tooltip on hover */}
+                    <div className="absolute -top-7 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-2 py-0.5 rounded-md bg-foreground text-background text-[10px] font-bold font-['Outfit'] shadow-md">
+                      {item.count} sessions
+                    </div>
+
+                    {/* Slender Vertical Capsule Track */}
+                    <div className="w-3 sm:w-3.5 h-20 bg-black/5 dark:bg-white/5 rounded-full flex items-end justify-center p-0.5 overflow-hidden transition-all group-hover:bg-black/10 dark:group-hover:bg-white/10">
+                      <div
+                        className={`w-full rounded-full transition-all duration-500 ${
+                          isToday
+                            ? "bg-gradient-to-t from-rose-600 to-pink-500 shadow-[0_0_12px_rgba(255,42,85,0.4)]"
+                            : "bg-gradient-to-t from-violet-600 via-purple-500 to-indigo-400 opacity-70 group-hover:opacity-100 group-hover:scale-y-105"
+                        }`}
+                        style={{ height: `${item.height}%` }}
+                      />
+                    </div>
+
+                    {/* Day label */}
+                    <div className="flex flex-col items-center">
+                      <span
+                        className={`text-[11px] font-['Outfit'] font-bold transition-colors ${
+                          isToday
+                            ? "text-active"
+                            : "text-[#535C91] dark:text-[#9290C3] group-hover:text-foreground"
+                        }`}
+                      >
+                        {item.day}
+                      </span>
+                      {isToday && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-active animate-pulse mt-0.5" />
+                      )}
+                    </div>
                   </div>
-                  <span className="text-[10px] font-['Outfit'] font-semibold text-[#535C91] dark:text-[#9290C3]">
-                    {item.day}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
