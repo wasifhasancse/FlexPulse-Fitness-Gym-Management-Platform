@@ -3,12 +3,14 @@
 import { AlertDialog, Button } from "@heroui/react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import DashboardPageHeader from "@/components/Dashboard/common/DashboardPageHeader";
 import {
   FaSpinner,
   FaUserCircle,
   FaChalkboardTeacher,
   FaUser,
 } from "react-icons/fa";
+import { MdOutlineManageAccounts } from "react-icons/md";
 import { getAllTrainer } from "@/lib/api/getTrainerApplication";
 import { authClient } from "@/lib/auth-client";
 import { setUserRole } from "@/lib/api/getAllUsers";
@@ -98,51 +100,53 @@ const ManageTrainers = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="space-y-6 px-4 sm:px-0"
+      transition={{ duration: 0.3 }}
+      className="w-full space-y-6 pb-12 text-left"
     >
-      {/* Header */}
-      <div>
-        <h1 className="font-['Outfit'] text-3xl md:text-4xl font-bold text-foreground tracking-wide">
-          Manage Trainers
-        </h1>
-        <p className="font-sans text-[#535C91] dark:text-[#9290C3] mt-1">
-          {trainers.length} Active {trainers.length === 1 ? "Trainer" : "Trainers"} on the platform
-        </p>
-      </div>
+      {/* Header matching Overview */}
+      <DashboardPageHeader
+        icon={MdOutlineManageAccounts}
+        title="Manage Trainers"
+        subtitle={`${trainers.length} Active ${trainers.length === 1 ? "Trainer" : "Trainers"} on the FlexPulse platform`}
+        badges={[
+          <span key="badge" className="text-active font-semibold">
+            Certified Coaching Faculty
+          </span>,
+        ]}
+      />
 
       {trainers.length === 0 ? (
-        <div className="bg-white dark:bg-brand-800/20 rounded-2xl p-14 text-center shadow-card border border-brand-500/15 dark:border-brand-500/20">
+        <div className="bg-white dark:bg-[#070F2B] rounded-2xl p-12 text-center shadow-xs border border-brand-500/15">
           <FaChalkboardTeacher className="mx-auto text-5xl text-active mb-4" />
-          <h3 className="text-foreground font-bold text-lg">
+          <h3 className="text-foreground font-['Outfit'] font-bold text-lg">
             No Trainers Found
           </h3>
-          <p className="text-[#535C91] dark:text-[#9290C3] mt-2 text-sm">
+          <p className="text-[#535C91] dark:text-[#9290C3] mt-2 text-xs font-['Inter']">
             There are currently no active trainers.
           </p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-brand-800/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/20 overflow-hidden">
+        <div className="bg-white dark:bg-[#070F2B] rounded-2xl shadow-xs border border-brand-500/15 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left font-sans text-sm">
-              <thead className="bg-brand-500/10 text-[#535C91] dark:text-[#9290C3]">
+            <table className="w-full text-left font-['Inter'] text-sm">
+              <thead className="bg-black/5 dark:bg-white/5 border-b border-brand-500/15 text-[#535C91] dark:text-[#9290C3] uppercase tracking-wider font-['Outfit'] text-[11px] font-bold">
                 <tr>
-                  <th className="px-6 py-4 font-semibold">Trainer</th>
-                  <th className="px-6 py-4 font-semibold">Email</th>
-                  <th className="px-6 py-4 font-semibold">Specialty</th>
-                  <th className="px-6 py-4 font-semibold">Classes</th>
-                  <th className="px-6 py-4 font-semibold">Joined</th>
-                  <th className="px-6 py-4 text-right font-semibold">Action</th>
+                  <th className="px-6 py-4">Trainer</th>
+                  <th className="px-6 py-4">Email</th>
+                  <th className="px-6 py-4">Specialty</th>
+                  <th className="px-6 py-4">Classes</th>
+                  <th className="px-6 py-4">Joined</th>
+                  <th className="px-6 py-4 text-right">Action</th>
                 </tr>
               </thead>
 
-              <tbody>
+              <tbody className="divide-y divide-brand-500/10">
                 {trainers.map((trainer) => (
                   <tr
                     key={trainer._id}
-                    className="border-b border-brand-500/10 hover:bg-brand-500/5 transition-colors"
+                    className="hover:bg-black/2 dark:hover:bg-white/2 transition-colors"
                   >
                     {/* Trainer */}
                     <td className="px-6 py-5">
