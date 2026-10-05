@@ -7,12 +7,14 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import DashboardPageHeader from "@/components/Dashboard/common/DashboardPageHeader";
 import {
   FaCheck,
   FaSearch,
   FaSpinner,
   FaTimes,
   FaUserCircle,
+  FaUsers,
 } from "react-icons/fa";
 
 export default function ManageUsersPage() {
@@ -150,63 +152,64 @@ export default function ManageUsersPage() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="space-y-6 px-4 sm:px-0"
+      transition={{ duration: 0.3 }}
+      className="w-full space-y-6 pb-12 text-left"
     >
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="font-['Outfit'] text-3xl md:text-4xl font-bold text-foreground tracking-wide">
-            Manage Users
-          </h1>
-          <p className="font-['Inter'] text-[#535C91] dark:text-[#9290C3] mt-1">
-            {filteredUsers.length}{" "}
-            {filteredUsers.length === 1 ? "user" : "users"} found
-          </p>
-        </div>
-        <div className="relative max-w-sm w-full sm:w-64">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <FaSearch className="h-4 w-4 text-[#535C91] dark:text-[#9290C3]" />
+      {/* Header matching Overview */}
+      <DashboardPageHeader
+        icon={FaUsers}
+        title="Manage Users"
+        subtitle={`${filteredUsers.length} ${filteredUsers.length === 1 ? "user" : "users"} registered on the platform`}
+        badges={[
+          <span key="badge" className="text-active font-semibold">
+            User Directory & Roles
+          </span>,
+        ]}
+        actions={
+          <div className="relative w-full sm:w-72">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+              <FaSearch className="h-3.5 w-3.5 text-[#535C91] dark:text-[#9290C3]" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search by name or email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2.5 bg-black/5 dark:bg-white/5 border border-brand-500/15 focus:border-active rounded-xl text-foreground font-['Inter'] text-xs focus:outline-none"
+            />
           </div>
-          <input
-            type="text"
-            placeholder="Search by name or email..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-brand-800/10 border border-brand-500/15 dark:border-brand-500/30 rounded-lg text-foreground placeholder-[#535C91]/50 dark:placeholder-[#9290C3]/50 focus:outline-none focus:border-active focus:ring-1 focus:ring-active font-['Inter'] text-sm"
-          />
-        </div>
-      </div>
+        }
+      />
 
       {/* Table */}
       {filteredUsers.length === 0 ? (
-        <div className="bg-white dark:bg-brand-800/20 rounded-xl p-12 text-center shadow-sm border border-brand-500/15 dark:border-brand-500/20">
+        <div className="bg-white dark:bg-[#070F2B] rounded-2xl p-12 text-center shadow-xs border border-brand-500/15">
           <p className="text-[#535C91] dark:text-[#9290C3] font-['Inter']">
             No users found.
           </p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-brand-800/20 rounded-xl shadow-sm border border-brand-500/15 dark:border-brand-500/20 overflow-hidden">
+        <div className="bg-white dark:bg-[#070F2B] rounded-2xl border border-brand-500/15 shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left font-['Inter'] text-sm">
-              <thead className="bg-brand-500/10 text-[#535C91] dark:text-[#9290C3]">
+              <thead className="bg-black/5 dark:bg-white/5 border-b border-brand-500/15 text-[#535C91] dark:text-[#9290C3] uppercase tracking-wider font-['Outfit'] text-[11px] font-bold">
                 <tr>
-                  <th className="py-3 px-4 font-semibold">User</th>
-                  <th className="py-3 px-4 font-semibold">Email</th>
-                  <th className="py-3 px-4 font-semibold">Role</th>
-                  <th className="py-3 px-4 font-semibold">Status</th>
-                  <th className="py-3 px-4 font-semibold text-right">
+                  <th className="py-3.5 px-5 font-semibold">User</th>
+                  <th className="py-3.5 px-5 font-semibold">Email</th>
+                  <th className="py-3.5 px-5 font-semibold">Role</th>
+                  <th className="py-3.5 px-5 font-semibold">Status</th>
+                  <th className="py-3.5 px-5 font-semibold text-right">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-brand-500/10">
                 {filteredUsers.map((user) => (
                   <tr
                     key={user._id}
-                    className="border-b border-brand-500/10 dark:border-brand-800/40 hover:bg-brand-50/5 dark:hover:bg-brand-500/5 transition-colors"
+                    className="hover:bg-black/2 dark:hover:bg-white/2 transition-colors"
                   >
                     {/* User */}
                     <td className="py-4 px-4">
