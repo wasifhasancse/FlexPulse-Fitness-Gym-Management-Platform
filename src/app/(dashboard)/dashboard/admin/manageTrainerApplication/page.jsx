@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import DashboardPageHeader from "@/components/Dashboard/common/DashboardPageHeader";
 import {
   FaSpinner,
   FaEye,
@@ -13,6 +14,7 @@ import {
   FaTag,
   FaClock,
 } from "react-icons/fa";
+import { LuFileUser } from "react-icons/lu";
 import { authClient } from "@/lib/auth-client";
 import {
   getAllTrainerApplication,
@@ -144,45 +146,47 @@ const ManageTrainerApplication = () => {
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="space-y-6 px-4 sm:px-0"
+        transition={{ duration: 0.3 }}
+        className="w-full space-y-6 pb-12 text-left"
       >
-        {/* Header */}
-        <div>
-          <h1 className="font-['Outfit'] text-3xl md:text-4xl font-bold text-foreground tracking-wide">
-            Applied Trainers
-          </h1>
-          <p className="font-sans text-[#535C91] dark:text-[#9290C3] mt-1">
-            {pendingCount} pending {pendingCount === 1 ? "application" : "applications"}
-          </p>
-        </div>
+        {/* Header matching Overview */}
+        <DashboardPageHeader
+          icon={LuFileUser}
+          title="Applied Trainers"
+          subtitle={`${pendingCount} pending ${pendingCount === 1 ? "application" : "applications"} awaiting administrative review`}
+          badges={[
+            <span key="badge" className="text-active font-semibold">
+              Coach Admissions Queue
+            </span>,
+          ]}
+        />
 
         {pendingCount === 0 ? (
-          <div className="bg-white dark:bg-brand-800/20 rounded-2xl p-12 text-center shadow-card border border-brand-500/15 dark:border-brand-500/20">
-            <p className="text-[#535C91] dark:text-[#9290C3] font-sans">
+          <div className="bg-white dark:bg-[#070F2B] rounded-2xl p-12 text-center shadow-xs border border-brand-500/15">
+            <p className="text-[#535C91] dark:text-[#9290C3] font-['Inter'] text-sm">
               No pending trainer applications.
             </p>
           </div>
         ) : (
-          <div className="bg-white dark:bg-brand-800/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/20 overflow-hidden">
+          <div className="bg-white dark:bg-[#070F2B] rounded-2xl shadow-xs border border-brand-500/15 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left font-sans text-sm">
-                <thead className="bg-brand-500/10 text-[#535C91] dark:text-[#9290C3]">
+              <table className="w-full text-left font-['Inter'] text-sm">
+                <thead className="bg-black/5 dark:bg-white/5 border-b border-brand-500/15 text-[#535C91] dark:text-[#9290C3] uppercase tracking-wider font-['Outfit'] text-[11px] font-bold">
                   <tr>
-                    <th className="py-3.5 px-6 font-semibold">Applicant</th>
-                    <th className="py-3.5 px-6 font-semibold">Specialty</th>
-                    <th className="py-3.5 px-6 font-semibold">Experience</th>
-                    <th className="py-3.5 px-6 font-semibold">Applied At</th>
-                    <th className="py-3.5 px-6 font-semibold text-right">Action</th>
+                    <th className="py-4 px-6">Applicant</th>
+                    <th className="py-4 px-6">Specialty</th>
+                    <th className="py-4 px-6">Experience</th>
+                    <th className="py-4 px-6">Applied At</th>
+                    <th className="py-4 px-6 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-brand-500/10">
                   {pendingApplications.map((app) => (
                     <tr
                       key={app._id}
-                      className="border-b border-brand-500/10 hover:bg-brand-500/5 transition-colors"
+                      className="hover:bg-black/2 dark:hover:bg-white/2 transition-colors"
                     >
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
@@ -241,7 +245,7 @@ const ManageTrainerApplication = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2 }}
-            className="bg-background rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-brand-500/20 max-h-[90vh] overflow-y-auto"
+            className="bg-white dark:bg-[#070F2B] rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-brand-500/20 max-h-[90vh] overflow-y-auto"
           >
             <h2 className="font-['Outfit'] text-2xl font-bold text-foreground mb-4">
               Application Details
@@ -249,7 +253,7 @@ const ManageTrainerApplication = () => {
 
             <div className="space-y-5">
               {/* Applicant info */}
-              <div className="flex items-center gap-3 bg-brand-500/5 p-4 rounded-xl border border-brand-500/10">
+              <div className="flex items-center gap-3 bg-black/5 dark:bg-white/5 p-4 rounded-xl border border-brand-500/10">
                 {selectedApp.userImage ? (
                   <Image
                     width={48}
@@ -262,7 +266,7 @@ const ManageTrainerApplication = () => {
                   <FaUserCircle className="w-12 h-12 text-active shrink-0" />
                 )}
                 <div>
-                  <p className="font-sans font-bold text-foreground">
+                  <p className="font-['Outfit'] font-bold text-foreground">
                     {selectedApp.userName}
                   </p>
                   <p className="text-sm text-[#535C91] dark:text-[#9290C3] mt-0.5">
@@ -272,7 +276,7 @@ const ManageTrainerApplication = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="bg-brand-500/5 p-3 rounded-xl border border-brand-500/10">
+                <div className="bg-black/5 dark:bg-white/5 p-3 rounded-xl border border-brand-500/10">
                   <p className="text-[#535C91] dark:text-[#9290C3] text-xs flex items-center gap-1.5 font-bold uppercase tracking-wider mb-1">
                     <FaTag className="w-3.5 h-3.5 text-active" />
                     Specialty
@@ -281,7 +285,7 @@ const ManageTrainerApplication = () => {
                     {selectedApp.specialty}
                   </p>
                 </div>
-                <div className="bg-brand-500/5 p-3 rounded-xl border border-brand-500/10">
+                <div className="bg-black/5 dark:bg-white/5 p-3 rounded-xl border border-brand-500/10">
                   <p className="text-[#535C91] dark:text-[#9290C3] text-xs flex items-center gap-1.5 font-bold uppercase tracking-wider mb-1">
                     <FaCalendarAlt className="w-3.5 h-3.5 text-active" />
                     Experience
@@ -292,7 +296,7 @@ const ManageTrainerApplication = () => {
                 </div>
               </div>
 
-              <div className="bg-brand-500/5 p-3.5 rounded-xl border border-brand-500/10 text-sm">
+              <div className="bg-black/5 dark:bg-white/5 p-3.5 rounded-xl border border-brand-500/10 text-sm">
                 <p className="text-[#535C91] dark:text-[#9290C3] text-xs flex items-center gap-1.5 font-bold uppercase tracking-wider mb-1">
                   <FaClock className="w-3.5 h-3.5 text-active" />
                   Applied At
@@ -303,12 +307,12 @@ const ManageTrainerApplication = () => {
               </div>
 
               {/* Bio */}
-              <div className="bg-brand-500/5 p-4 rounded-xl border border-brand-500/10 text-sm">
+              <div className="bg-black/5 dark:bg-white/5 p-4 rounded-xl border border-brand-500/10 text-sm">
                 <p className="text-[#535C91] dark:text-[#9290C3] text-xs flex items-center gap-1.5 font-bold uppercase tracking-wider mb-1.5">
                   <FaTag className="w-3.5 h-3.5 text-active" />
                   Professional Bio
                 </p>
-                <p className="text-foreground leading-relaxed font-sans">
+                <p className="text-foreground leading-relaxed font-['Inter'] text-xs">
                   {selectedApp.bio || "No bio description provided."}
                 </p>
               </div>
@@ -317,7 +321,7 @@ const ManageTrainerApplication = () => {
               <div>
                 <label
                   htmlFor="feedback"
-                  className="block font-sans text-sm font-bold text-foreground mb-2"
+                  className="block font-['Outfit'] text-sm font-bold text-foreground mb-2"
                 >
                   Feedback Message
                 </label>
@@ -327,7 +331,7 @@ const ManageTrainerApplication = () => {
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
                   placeholder="Provide feedback for the applicant (mandatory if rejecting)..."
-                  className="w-full px-4 py-3 bg-brand-50/5 dark:bg-brand-800/40 border border-brand-500/20 dark:border-brand-500/30 rounded-xl text-foreground placeholder-[#535C91]/50 dark:placeholder-[#9290C3]/50 focus:outline-none focus:border-active focus:ring-1 focus:ring-active transition-all font-sans text-sm resize-none shadow-inner"
+                  className="w-full px-4 py-3 bg-black/5 dark:bg-white/5 border border-brand-500/20 rounded-xl text-foreground placeholder-[#535C91]/60 dark:placeholder-[#9290C3]/60 focus:outline-none focus:border-active transition-all font-['Inter'] text-sm resize-none"
                 />
               </div>
 
