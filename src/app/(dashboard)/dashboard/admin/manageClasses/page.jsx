@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import DashboardPageHeader from "@/components/Dashboard/common/DashboardPageHeader";
 import {
   FaSpinner,
   FaCheck,
@@ -12,6 +13,7 @@ import {
   FaDollarSign,
   FaTag,
 } from "react-icons/fa";
+import { SiGoogleclassroom } from "react-icons/si";
 import {
   getAdminAllClasses,
   approveClassByAdmin,
@@ -161,50 +163,51 @@ const ManageClasses = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="space-y-6 px-4 sm:px-0"
+      transition={{ duration: 0.3 }}
+      className="w-full space-y-6 pb-12 text-left"
     >
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="font-['Outfit'] text-3xl md:text-4xl font-bold text-foreground tracking-wide">
-            Manage Classes
-          </h1>
-          <p className="font-sans text-[#535C91] dark:text-[#9290C3] mt-1">
-            {classes.length} total classes · {pendingCount} pending · {approvedCount} approved
-          </p>
-        </div>
-      </div>
+      {/* Header matching Overview */}
+      <DashboardPageHeader
+        icon={SiGoogleclassroom}
+        title="Manage Classes"
+        subtitle={`${classes.length} total classes · ${pendingCount} pending · ${approvedCount} approved`}
+        badges={[
+          <span key="badge" className="text-active font-semibold">
+            Platform Master Schedule
+          </span>,
+        ]}
+      />
 
       {classes.length === 0 ? (
-        <div className="bg-white dark:bg-brand-800/20 rounded-2xl p-12 text-center shadow-card border border-brand-500/15 dark:border-brand-500/20">
-          <p className="text-[#535C91] dark:text-[#9290C3] font-sans">
+        <div className="bg-white dark:bg-[#070F2B] rounded-2xl p-12 text-center shadow-xs border border-brand-500/15">
+          <p className="text-[#535C91] dark:text-[#9290C3] font-['Inter'] text-sm">
             No classes found.
           </p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-brand-800/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/20 overflow-hidden">
+        <div className="bg-white dark:bg-[#070F2B] rounded-2xl shadow-xs border border-brand-500/15 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left font-sans text-sm">
-              <thead className="bg-brand-500/10 text-[#535C91] dark:text-[#9290C3]">
+            <table className="w-full text-left font-['Inter'] text-sm">
+              <thead className="bg-black/5 dark:bg-white/5 border-b border-brand-500/15 text-[#535C91] dark:text-[#9290C3] uppercase tracking-wider font-['Outfit'] text-[11px] font-bold">
                 <tr>
-                  <th className="py-3.5 px-6 font-semibold">Image</th>
-                  <th className="py-3.5 px-6 font-semibold">Class Name</th>
-                  <th className="py-3.5 px-6 font-semibold">Trainer</th>
-                  <th className="py-3.5 px-6 font-semibold">Category</th>
-                  <th className="py-3.5 px-6 font-semibold">Price</th>
-                  <th className="py-3.5 px-6 font-semibold">Status</th>
-                  <th className="py-3.5 px-6 font-semibold text-right">Actions</th>
+                  <th className="py-4 px-6">Image</th>
+                  <th className="py-4 px-6">Class Name</th>
+                  <th className="py-4 px-6">Trainer</th>
+                  <th className="py-4 px-6">Category</th>
+                  <th className="py-4 px-6">Price</th>
+                  <th className="py-4 px-6">Status</th>
+                  <th className="py-4 px-6 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-brand-500/10">
                 {classes.map((cls) => (
                   <tr
                     key={cls._id}
-                    className="border-b border-brand-500/10 hover:bg-brand-500/5 transition-colors"
+                    className="hover:bg-black/2 dark:hover:bg-white/2 transition-colors"
                   >
-                    <td className="py-3.5 px-6">
+                    <td className="py-4 px-6">
                       {cls.classImage ? (
                         <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-brand-500/5 border border-brand-500/10 shrink-0">
                           <Image
