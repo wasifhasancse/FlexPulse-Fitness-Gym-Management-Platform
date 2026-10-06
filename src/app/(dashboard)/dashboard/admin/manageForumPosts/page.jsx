@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import DashboardPageHeader from "@/components/Dashboard/common/DashboardPageHeader";
 import {
   FaCheck,
   FaEdit,
@@ -26,6 +27,7 @@ import {
   FaTrash,
   FaUser,
 } from "react-icons/fa";
+import { MdOutlineManageSearch } from "react-icons/md";
 
 const ManageForumPosts = () => {
   const [posts, setPosts] = useState([]);
@@ -177,30 +179,29 @@ const ManageForumPosts = () => {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="space-y-6 pb-12"
+      className="w-full space-y-6 pb-12 text-left"
     >
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-[#070F2B] p-5 sm:p-6 rounded-2xl border border-brand-500/15 shadow-xs">
-        <div>
-          <h1 className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground tracking-tight flex items-center gap-2.5">
-            <FaFileAlt className="text-active w-6 h-6" />
-            <span>Forum Moderation & Articles</span>
-          </h1>
-          <p className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3] mt-1">
-            {posts.length} {posts.length === 1 ? "article" : "articles"} registered
-            across members, trainers, and administrators
-          </p>
-        </div>
-
-        <button
-          onClick={handleCreateNew}
-          className="relative overflow-hidden inline-flex items-center gap-2 px-5 py-2.5 bg-btn-bg text-btn-text text-xs font-['Outfit'] font-extrabold rounded-xl shadow-xs hover:shadow-md hover:brightness-105 active:scale-95 transition-all duration-200 border border-white/20 group cursor-pointer"
-        >
-          <span className="absolute inset-0 w-1/2 h-full bg-linear-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-[250%] transition-transform duration-700 pointer-events-none" />
-          <FaPlus className="w-3.5 h-3.5 text-btn-text" />
-          <span>New Community Post</span>
-        </button>
-      </div>
+      {/* Top Header matching Overview */}
+      <DashboardPageHeader
+        icon={MdOutlineManageSearch}
+        title="Forum Moderation & Articles"
+        subtitle={`${posts.length} ${posts.length === 1 ? "article" : "articles"} registered across members, trainers, and administrators`}
+        badges={[
+          <span key="badge" className="text-active font-semibold">
+            Central Knowledge Base
+          </span>,
+        ]}
+        actions={
+          <button
+            onClick={handleCreateNew}
+            className="relative overflow-hidden inline-flex items-center gap-2 px-5 py-2.5 bg-btn-bg text-btn-text text-xs font-['Outfit'] font-extrabold rounded-xl shadow-xs hover:shadow-md hover:brightness-105 active:scale-95 transition-all duration-200 border border-white/20 group cursor-pointer"
+          >
+            <span className="absolute inset-0 w-1/2 h-full bg-linear-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-[250%] transition-transform duration-700 pointer-events-none" />
+            <FaPlus className="w-3.5 h-3.5 text-btn-text" />
+            <span>New Community Post</span>
+          </button>
+        }
+      />
 
       {/* Filter and Search Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white dark:bg-[#070F2B] p-4 rounded-2xl border border-brand-500/15 shadow-xs">
