@@ -8,7 +8,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import DashboardPageHeader from "@/components/Dashboard/common/DashboardPageHeader";
 import { FaArrowLeft, FaImage, FaPencilAlt, FaTimes } from "react-icons/fa";
+import { MdPostAdd } from "react-icons/md";
 
 const AddAdminForumPost = () => {
   const [title, setTitle] = useState("");
@@ -73,35 +75,34 @@ const AddAdminForumPost = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300 flex items-center justify-center">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-2xl bg-white dark:bg-brand-800/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/30 p-6 md:p-8"
-      >
-        {/* Back button */}
-        <div className="mb-6">
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="w-full space-y-6 pb-12 text-left"
+    >
+      {/* Header matching Overview */}
+      <DashboardPageHeader
+        icon={MdPostAdd}
+        title="Create New Post"
+        subtitle="Publish announcements, editorial guides, or official platform notices to the community."
+        badges={[
+          <span key="badge" className="text-active font-semibold">
+            Administrative Editorial
+          </span>,
+        ]}
+        actions={
           <Link
-            href="/forum"
-            className="inline-flex items-center gap-2 text-[#535C91] dark:text-[#9290C3] hover:text-active transition-colors font-['Inter'] text-sm"
+            href="/dashboard/admin/manageForumPosts"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-brand-500/15 hover:border-active/50 text-[#535C91] dark:text-[#9290C3] hover:text-foreground text-xs font-['Inter'] font-bold transition-all shadow-xs"
           >
-            <FaArrowLeft className="w-4 h-4" />
-            Back to Forum
+            <FaArrowLeft className="w-3 h-3" />
+            <span>Back to Manage Forum</span>
           </Link>
-        </div>
+        }
+      />
 
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="font-['Outfit'] text-3xl font-bold text-foreground">
-            Create New Post
-          </h1>
-          <p className="font-['Inter'] text-[#535C91] dark:text-[#9290C3] mt-1">
-            Share your fitness insights, tips, or success story with the
-            community.
-          </p>
-        </div>
-
+      <div className="w-full bg-white dark:bg-[#070F2B] rounded-2xl shadow-xs border border-brand-500/15 p-6 md:p-8">
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Post Title */}
@@ -228,8 +229,8 @@ const AddAdminForumPost = () => {
             </Link>
           </div>
         </form>
-      </motion.div>
-    </div>
+      </div>
+    </motion.div>
   );
 };
 export default AddAdminForumPost;
