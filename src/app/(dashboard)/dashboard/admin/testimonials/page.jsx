@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import DashboardPageHeader from "@/components/Dashboard/common/DashboardPageHeader";
 import {
   FaCheck,
   FaCheckCircle,
@@ -22,6 +23,7 @@ import {
   FaFilter,
   FaHourglassHalf,
   FaQuoteLeft,
+  FaQuoteRight,
   FaSearch,
   FaSpinner,
   FaStar,
@@ -131,31 +133,27 @@ export default function AdminTestimonialsManagePage() {
   const approvedCount = testimonials.filter((t) => t.status === "approved").length;
 
   return (
-    <div className="w-full space-y-6 sm:space-y-8">
-      {/* 1. Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-brand-500/15">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-active/10 border border-active/20 text-active text-xs font-extrabold uppercase tracking-wider mb-2">
-            <FaQuoteLeft className="w-3 h-3" />
-            <span>Admin Authority Hub</span>
-          </div>
-          <h1 className="font-['Outfit'] font-black text-2xl sm:text-3xl lg:text-4xl text-foreground tracking-tight">
-            Manage Athlete <span className="text-active">Testimonials</span>
-          </h1>
-          <p className="font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3] mt-1 max-w-2xl">
-            Control verified member transformations, moderate incoming submissions, and curate
-            the Homepage &ldquo;Member Voices&rdquo; spotlight.
-          </p>
-        </div>
-
-        <Link
-          href="/#testimonials"
-          className="px-4 py-3 rounded-2xl bg-white dark:bg-[#070F2B] border border-brand-500/15 hover:border-active/50 text-[#535C91] dark:text-[#9290C3] hover:text-foreground dark:hover:text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-xs cursor-pointer"
-        >
-          <FaExternalLinkAlt className="w-3 h-3" />
-          <span>View Live Section</span>
-        </Link>
-      </div>
+    <div className="w-full space-y-6 pb-12 text-left">
+      {/* 1. Header Banner matching Overview */}
+      <DashboardPageHeader
+        icon={FaQuoteRight}
+        title="Manage Athlete Testimonials"
+        subtitle="Control verified member transformations, moderate incoming submissions, and curate the Homepage showcase."
+        badges={[
+          <span key="badge" className="text-active font-semibold">
+            Admin Authority Hub
+          </span>,
+        ]}
+        actions={
+          <Link
+            href="/#testimonials"
+            className="px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-brand-500/15 hover:border-active/50 text-[#535C91] dark:text-[#9290C3] hover:text-foreground text-xs font-['Inter'] font-bold transition-all flex items-center gap-2 shadow-xs cursor-pointer"
+          >
+            <FaExternalLinkAlt className="w-3 h-3" />
+            <span>View Live Section</span>
+          </Link>
+        }
+      />
 
       {/* 2. Overview Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
