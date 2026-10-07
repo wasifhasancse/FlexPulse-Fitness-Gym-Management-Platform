@@ -9,8 +9,10 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import DashboardPageHeader from "@/components/Dashboard/common/DashboardPageHeader";
 import {
   FaCalendarAlt,
+  FaChalkboardTeacher,
   FaClock,
   FaEye,
   FaPlus,
@@ -132,66 +134,67 @@ export default function MyClassesPage() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="max-w-6xl mx-auto space-y-6 px-4 sm:px-0"
+      transition={{ duration: 0.3 }}
+      className="w-full space-y-6 pb-12 text-left"
     >
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="font-['Outfit'] text-3xl md:text-4xl font-bold text-foreground">
-            My Managed Classes
-          </h1>
-          <p className="font-['Inter'] text-[#535C91] dark:text-[#9290C3] mt-1">
-            {activeClasses} Active Sessions · {totalEnrollments} Total
-            Enrollments · Updated just now
-          </p>
-        </div>
-        <Link
-          href="/dashboard/trainer/add-class"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-btn-bg text-btn-text font-['Inter'] font-semibold rounded-xl hover:opacity-90 transition-colors shadow-sm hover:shadow-md whitespace-nowrap border border-brand-500/20"
-        >
-          <FaPlus className="w-4 h-4" />
-          Create New Class
-        </Link>
-      </div>
+      {/* Header matching Overview */}
+      <DashboardPageHeader
+        icon={FaChalkboardTeacher}
+        title="My Managed Classes"
+        subtitle={`${activeClasses} Active Sessions · ${totalEnrollments} Total Enrollments · Real-time Roster`}
+        badges={[
+          <span key="badge" className="text-active font-semibold">
+            Coaching Curriculum
+          </span>,
+        ]}
+        actions={
+          <Link
+            href="/dashboard/trainer/add-class"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-btn-bg text-btn-text font-['Outfit'] font-extrabold text-xs rounded-xl shadow-xs hover:shadow-md hover:brightness-105 active:scale-95 transition-all whitespace-nowrap"
+          >
+            <FaPlus className="w-3.5 h-3.5" />
+            <span>Create New Class</span>
+          </Link>
+        }
+      />
 
       {/* Table */}
       {classes.length === 0 ? (
-        <div className="bg-white dark:bg-brand-800/20 rounded-2xl p-12 text-center shadow-card border border-brand-500/15 dark:border-brand-500/20">
-          <p className="font-['Inter'] text-[#535C91] dark:text-[#9290C3] mb-4">
+        <div className="bg-white dark:bg-[#070F2B] rounded-2xl p-12 text-center shadow-xs border border-brand-500/15">
+          <p className="font-['Inter'] text-[#535C91] dark:text-[#9290C3] mb-4 text-sm">
             You haven&apos;t created any classes yet.
           </p>
           <Link
             href="/dashboard/trainer/add-class"
-            className="inline-block px-5 py-2.5 bg-btn-bg text-btn-text font-['Inter'] font-semibold rounded-xl hover:opacity-90 transition-colors shadow-sm"
+            className="inline-block px-5 py-2.5 bg-btn-bg text-btn-text font-['Outfit'] font-bold text-xs rounded-xl hover:opacity-90 transition-all shadow-xs"
           >
             Create Your First Class
           </Link>
         </div>
       ) : (
-        <div className="bg-white dark:bg-brand-800/20 rounded-2xl shadow-card border border-brand-500/15 dark:border-brand-500/20 overflow-hidden">
+        <div className="bg-white dark:bg-[#070F2B] rounded-2xl shadow-xs border border-brand-500/15 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left font-['Inter'] text-sm">
-              <thead className="bg-brand-500/10 text-[#535C91] dark:text-[#9290C3]">
+              <thead className="bg-black/5 dark:bg-white/5 border-b border-brand-500/15 text-[#535C91] dark:text-[#9290C3] uppercase tracking-wider font-['Outfit'] text-[11px] font-bold">
                 <tr>
-                  <th className="py-3.5 px-6 font-semibold">Image</th>
-                  <th className="py-3.5 px-6 font-semibold">Class Name</th>
-                  <th className="py-3.5 px-6 font-semibold">Date & Time</th>
-                  <th className="py-3.5 px-6 font-semibold">Price</th>
-                  <th className="py-3.5 px-6 font-semibold">Bookings</th>
-                  <th className="py-3.5 px-6 font-semibold">Status</th>
-                  <th className="py-3.5 px-6 font-semibold text-right">
+                  <th className="py-4 px-6">Image</th>
+                  <th className="py-4 px-6">Class Name</th>
+                  <th className="py-4 px-6">Date & Time</th>
+                  <th className="py-4 px-6">Price</th>
+                  <th className="py-4 px-6">Bookings</th>
+                  <th className="py-4 px-6">Status</th>
+                  <th className="py-4 px-6 text-right">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-brand-500/10">
                 {classes.map((cls) => (
                   <tr
                     key={cls._id}
-                    className="border-b border-brand-500/10 dark:border-brand-800/40 hover:bg-brand-500/5 transition-colors"
+                    className="hover:bg-black/2 dark:hover:bg-white/2 transition-colors"
                   >
                     {/* Image */}
                     <td className="py-3 px-6">
