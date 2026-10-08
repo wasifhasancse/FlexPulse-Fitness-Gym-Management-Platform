@@ -7,7 +7,10 @@ import { toast } from "@heroui/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
+import DashboardPageHeader from "@/components/Dashboard/common/DashboardPageHeader";
+import Link from "next/link";
 import {
+    FaArrowLeft,
     FaCalendarAlt,
     FaClock,
     FaDollarSign,
@@ -79,7 +82,7 @@ export default function AddClassPage() {
       authorName: user.name,
       authorImage: user.image,
       authorEmail: user.email,
-      status: "panding",
+      status: "pending",
     };
     try {
       const addClass = await createClasses(formData);
@@ -89,31 +92,40 @@ export default function AddClassPage() {
       }
     } catch (error) {
       console.error(error);
-      toast.danger("Faild to add class");
+      toast.danger("Failed to add class");
     }
   };
 
   return (
-    <div className="w-full bg-white dark:bg-brand-800/20 h-full p-6 md:p-8 rounded-2xl border border-brand-500/10 dark:border-brand-500/20 shadow-card">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        {/* Header */}
-        <div className="mb-8 font-sans">
-          <h1 className="font-['Outfit'] text-3xl font-bold text-foreground">
-            Trainer Dashboard
-          </h1>
-          <p className="text-[#535C91] dark:text-[#9290C3] font-medium mt-1">
-            Welcome back, Trainer!
-          </p>
-          <h2 className="text-xl font-bold text-active mt-4">
-            Add New Class
-          </h2>
-        </div>
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="w-full space-y-6 pb-12 text-left"
+    >
+      {/* Header matching Overview */}
+      <DashboardPageHeader
+        icon={FaDumbbell}
+        title="Add New Class"
+        subtitle="Create, configure, and publish a premium athletic session for FlexPulse athletes."
+        badges={[
+          <span key="badge" className="text-active font-semibold">
+            Session Creator
+          </span>,
+        ]}
+        actions={
+          <Link
+            href="/dashboard/trainer/my-classes"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-brand-500/15 hover:border-active/50 text-[#535C91] dark:text-[#9290C3] hover:text-foreground text-xs font-['Inter'] font-bold transition-all shadow-xs"
+          >
+            <FaArrowLeft className="w-3 h-3" />
+            <span>Back to My Classes</span>
+          </Link>
+        }
+      />
 
-        {/* Form */}
+      {/* Form Container */}
+      <div className="w-full bg-white dark:bg-[#070F2B] p-6 md:p-8 rounded-2xl border border-brand-500/15 shadow-xs">
         <form onSubmit={handleSubmit} className="space-y-6 font-sans">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Left column */}
@@ -381,7 +393,7 @@ export default function AddClassPage() {
             </button>
           </div>
         </form>
-      </motion.div>
-    </div>
+      </div>
+    </motion.div>
   );
 }
