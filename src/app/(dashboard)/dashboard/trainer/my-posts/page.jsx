@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import DashboardPageHeader from "@/components/Dashboard/common/DashboardPageHeader";
 import {
   FaCheck,
   FaCheckCircle,
@@ -30,6 +31,7 @@ import {
   FaTrash,
   FaUser,
 } from "react-icons/fa";
+import { LuGalleryHorizontalEnd } from "react-icons/lu";
 
 export default function TrainerPostsManagementPage() {
   const { data: session } = authClient.useSession();
@@ -168,28 +170,28 @@ export default function TrainerPostsManagementPage() {
   };
 
   return (
-    <div className="space-y-6 pb-12">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-[#070F2B] p-5 sm:p-6 rounded-2xl border border-brand-500/15 shadow-xs">
-        <div>
-          <h1 className="font-['Outfit'] text-2xl sm:text-3xl font-black text-foreground tracking-tight flex items-center gap-2.5">
-            <FaShieldAlt className="text-active w-6 h-6" />
-            <span>Trainer Community Hub & Moderation</span>
-          </h1>
-          <p className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3] mt-1">
-            Review and approve member questions, edit articles, and publish coaching insights
-          </p>
-        </div>
-
-        <button
-          onClick={handleCreate}
-          className="relative overflow-hidden inline-flex items-center gap-2 px-5 py-2.5 bg-btn-bg text-btn-text text-xs font-['Outfit'] font-extrabold rounded-xl shadow-xs hover:shadow-md hover:brightness-105 active:scale-95 transition-all duration-200 border border-white/20 group cursor-pointer"
-        >
-          <span className="absolute inset-0 w-1/2 h-full bg-linear-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-[250%] transition-transform duration-700 pointer-events-none" />
-          <FaPlus className="w-3.5 h-3.5 text-btn-text" />
-          <span>New Coach Article</span>
-        </button>
-      </div>
+    <div className="w-full space-y-6 pb-12 text-left">
+      {/* Header matching Overview */}
+      <DashboardPageHeader
+        icon={LuGalleryHorizontalEnd}
+        title="Trainer Community Hub & Moderation"
+        subtitle="Review and moderate member questions, edit articles, and publish coaching insights."
+        badges={[
+          <span key="badge" className="text-active font-semibold">
+            Community Editorial
+          </span>,
+        ]}
+        actions={
+          <button
+            onClick={handleCreate}
+            className="relative overflow-hidden inline-flex items-center gap-2 px-5 py-2.5 bg-btn-bg text-btn-text text-xs font-['Outfit'] font-extrabold rounded-xl shadow-xs hover:shadow-md hover:brightness-105 active:scale-95 transition-all duration-200 border border-white/20 group cursor-pointer"
+          >
+            <span className="absolute inset-0 w-1/2 h-full bg-linear-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-[250%] transition-transform duration-700 pointer-events-none" />
+            <FaPlus className="w-3.5 h-3.5 text-btn-text" />
+            <span>New Coach Article</span>
+          </button>
+        }
+      />
 
       {/* Tabs Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white dark:bg-[#070F2B] p-4 rounded-2xl border border-brand-500/15 shadow-xs">
