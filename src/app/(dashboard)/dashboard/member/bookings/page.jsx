@@ -7,7 +7,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "@heroui/react";
+import DashboardPageHeader from "@/components/Dashboard/common/DashboardPageHeader";
 import {
+  FaBook,
   FaCalendarAlt,
   FaClock,
   FaSpinner,
@@ -150,67 +152,76 @@ export default function BookingsPage() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="max-w-6xl mx-auto space-y-7 px-4 sm:px-0 pb-12"
+      transition={{ duration: 0.3 }}
+      className="w-full space-y-6 pb-12 text-left"
     >
-      {/* Header & Subscriptions Overview */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <span className="text-xs font-black uppercase tracking-widest text-active block mb-1">
-            Athlete Membership Management
-          </span>
-          <h1 className="font-['Outfit'] text-3xl md:text-4xl font-black text-foreground tracking-tight">
-            My Enrolled Classes & Subscriptions
-          </h1>
-          <p className="font-['Inter'] text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-xl">
-            View all your confirmed athletic classes. Control monthly auto-renewals with 1-click flexible cancellation.
-          </p>
-        </div>
+      {/* Header & Subscriptions Overview matching Overview layout */}
+      <DashboardPageHeader
+        icon={FaBook}
+        title="My Enrolled Classes & Subscriptions"
+        subtitle="View all your confirmed athletic classes. Control monthly auto-renewals with 1-click flexible cancellation."
+        badges={[
+          <span key="badge" className="text-active font-semibold">
+            Athlete Pass Registry
+          </span>,
+        ]}
+        actions={
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="px-3.5 py-1.5 rounded-xl bg-black/5 dark:bg-white/5 border border-brand-500/15 shadow-xs text-left">
+              <span className="text-[10px] font-bold uppercase text-[#535C91] dark:text-[#9290C3] block">
+                Total Classes
+              </span>
+              <span className="font-['Outfit'] font-black text-sm text-foreground">
+                {bookings.length}
+              </span>
+            </div>
 
-        {/* Quick Stat Badges */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="px-4 py-2 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 shadow-xs">
-            <span className="text-[10px] font-bold uppercase text-slate-400 block">Total Classes</span>
-            <span className="font-['Outfit'] font-black text-lg text-foreground">{bookings.length}</span>
-          </div>
+            <div className="px-3.5 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 shadow-xs text-left">
+              <span className="text-[10px] font-bold uppercase block">
+                Auto-Renew
+              </span>
+              <span className="font-['Outfit'] font-black text-sm">
+                {activeRenewCount} Active
+              </span>
+            </div>
 
-          <div className="px-4 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 shadow-xs">
-            <span className="text-[10px] font-bold uppercase block">Auto-Renew Active</span>
-            <span className="font-['Outfit'] font-black text-lg">{activeRenewCount}</span>
+            <div className="px-3.5 py-1.5 rounded-xl bg-black/5 dark:bg-white/5 border border-brand-500/15 text-[#535C91] dark:text-[#9290C3] shadow-xs text-left">
+              <span className="text-[10px] font-bold uppercase block">
+                Single Pass
+              </span>
+              <span className="font-['Outfit'] font-black text-sm text-foreground">
+                {singlePassCount}
+              </span>
+            </div>
           </div>
-
-          <div className="px-4 py-2 rounded-2xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 shadow-xs">
-            <span className="text-[10px] font-bold uppercase block">Single Pass</span>
-            <span className="font-['Outfit'] font-black text-lg text-foreground">{singlePassCount}</span>
-          </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* Bookings & Subscriptions Table */}
       {bookings.length === 0 ? (
-        <div className="bg-white dark:bg-[#121124] rounded-3xl p-12 text-center shadow-sm border border-slate-200 dark:border-white/10 space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-400 flex items-center justify-center mx-auto text-2xl">
+        <div className="bg-white dark:bg-[#070F2B] rounded-2xl p-12 text-center shadow-xs border border-brand-500/15 space-y-4">
+          <div className="w-16 h-16 rounded-2xl bg-black/5 dark:bg-white/5 border border-brand-500/15 text-active flex items-center justify-center mx-auto text-2xl">
             <FaDumbbell />
           </div>
           <h3 className="font-['Outfit'] text-xl font-bold text-foreground">No Enrolled Classes Found</h3>
-          <p className="font-sans text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+          <p className="font-['Inter'] text-xs text-[#535C91] dark:text-[#9290C3] max-w-md mx-auto">
             You have not booked any classes yet. Browse our curated high-performance curriculum to enroll today.
           </p>
           <Link
             href="/all-classes"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-active hover:bg-rose-600 text-white font-['Outfit'] font-black text-xs uppercase tracking-wider transition-all shadow-md shadow-active/25"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-btn-bg hover:brightness-105 text-btn-text font-['Outfit'] font-black text-xs uppercase tracking-wider transition-all shadow-xs"
           >
             <span>Explore Classes</span>
             <FiArrowRight className="w-4 h-4" />
           </Link>
         </div>
       ) : (
-        <div className="bg-white dark:bg-[#121124] rounded-3xl shadow-sm border border-slate-200 dark:border-white/10 overflow-hidden">
+        <div className="bg-white dark:bg-[#070F2B] rounded-2xl shadow-xs border border-brand-500/15 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left font-['Inter'] text-sm">
-              <thead className="bg-slate-50/80 dark:bg-white/[0.02] border-b border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-bold tracking-wider">
+              <thead className="bg-black/5 dark:bg-white/5 border-b border-brand-500/15 text-[#535C91] dark:text-[#9290C3] uppercase text-[11px] font-['Outfit'] font-bold tracking-wider">
                 <tr>
                   <th className="py-4 px-5">Class Details</th>
                   <th className="py-4 px-4">Coach</th>
@@ -219,14 +230,14 @@ export default function BookingsPage() {
                   <th className="py-4 px-5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-slate-600 dark:text-slate-300">
+              <tbody className="divide-y divide-brand-500/10 text-foreground">
                 {bookings.map((booking) => {
                   const isRenewOn = booking.autoRenew !== false;
 
                   return (
                     <tr
                       key={booking._id}
-                      className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors"
+                      className="hover:bg-black/2 dark:hover:bg-white/2 transition-colors"
                     >
                       {/* Class Image & Title */}
                       <td className="py-4 px-5">
@@ -328,7 +339,7 @@ export default function BookingsPage() {
                           {booking.sessionId && (
                             <Link
                               href={`/success?session_id=${booking.sessionId}`}
-                              className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 text-foreground text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
+                              className="px-3 py-1.5 rounded-xl border border-brand-500/15 hover:bg-black/5 dark:hover:bg-white/5 text-foreground text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
                               title="Print Official Payment Receipt"
                             >
                               <FiPrinter className="w-3.5 h-3.5 text-active" />
