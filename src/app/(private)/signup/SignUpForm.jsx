@@ -64,7 +64,7 @@ const SIGNUP_TESTIMONIALS = [
     author: "David Chen",
     role: "Marathon Runner • Executive Member",
     metric: "2:54 Marathon PB",
-    avatar: "https://lh3.googleusercontent.com/a/ACg8ocKzbEXd0N7V406ocsmdiEQkxCVV1BIJpiTn--O3W0TqjLiNy6e3=s96-c",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop",
   },
 ];
 
@@ -80,9 +80,9 @@ const PRESET_AVATARS = [
     url: "https://t4.ftcdn.net/jpg/11/66/06/77/360_F_1166067709_2SooAuPWXp20XkGev7oOT7nuK1VThCsN.jpg",
   },
   {
-    id: "wasif",
+    id: "hybrid",
     label: "Hybrid",
-    url: "https://lh3.googleusercontent.com/a/ACg8ocKzbEXd0N7V406ocsmdiEQkxCVV1BIJpiTn--O3W0TqjLiNy6e3=s96-c",
+    url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop",
   },
   {
     id: "sophie",
@@ -331,8 +331,8 @@ export default function SignUpForm() {
                         className="w-8 h-8 rounded-full object-cover ring-2 ring-[#070F2B]"
                       />
                       <Image
-                        src="https://lh3.googleusercontent.com/a/ACg8ocKzbEXd0N7V406ocsmdiEQkxCVV1BIJpiTn--O3W0TqjLiNy6e3=s96-c"
-                        alt="Wasif"
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop"
+                        alt="Member"
                         width={32}
                         height={32}
                         className="w-8 h-8 rounded-full object-cover ring-2 ring-[#070F2B]"
