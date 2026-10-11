@@ -104,8 +104,8 @@ export default function ForumFeaturedSpotlight() {
                   transition={{ type: "spring", stiffness: 160, damping: 18, delay: 0.5 }}
                 >
                   <Image
-                    src="https://lh3.googleusercontent.com/a/ACg8ocKzbEXd0N7V406ocsmdiEQkxCVV1BIJpiTn--O3W0TqjLiNy6e3=s96-c"
-                    alt="Wasif Hasan"
+                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop"
+                    alt="Featured Athlete"
                     width={34}
                     height={34}
                     className="w-8 h-8 rounded-full object-cover border-2 border-active"

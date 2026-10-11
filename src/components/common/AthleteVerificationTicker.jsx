@@ -28,7 +28,7 @@ export const DEFAULT_TESTIMONIALS = [
     author: "David Chen",
     role: "Marathon Runner • Pro Member",
     metric: "2:54 Marathon PB",
-    avatar: "https://lh3.googleusercontent.com/a/ACg8ocKzbEXd0N7V406ocsmdiEQkxCVV1BIJpiTn--O3W0TqjLiNy6e3=s96-c",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop",
   },
   {
     quote:

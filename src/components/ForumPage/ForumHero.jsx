@@ -149,8 +149,8 @@ export default function ForumHero({ totalPosts = 12 }) {
                 transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.36 }}
               >
                 <Image
-                  src="https://lh3.googleusercontent.com/a/ACg8ocKzbEXd0N7V406ocsmdiEQkxCVV1BIJpiTn--O3W0TqjLiNy6e3=s96-c"
-                  alt="Wasif"
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop"
+                  alt="Athlete"
                   width={28}
                   height={28}
                   className="inline-block h-7 w-7 rounded-full ring-2 ring-white dark:ring-slate-900 object-cover"
