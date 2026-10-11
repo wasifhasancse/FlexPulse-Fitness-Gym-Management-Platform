@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import DashboardPageHeader from "@/components/Dashboard/common/DashboardPageHeader";
 import {
   FaCheckCircle,
   FaClock,
@@ -17,6 +18,7 @@ import {
   FaHourglassHalf,
   FaPlus,
   FaQuoteLeft,
+  FaQuoteRight,
   FaSpinner,
   FaStar,
   FaTimesCircle,
@@ -96,44 +98,40 @@ export default function MemberTestimonialsPage() {
   const approvedCount = testimonials.filter((t) => t.status === "approved").length;
 
   return (
-    <div className="w-full space-y-6 sm:space-y-8">
-      {/* 1. Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-brand-500/15">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-active/10 border border-active/20 text-active text-xs font-extrabold uppercase tracking-wider mb-2">
-            <FaQuoteLeft className="w-3 h-3" />
-            <span>Member Voices • Athlete Testimonials</span>
+    <div className="w-full space-y-6 pb-12 text-left">
+      {/* 1. Header Banner matching Overview */}
+      <DashboardPageHeader
+        icon={FaQuoteRight}
+        title="My Transformation Stories"
+        subtitle="Share your evidence-based achievements, coaching breakthroughs, and training journey. Approved stories are featured on the Homepage."
+        badges={[
+          <span key="badge" className="text-active font-semibold">
+            Member Voices
+          </span>,
+        ]}
+        actions={
+          <div className="flex items-center gap-3">
+            <Link
+              href="/#testimonials"
+              className="px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-brand-500/15 hover:border-active/50 text-[#535C91] dark:text-[#9290C3] hover:text-foreground text-xs font-['Inter'] font-bold transition-all flex items-center gap-2 shadow-xs cursor-pointer"
+            >
+              <FaExternalLinkAlt className="w-3 h-3" />
+              <span>View On Homepage</span>
+            </Link>
+
+            <button
+              onClick={() => {
+                setTestimonialToEdit(null);
+                setModalOpen(true);
+              }}
+              className="px-5 py-2.5 rounded-xl bg-btn-bg text-btn-text hover:brightness-105 active:scale-95 font-['Outfit'] font-extrabold text-xs transition-all flex items-center gap-2 shadow-xs hover:shadow-md cursor-pointer"
+            >
+              <FaPlus className="w-3.5 h-3.5" />
+              <span>Submit New Testimonial</span>
+            </button>
           </div>
-          <h1 className="font-['Outfit'] font-black text-2xl sm:text-3xl lg:text-4xl text-foreground tracking-tight">
-            My Transformation <span className="text-active">Stories</span>
-          </h1>
-          <p className="font-['Inter'] text-sm text-[#535C91] dark:text-[#9290C3] mt-1 max-w-2xl">
-            Share your evidence-based achievements, coaching breakthroughs, and training journey.
-            Approved stories are featured on the FlexPulse Homepage for all athletes to see.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Link
-            href="/#testimonials"
-            className="px-4 py-3 rounded-2xl bg-white dark:bg-[#070F2B] border border-brand-500/15 hover:border-active/50 text-[#535C91] dark:text-[#9290C3] hover:text-foreground dark:hover:text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-xs cursor-pointer"
-          >
-            <FaExternalLinkAlt className="w-3 h-3" />
-            <span>View On Homepage</span>
-          </Link>
-
-          <button
-            onClick={() => {
-              setTestimonialToEdit(null);
-              setModalOpen(true);
-            }}
-            className="px-5 py-3 rounded-2xl bg-[#ff2a55] hover:opacity-90 active:scale-95 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-sm hover:shadow-md cursor-pointer"
-          >
-            <FaPlus className="w-3.5 h-3.5" />
-            <span>Submit New Testimonial</span>
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* 2. Telemetry Overview Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
